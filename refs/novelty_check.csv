@@ -1,0 +1,13 @@
+id,title,authors,year,venue,doi,threat,reason
+1,Pitfalls of Conformal Predictions for Medical Image Classification,"Mehrtens; Bucher; Brinker",2025,arXiv 2506.18162,10.1007/978-3-031-44336-7_20,medium,pitfalls framing taken; different pitfalls
+2,What Split Conformal Prediction Guarantees and What It Does Not,Aguru,2026,Zenodo,10.5281/zenodo.23582987,high,proves binary threshold >= 1/2 implies singleton or empty
+3,Adaptive Coverage Policies in Conformal Prediction,"Gauthier; Bach; Jordan",2025,arXiv 2510.04318,10.48550/arxiv.2510.04318,low-medium,empty sets known as low-coverage outcome
+4,Certified Label-Free Drift Alarms From Empty Conformal Prediction Sets,Al Bataineh,2026,IEEE Sensors Letters,10.1109/lsens.2026.3748815,low,empty sets used as a drift signal
+5,Benchmarking non-conformity score functions in conformal prediction,Boman,2026,arXiv 2605.24983,,low-medium,score comparison but no post-processing audit
+6,AdaptiveConformal: An R Package for Adaptive Conformal Inference,"Susmann; Chambaz; Josse",2023,arXiv 2312.00448,,medium,ACI implementation; check update rule
+7,Audited Conformal Prediction for Classification under Unknown Distribution Shift,"Zhou; Fathony; Nguyen; Sesia",2026,arXiv 2606.14909,10.48550/arxiv.2606.14909,low,method not implementation audit
+8,Two ways an AKI prediction model can look better than it is,"Opoku; Banahene",2026,Research Square,10.21203/rs.3.rs-10463539/v2,low-medium,marginal-only coverage; different mechanism
+9,Conformal Tradeoffs: Operational Profiles Beyond Coverage,Zwart,2026,arXiv 2602.18045,,low,decision-theoretic deployment metrics
+10,A Review of Conformal Prediction-Based Post-Processing Methods for Calibrating Prediction Intervals,"Zhan; Phan; Wu",2026,IEEE I&CPS Asia,10.1109/icpsasia70813.2026.11691987,low,post-processing means interval calibration
+11,When the Promise Is Broken: Auditing Conformal Predictions under Domain Change,Ng,2026,SSRN,10.2139/ssrn.7496318,low-medium,audit under drift not implementation
+12,Contract Cards for Auditable Private Conformal Prediction,"Indri; Tamara; Spathoulas",2026,Zenodo,10.5281/zenodo.23456635,low,audit records not measurement

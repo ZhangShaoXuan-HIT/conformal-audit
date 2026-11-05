@@ -13,6 +13,18 @@ reports the model's accuracy. The number looks like a coverage guarantee and is
 not one. Three different mistakes produce this outcome, and all three are common
 in released code.
 
+### Positioning against the closest work
+
+<!-- phase 3A. Do not claim the threshold geometry as new.
+- Aguru 2026 (Zenodo, binary): proves threshold >= 1/2 implies singleton or empty.
+  Cite it; start from the multi-class corollary and the empirical consequences.
+- Mehrtens et al. 2025 (arXiv 2506.18162): pitfalls in medical imaging, different set.
+- Gauthier, Bach & Jordan 2025 (arXiv 2510.04318): empty sets as a low-coverage outcome.
+- Al Bataineh 2026 (IEEE Sensors Letters): empty sets as a drift alarm.
+- Susmann, Chambaz & Josse 2023 (arXiv 2312.00448): AdaptiveConformal R package.
+- Avoid the word "pitfalls" in the title and abstract; use "audit" or "accounting".
+-->
+
 ## 2. The guarantee in one page (1200 words)
 
 Exchangeability, the finite-sample quantile correction, the difference between
@@ -29,17 +41,20 @@ This replaces the four-generation narrative.
 ## 4. Three implementation traps (2500 words)
 
 ### 4.1 A calibrated threshold is split conformal
+<!-- cite Aguru 2026 for the binary threshold fact; our contribution is the multi-class consequence and the equivalence in practice, not the geometry. -->
 The set {y : p_y >= 1-q} with q the conformal quantile of 1-p_true is exactly
 the naive split conformal set. The distinction is calibration, not set
 construction. Calibrating on the max probability instead of the true-class
 probability fails to reach the target.
 
 ### 4.2 Non-empty post-processing inflates coverage
+<!-- novel core. Cite Gauthier 2025 and Al Bataineh 2026 for empty sets as a known phenomenon; distinguish: they use or avoid empty sets, we measure forced non-empty reporting. -->
 Forcing the argmax into empty sets raises coverage and size. The inflation grows
 with alpha and with the empty rate. Report both raw and forced numbers.
 <!-- phase 1: mean delta 0.077, max 0.318; naive 0.041, APS rand 0.080, APS det 0.108, RAPS 0.078 -->
 
 ### 4.3 The alpha_t update is not ACI
+<!-- cite Susmann et al. 2023 (AdaptiveConformal). The update rule is not new; the audit of implementations is. -->
 ACI uses a fixed target alpha. Replacing it with alpha_t removes the
 target-tracking guarantee and can look successful by collapsing to the clip.
 <!-- phase 1, average over three schedules, gamma 0.02: fixed = 0.833 cov, 3.10 size, alpha 0.0082; buggy = 0.838 cov, 3.70 size, alpha 0.0011, near-trivial 17.3% vs 9.1%. At gamma 0.1 the buggy update diverges (seed SD 0.205). -->
