@@ -2,7 +2,7 @@
 import os, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-STEPS = ["exp_equiv.py", "make_tables.py"]
+STEPS = ["exp_equiv.py", "exp_postprocess.py", "exp_aci.py", "make_tables.py", "make_figures.py"]
 
 
 def main():

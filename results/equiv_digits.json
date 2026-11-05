@@ -8,7 +8,7 @@
   "sklearn": "1.9.1",
   "matplotlib": "3.11.2",
   "platform": "Windows-11-10.0.26200-SP0",
-  "git_commit": "af60d3b"
+  "git_commit": "f8ba868"
  },
  "checks": {
   "set_mismatches": 0,

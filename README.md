@@ -49,5 +49,9 @@ Python 3.12.14, numpy 2.3.5, scipy 1.18.1, scikit-learn 1.9.1, matplotlib 3.11.2
 
 ## Status
 
-Phase 0 complete: scaffold, legacy freeze, audit A on digits.
-Next: phase 1, audits B and C.
+Phase 0: scaffold, legacy freeze, audit A on digits.
+
+Phase 1: audits B and C on digits. Tables 2 to 4 and Figures 2 to 4 are
+generated from results JSON. Working notes in `paper/notes_phase1.md`.
+
+Next: phase 2, CIFAR-10 with two model strengths.

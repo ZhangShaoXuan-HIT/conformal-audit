@@ -37,10 +37,12 @@ probability fails to reach the target.
 ### 4.2 Non-empty post-processing inflates coverage
 Forcing the argmax into empty sets raises coverage and size. The inflation grows
 with alpha and with the empty rate. Report both raw and forced numbers.
+<!-- phase 1: mean delta 0.077, max 0.318; naive 0.041, APS rand 0.080, APS det 0.108, RAPS 0.078 -->
 
 ### 4.3 The alpha_t update is not ACI
 ACI uses a fixed target alpha. Replacing it with alpha_t removes the
 target-tracking guarantee and can look successful by collapsing to the clip.
+<!-- phase 1, average over three schedules, gamma 0.02: fixed = 0.833 cov, 3.10 size, alpha 0.0082; buggy = 0.838 cov, 3.70 size, alpha 0.0011, near-trivial 17.3% vs 9.1%. At gamma 0.1 the buggy update diverges (seed SD 0.205). -->
 
 ## 5. Experiments (1800 words)
 
@@ -85,6 +87,6 @@ the absence of a reference in this bibliography.
 |---|---|---|---|
 | C1 | a calibrated true-class threshold is split conformal | T2, exact set equality | supported |
 | C2 | max-prob calibration misses the target | T2 | supported (digits) |
-| C3 | non-empty forcing inflates coverage | T3 | pending |
-| C4 | the alpha_t update does not track the target | T4 | pending |
+| C3 | non-empty forcing inflates coverage | T3, F3 | supported (mean delta 0.077, max 0.318) |
+| C4 | the alpha_t update does not track the target | T4, F4 | supported (alpha collapses to clip, size +19%) |
 | C5 | traps matter only when sets are non-singleton | T1, F5 | pending |
