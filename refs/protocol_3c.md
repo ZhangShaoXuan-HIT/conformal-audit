@@ -70,3 +70,12 @@ Angelopoulos & Bates 2021、Fontana et al. 2023、Campos et al. 2024、Zhou et a
 - refs/bib.json
 - paper/tables/table1_map.md
 - paper/tables/table9_coverage.md
+
+## 执行结果（2026-11-06）
+
+- 检索 443 条，去重 337 条。
+- 自动初筛 110 shortlist / 77 borderline / 150 reject。
+- 最终 40 include / 149 defer / 148 exclude。
+- 书目 69 条：35 seed + 6 classic + 28 recent。
+- 29 条为已知条目种子，不在标题检索结果中。
+- 详见 refs/screening_3c_README.md。

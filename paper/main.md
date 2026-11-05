@@ -33,10 +33,13 @@ than an equality. No history, no generations.
 
 ## 3. A two-axis map (1200 words)
 
-Rows: marginal, group-conditional, pointwise, risk control.
-Columns: exchangeable, covariate shift, non-exchangeable, known groups.
-Each cell: representative method, assumption, cost, reference.
-This replaces the four-generation narrative.
+Table 1 gives the map. The rows are the guarantee a method pursues. The columns are the
+assumption it is willing to make. Each cell names a representative method, the assumption
+it needs, and the price it pays. The point of the table is not that every cell is full.
+The empty cells are the open problems, and they are more informative than a list of
+methods. A reader can see at a glance that pointwise conditional coverage is essentially
+empty outside the exchangeable column, and that risk control under covariate shift has no
+entry in the reviewed set.
 
 ## 4. Three implementation traps (2500 words)
 
@@ -162,7 +165,7 @@ the absence of a reference in this bibliography.
 
 | id | content | source |
 |---|---|---|
-| T1 | regime map: dataset, model strength, accuracy, ECE, alpha where sets become singleton | results/*.json |
+| T1 | two-axis map: guarantee x assumption | paper/tables/table1_map.md |
 | T2 | calibrated threshold equals split conformal | paper/tables/table2_equivalence.md |
 | T3 | post-processing inflation grid | results/postprocess_digits.json |
 | T4 | ACI update comparison | results/aci_digits.json |
@@ -174,6 +177,7 @@ the absence of a reference in this bibliography.
 | T6 | CIFAR audit B | paper/tables/table6_cifar_postprocess.md |
 | T7 | CIFAR audit C | paper/tables/table7_cifar_aci.md |
 | T8 | library behavior audit | paper/tables/table8_libraries.md |
+| T9 | coverage against four surveys | paper/tables/table9_coverage.md |
 | F5 | trap visibility versus empty rate | paper/figures/fig5_regime |
 
 ## Claims ledger
