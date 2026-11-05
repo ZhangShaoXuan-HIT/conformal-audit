@@ -1,0 +1,543 @@
+%% Conformal Prediction Survey -- Elsevier CAS single-column version.
+%% Build: pdflatex x2 (the bibliography is inline, so BibTeX is not required).
+\documentclass[a4paper,longmktitle]{cas-sc}
+
+\usepackage{tabularx}
+\usepackage{ragged2e}
+\usepackage{caption}
+\usepackage[expansion=false]{microtype}
+\usepackage[scaled=0.95]{helvet}
+\usepackage{courier}
+\usepackage{indentfirst}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{rotating}
+\usepackage{amsmath}
+
+%% The 2024 CAS class uses \vbox_unpack_clear:N, renamed to
+%% \vbox_unpack_drop:N in current expl3 releases.
+\ExplSyntaxOn
+\cs_if_exist:NF \vbox_unpack_clear:N
+  { \cs_gset_eq:NN \vbox_unpack_clear:N \vbox_unpack_drop:N }
+\ExplSyntaxOff
+
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue,
+            breaklinks,pdfencoding=auto,
+            pdftitle={Conformal Prediction for Calibrated Set-Valued Prediction: A Survey},
+            pdfauthor={Anonymous Author(s)},
+            pdfsubject={Conformal prediction, distribution-free uncertainty quantification},
+            pdfkeywords={conformal prediction, uncertainty quantification,
+            distribution-free inference, risk control, conditional coverage,
+            trustworthy machine learning}}
+
+\makeatletter
+\g@addto@macro\UrlBreaks{\do\-\do\_}
+\newcommand{\tcite}[1]{\begingroup\def\NAT@penalty{\penalty0\relax}\cite{#1}\endgroup}
+\makeatother
+
+\captionsetup{font=small,labelfont=bf,justification=justified,
+              singlelinecheck=false,labelsep=period}
+\setlength{\bibsep}{2.2pt}
+\renewcommand{\bibfont}{\small\RaggedRight}
+\tolerance=2000
+\setlength{\emergencystretch}{2em}
+\newcolumntype{Y}[1]{>{\RaggedRight\arraybackslash\hspace{0pt}\hsize=#1\hsize}X}
+
+\shorttitle{Conformal Prediction Survey}
+\shortauthors{Anonymous Author(s)}
+
+\title[mode = title]{Conformal Prediction for Calibrated Set-Valued Prediction: A Survey, 2005--2026}
+
+\author[1]{Anonymous Author(s)}
+\affiliation[1]{organization={Anonymous Author(s)},
+                 country={}}
+
+\begin{document}
+\let\WriteBookmarks\relax
+%% The stock CAS template sets \floatpagepagefraction{1} and
+%% \textpagefraction{.001}, which forbids floats on text pages and therefore
+%% sweeps every figure and table to a block of float-only pages at the end.
+%% Relaxing the second value lets floats sit next to the text that discusses
+%% them, which is what a review article needs.
+\def\floatpagepagefraction{.7}
+\def\textpagefraction{.35}
+\renewcommand{\topfraction}{.92}
+\renewcommand{\bottomfraction}{.75}
+\renewcommand{\textfraction}{.08}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+
+\begin{abstract}
+A point prediction carries no statement about its own reliability. The softmax probability attached to a classifier output is a model score, not a frequency: it can be, and routinely is, over-confident by large margins on data the model has not seen. Conformal prediction replaces the point prediction with a set that is calibrated by construction, so that the set contains the true label with probability at least $1-\alpha$ under the sole assumption that calibration and test data are exchangeable. This survey traces the field from its random-world origins in 2005 to the conditional and risk-controlling guarantees of 2024--2026, and organises the literature by the guarantee each generation attempts to obtain rather than by the algorithm it introduces: marginal validity, then sharpness, then bounded risk, then conditional validity under weaker data assumptions. We separate what is proved from what is measured, and we mark every preprint as not peer reviewed. To keep the survey from becoming a literature digest, we also report an original reproducible study on the scikit-learn \texttt{digits} benchmark, deliberately posed in a label-scarce regime so that prediction-set size responds to $\alpha$. Three experiments are reported: a coverage--efficiency sweep over six values of $\alpha$ with ten repeated splits; a head-to-head comparison against softmax thresholding and temperature scaling at a nominal $0.90$ target; and a distribution-shift stress test that contrasts static calibration against online adaptive conformal inference. At $\alpha=0.10$ split conformal attains empirical coverage $0.8996\pm0.0189$ against a $0.90$ target with mean set size $1.331$, whereas a softmax threshold at the same nominal level collapses to the base model's accuracy, $0.8207\pm0.0236$, because the score threshold cannot manufacture information the model does not have. Under progressive Gaussian corruption the statically calibrated set degrades to $0.4644$ coverage, while online adaptation recovers $0.9111$ at the cost of inflating the mean set size from $1.256$ to $7.618$ classes. We read these results as a concrete illustration of the central tension of the field: validity is cheap to obtain marginally, expensive to obtain conditionally, and not free to maintain under shift.
+\end{abstract}
+\begin{keywords}
+conformal prediction \sep uncertainty quantification \sep distribution-free inference \sep risk control \sep conditional coverage
+\end{keywords}
+
+\maketitle
+
+\section{Introduction}
+
+A classifier that answers ``seven'' and a classifier that answers ``seven or nine'' are not the same kind of object. The first asserts a fact; the second asserts a set of possibilities together with an implicit claim about how often that set is wrong. Modern pattern-recognition systems are almost entirely of the first kind. They emit an argmax and, as a courtesy, the probability that produced it. That probability is a useful ranking signal and a poor reliability statement. A network trained to minimise cross-entropy on a finite sample is not optimised to make its confidences match observed frequencies, and it typically does not: the gap between nominal confidence and empirical accuracy is one of the most reliably reproduced findings in the applied literature, and temperature scaling, the simplest post-hoc remedy, changes the scores without changing the ranking and therefore without changing the set of errors the model makes \cite{Guo2017}.
+
+The consequence is a specific and practical failure. Suppose a diagnostic pipeline is required to be wrong no more than one time in twenty. A softmax threshold chosen to satisfy that requirement on a held-out sample will satisfy it on that sample and may not satisfy it on the next one, because the threshold was selected to fit the sample rather than derived from a guarantee. The distinction matters: fitting a threshold is estimation, and estimation on finite data carries no finite-sample validity statement unless the procedure is designed to provide one.
+
+Conformal prediction is the design that provides one. Its central move, due to Vovk and colleagues \cite{Vovk2005}, is to stop asking the model to be calibrated and instead to calibrate the model's outputs against a held-out sample. Given a fitted model, a calibration set of examples the model did not train on, and a target error rate $\alpha$, one computes a nonconformity score for each calibration example, takes an appropriate empirical quantile of those scores, and uses that quantile to decide which labels enter the prediction set for a new input. The resulting set satisfies
+\begin{equation}
+\Pr\{Y_{\text{new}} \in \mathcal{C}(X_{\text{new}})\} \;\geq\; 1-\alpha
+\label{eq:coverage}
+\end{equation}
+for any joint distribution of the data, provided only that the calibration and test pairs are exchangeable. No assumption is made about the model, the feature distribution, or the relationship between them. This is what ``distribution-free'' means, and it is a stronger statement than it is often taken to be: the guarantee survives a badly misspecified model, an over-parameterised model, and a model that is simply wrong most of the time. What the guarantee does not do is promise that the set will be small. That trade-off, between validity and sharpness, organises most of the field's subsequent history.
+
+Three developments turned a clean theoretical idea into a body of methods. The first was the recognition that the guarantee can be computed with a single model fit and a single calibration pass, which made conformal prediction cheap enough to use \cite{Lei2018,Angelopoulos2021intro}. The second was the construction of scores that adapt the set size to the difficulty of the individual input, so that easy examples receive small sets and ambiguous ones receive large sets \cite{Romano2020,RAPS}. The third was the extension from coverage to arbitrary bounded risks, which allowed the machinery to control false-negative rates, graph errors, and other losses that are not coverage \cite{Bates2021,LTT,CRC}. Running alongside these was a negative result of considerable importance: distribution-free conditional coverage, meaning coverage guaranteed separately for every subgroup or every covariate value, is impossible to achieve in a non-trivial way \cite{Barber2021}. The field's most recent work is largely an attempt to live with that impossibility, either by weakening the target to approximate conditional coverage with explicit smoothness assumptions \cite{Hore2024,Gibbs2025}, or by moving to data regimes where exchangeability itself must be relaxed \cite{Beyond,NonExchgCRC}.
+
+This survey is organised around the guarantee rather than the algorithm, for a reason that becomes clear in Section~\ref{sec:genealogy}. Every generation of methods reuses the same three-stage template of Figure~\ref{fig:2}: fit, calibrate, threshold. What changes is the object being calibrated and the assumption under which the calibration is valid. A reader who memorises the algorithms learns a list; a reader who follows the guarantee learns where each method breaks.
+
+\subsection{Scope, method, and what this survey does not do}
+
+The literature search was conducted on 2026-11-04. Candidate records were retrieved from OpenAlex through title search and DOI reverse lookup, and from the arXiv API by identifier. Every entry in the reference list carries either a DOI or an arXiv identifier that was resolved during the search; entries whose metadata could not be resolved to a persistent identifier were excluded rather than guessed. This excludes most Chinese-language journal literature, because CNKI and Wanfang do not expose open APIs; we note the gap rather than fill it with unverified citations. Conference papers are cited by venue and year; journal articles by volume, issue, and page. Where a paper exists both as a preprint and as a published article, the published version is cited and the preprint identifier is retained in the entry. Where only a preprint exists, the entry is marked as such in the bibliography and the text says so explicitly.
+
+The survey covers conformal prediction and the closely adjacent literature on distribution-free risk control. It does not attempt to cover Bayesian uncertainty quantification, deep ensembles, or evidential deep learning except where those methods are used as baselines, and it does not cover the conformal prediction literature in fields where the terminology differs substantially, such as some of the reliability-engineering literature on tolerance intervals.
+
+\subsection{Contributions}
+
+This survey makes four contributions. First, it organises the field by guarantee type across four generations, with an explicit statement of what each generation could not do that motivated the next (Section~\ref{sec:genealogy}). Second, it separates the 2024--2026 literature into conditional guarantees, survey systematisation, and large-model deployment, and it distinguishes peer-reviewed results from preprints in every case (Section~\ref{sec:recent}). Third, it reports an original reproducible experimental study, posed in a label-scarce regime, that measures the coverage--efficiency trade-off, the failure of confidence thresholding, and the cost of maintaining validity under shift (Section~\ref{sec:experiments}). Fourth, it states the open problems in a form that identifies which of them are theoretical obstructions and which are engineering gaps (Section~\ref{sec:open}).
+
+\subsection{Positioning relative to existing surveys}
+
+Three surveys are close enough to require explicit positioning. Angelopoulos and Bates \cite{Angelopoulos2021intro} is a tutorial: it builds the reader's intuition for the split-conformal construction and covers the pre-2022 literature thoroughly, and this survey assumes it rather than duplicating it. Campos et al.\ \cite{Campos2024} surveys conformal prediction for natural language processing, and its organising axis is the NLP task; the present survey is organised by guarantee and treats language modelling as one application domain among several. Zhou et al.\ \cite{Zhou2025} takes a data perspective, organising by data modality and by the assumptions each modality violates; that is complementary to the guarantee-based axis used here, and we cross-reference it where the two orderings disagree about what is central.
+
+\begin{figure}[pos=htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig1_timeline.png}
+\caption{Four generations of conformal prediction, 2005--2026, read top to bottom. Each row gives the year, the representative work, and the generation it belongs to (G1--G4, colour-coded in the left margin). Rows with the same year are ordered by the guarantee they pursue, not by publication month. The generations are defined by the guarantee each one pursues rather than by the algorithm it introduces.}
+\label{fig:1}
+\end{figure}
+
+Figure~\ref{fig:1} gives the chronology that the rest of the paper explains. Three features of it are worth naming before the detailed discussion. The first is that the foundational period is long: from 2005 to roughly 2018 the field had a valid and general construction but almost no practical adoption, and the change that made adoption possible was not a new theorem but the realisation that a single split suffices. The second is that the density of work increases sharply after 2021, and that the increase is concentrated in two places: conditional guarantees, and applications to language models. The third is that the preprints of 2026 are already numerous relative to published work in the same year, which is a property of the field's current pace rather than of this bibliography's construction, and which is why Section~\ref{sec:recent} separates them.
+
+\section{Problem Setting and Theoretical Foundations}
+
+\subsection{Exchangeability and what the guarantee assumes}
+
+The coverage statement of Equation~\ref{eq:coverage} rests on one assumption: that the calibration pairs $(X_1,Y_1),\dots,(X_n,Y_n)$ and the test pair $(X_{\text{new}},Y_{\text{new}})$ are exchangeable. Exchangeability means that the joint distribution is invariant to permutation of the indices, which is weaker than independence and identical distribution and is satisfied by any i.i.d.\ sample. It is violated by any ordering that carries information: time series, active learning, dataset shift that depends on the order in which examples arrive, and any pipeline in which the calibration set was selected using information about the test point.
+
+The practical importance of this assumption is easy to understate. A calibration set drawn at random from the same collection as the test set is exchangeable with it. A calibration set drawn from last year's data, deployed against this year's data, is not. The guarantee does not degrade gracefully in that case; it fails silently, in the specific sense that the coverage on the deployed distribution can be far below $1-\alpha$ while every diagnostic computed on the calibration distribution looks correct. This is the failure mode that Section~\ref{sec:exp-drift} measures.
+
+\subsection{Split conformal in three stages}
+
+Figure~\ref{fig:2} shows the construction. A model $f$ is fitted on a training set. A disjoint calibration set of size $n$ is passed through the model to obtain nonconformity scores $s_i = s(X_i, Y_i)$, where a larger score means the pair is less conforming to the model's own judgement. The scores are sorted and the $\lceil (n+1)(1-\alpha)\rceil$-th smallest is taken as the threshold $q$. For a new input, the prediction set is the collection of labels whose score does not exceed $q$.
+
+The finite-sample correction in the quantile index, $\lceil (n+1)(1-\alpha)\rceil$ rather than $\lceil n(1-\alpha)\rceil$, is what makes the guarantee hold exactly rather than asymptotically, and it is the single most commonly implemented detail incorrectly. With $n$ calibration points and a target $\alpha$, the correction costs one calibration sample in effective sample size and buys a guarantee that holds for every $n$, not merely in the limit.
+
+\begin{figure}[pos=htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig2_pipeline.png}
+\caption{The split conformal pipeline. The guarantee comes from the calibration stage, not from the model: the model may be arbitrarily bad, and the quantile of its nonconformity scores will still yield a set that covers with probability at least $1-\alpha$ under exchangeability. What a bad model costs is set size, not validity.}
+\label{fig:2}
+\end{figure}
+
+Two properties of this construction deserve emphasis because they are frequently confused. The first is that the guarantee is marginal: it averages over the randomness in the calibration set and the test point, and says nothing about any particular test point. A set that covers $90\%$ of the time on average may cover $99\%$ of the time for one subgroup and $60\%$ of the time for another, and the guarantee is indifferent to this. The second is that the guarantee is not conditional on the model: a better model produces smaller sets, and a worse model produces larger ones, but neither produces invalid ones. This is why conformal prediction is often described as wrapping a model rather than improving it, and why the field's efficiency work has concentrated on scores rather than on the validity theorem.
+
+\subsection{Scores and the efficiency question}
+
+Given that validity is settled by the quantile, all remaining design freedom is in the score $s$. For classification, the simplest choice is $s(x,y) = 1 - \hat{p}_y(x)$, which yields the set of all labels whose predicted probability exceeds a threshold. This is the naive score, and it has a defect that becomes visible as soon as the number of classes grows: the threshold is global, so a class that the model systematically under-predicts is excluded more often than the nominal rate allows, and the resulting coverage is marginal only by compensation across classes.
+
+Adaptive scores address this by accumulating probability mass in descending order until the true label is reached, which makes the score sensitive to where the true label sits in the ranking rather than to its absolute probability \cite{Romano2020}. The adaptive prediction set (APS) score for a calibration pair is the cumulative probability of all classes ranked above the true class, plus a randomised fraction of the true class's own probability; the randomisation is what restores exact validity in the presence of ties. The regularised variant (RAPS) adds a penalty on the number of classes included, which shrinks large sets at a small cost in coverage \cite{RAPS}. For regression, the analogous choice is the absolute residual, possibly scaled by an estimated local variance, and the prediction set becomes an interval \cite{Lei2018}.
+
+The efficiency question has no distribution-free answer, and this is a theorem rather than a gap in the literature. For any conformal predictor, the expected set size is bounded below by a quantity that depends on the Bayes risk of the underlying problem; no score can produce sets smaller than the intrinsic ambiguity of the data allows. What scores can do is approach that bound for the model at hand, and the empirical literature is largely a sequence of increasingly clever attempts to do so.
+
+\subsection{Marginal versus conditional coverage}
+
+The distinction between marginal and conditional coverage is the pivot on which the modern literature turns, and Figure~\ref{fig:3} illustrates it in both schematic and measured form. Marginal coverage averages over the covariate distribution. Conditional coverage would require
+\begin{equation}
+\Pr\{Y \in \mathcal{C}(X) \mid X = x\} \;\geq\; 1-\alpha
+\quad \text{for (almost) every } x,
+\label{eq:cond}
+\end{equation}
+which is a statement about each point rather than about the ensemble.
+
+Barber et al.\ \cite{Barber2021} proved that Equation~\ref{eq:cond} cannot be achieved by any distribution-free procedure except in the trivial sense of returning sets of infinite size, and the impossibility is not an artefact of the proof technique. The intuition is that a finite calibration sample contains finite information about any particular $x$, and a procedure that must be valid for every distribution can always be confronted with a distribution that concentrates its mass elsewhere. The practical consequence is that the field's conditional-coverage work does not attempt the impossible; it either weakens the target to hold on average within groups, or it adds assumptions that make the target attainable.
+
+\begin{figure}[pos=htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig3_marginal_conditional.png}
+\caption{Marginal versus conditional coverage. Panel (a) is schematic: four groups whose average coverage equals the nominal level while two of them fall below it. Panel (b) is measured, using the experiments of Section~\ref{sec:experiments} at $\alpha=0.10$: the naive score produces class-conditional coverage ranging from $0.776$ to $0.995$ while its marginal coverage is $0.8996$, and the APS score narrows that range to $0.878$--$0.995$ at the cost of a larger mean set.}
+\label{fig:3}
+\end{figure}
+
+Panel (b) of Figure~\ref{fig:3} is worth reading carefully, because it is the empirical form of the impossibility. The marginal coverage of the naive score is $0.8996$, which is essentially the nominal $0.90$. The class-conditional coverage of the same predictor ranges from $0.776$ for the worst-served class to $0.995$ for the best-served one, and the standard deviation across classes is $0.074$. Both numbers are correct. A practitioner who reports only the first has reported a true statement that is misleading about the second, and the gap between them is not a bug in the implementation but a property of the construction.
+
+\section{Method Genealogy: Four Generations}
+\label{sec:genealogy}
+
+The four generations of Figure~\ref{fig:4} are defined by the guarantee each pursues. The ordering is not strictly chronological, because some third-generation ideas appeared before some second-generation ones were fully worked out; it is a dependency ordering, in which each generation's central problem is created by the previous generation's success.
+
+\begin{figure}[pos=htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig4_genealogy.png}
+\caption{Method genealogy by guarantee type. Each card gives the generation, its year span, the guarantee it pursues, the assumption it must make to obtain that guarantee, and representative work. The four generations are defined by the guarantee each pursues, not by the algorithm each introduces.}
+\label{fig:4}
+\end{figure}
+
+\subsection{Generation 1: marginal validity, 2005--2018}
+
+The first generation established that distribution-free marginal validity is attainable and cheap. Vovk, Gammerman and Shafer's monograph \cite{Vovk2005} developed the theory of conformal predictors as a form of transductive inference, in which the prediction for a new point is computed by considering each candidate label and testing how well the augmented sample conforms. The construction is exact and general, and it is also expensive: a naive implementation requires refitting the model once per candidate label.
+
+Shafer and Vovk's tutorial \cite{Shafer2008} made the ideas accessible and introduced the terminology that the field still uses. Lei et al.\ \cite{Lei2018} supplied the result that made the approach practical for regression, by showing that a single split of the data into a training portion and a calibration portion yields the same coverage guarantee at a fraction of the cost. Sadinle et al.\ \cite{Sadinle2019} formalised the classification case as the construction of set-valued classifiers with bounded error levels, and introduced the criterion of least ambiguity that the efficiency literature subsequently adopted as its objective.
+
+What this generation could not do is produce sets that adapt to the difficulty of individual inputs. The score was fixed and the threshold was global, so the set size was determined by the model's average behaviour rather than by its behaviour on the point at hand. For a ten-class problem in which the model is confident on most inputs and confused on a few, this means most inputs receive a singleton and a few receive a set of five, with no mechanism to allocate the budget where it is needed.
+
+\subsection{Generation 2: sharpness and adaptivity, 2019--2021}
+
+The second generation took validity for granted and competed on set size. Two ideas did most of the work. The first was the adaptive score, which ranks classes rather than thresholding probabilities \cite{Romano2020,RAPS}; the effect is to make the set size respond to the shape of the predicted distribution rather than to its maximum. The second was the extension of the guarantee to covariate shift, by reweighting the calibration scores according to the likelihood ratio between the test and calibration covariate distributions \cite{Tibshirani2019}. The reweighting preserves validity under a specified shift, at the cost of requiring the likelihood ratio to be known or estimable, which is a substantive assumption that the marginal guarantee did not need.
+
+The generation's limitation is the one identified in Section~2.4: sharpness averaged over the population is not sharpness for the subpopulation that matters. A set of average size $1.3$ can be a singleton for the majority and a set of six for a minority, and the average conceals exactly the case in which a deployed system fails.
+
+\subsection{Generation 3: risk control and impossibility, 2021--2023}
+
+The third generation made two moves that are logically independent but historically intertwined.
+
+The first was the generalisation from coverage to arbitrary bounded risks. Coverage is the risk of missing the true label, and it is not always the loss that matters: in a segmentation task the relevant loss may be the fraction of mislabelled pixels, in a retrieval task the fraction of relevant documents omitted, and in a screening task the false-negative rate. Bates et al.\ \cite{Bates2021} introduced risk-controlling prediction sets, which bound the expectation of a monotone loss; Angelopoulos et al.\ \cite{LTT} generalised further with Learn-then-Test, which casts calibration as a multiple-hypothesis testing problem and controls the risk at a specified level with finite-sample validity. The importance of this move is that it decouples the machinery from the coverage objective, so that the same calibration apparatus can be pointed at whatever loss the application actually cares about.
+
+The second move was the impossibility result of Barber et al.\ \cite{Barber2021}, discussed in Section~2.4. Its effect on the field was to redirect effort: an entire line of work that had been attempting to construct conditionally valid sets was, in a precise sense, attempting the impossible, and the productive response was to characterise exactly how close to conditional validity one can get and under what assumptions.
+
+\subsection{Generation 4: conditional guarantees and weaker assumptions, 2024--2026}
+
+The fourth generation is the current frontier and is treated separately in Section~\ref{sec:recent}. Its defining feature is that it accepts the impossibility and works around it, either by targeting a relaxed notion of conditional validity with explicit assumptions \cite{Hore2024,Gibbs2025}, or by relaxing exchangeability itself \cite{Beyond,NonExchgCRC}, or by moving to output spaces where the loss is not a simple coverage indicator \cite{ConformalLM,CRC_LLM}.
+
+Table~\ref{tab:1} summarises the four generations along the dimensions that determine whether a method is usable in a given application: the guarantee, the assumption it needs, the calibration cost, and the task types for which it is defined.
+
+\begin{table}[pos=htbp]
+\centering
+\footnotesize
+\caption{The four generations compared along the dimensions that determine practical applicability. Calibration cost is stated relative to a single model fit; $n$ denotes calibration-set size and $K$ the number of classes.}
+\label{tab:1}
+\begin{tabularx}{\textwidth}{@{}Y{0.62}Y{1.02}Y{1.02}Y{0.80}Y{1.10}Y{1.44}@{}}
+\toprule
+\textbf{Generation} & \textbf{Guarantee} & \textbf{Assumption} & \textbf{Calibration cost} & \textbf{Task types} & \textbf{Representative work} \\
+\midrule
+1. Marginal validity & $\Pr\{Y\in\mathcal{C}(X)\}\geq 1-\alpha$ & Exchangeability & $O(n)$ after one fit; $O(nK)$ if transductive & Classification, regression & Vovk et al.\ \cite{Vovk2005}; Shafer \& Vovk \cite{Shafer2008}; Lei et al.\ \cite{Lei2018}; Sadinle et al.\ \cite{Sadinle2019} \\
+2. Sharpness & Same, with smaller $\mathbb{E}|\mathcal{C}|$ & Exchangeability; likelihood ratio known for shift & $O(n)$ & Classification, regression, covariate shift & Romano et al.\ \cite{Romano2020}; Angelopoulos et al.\ \cite{RAPS}; Tibshirani et al.\ \cite{Tibshirani2019} \\
+3. Risk control & $\mathbb{E}[\ell(\mathcal{C}(X),Y)]\leq r$ & Exchangeability; monotone loss & $O(n)$ per candidate risk level; multiplicity correction for LTT & Any task with a bounded loss & Bates et al.\ \cite{Bates2021}; Angelopoulos et al.\ \cite{LTT}; Angelopoulos et al.\ \cite{CRC} \\
+4. Conditional & Group- or covariate-conditional coverage & Exchangeability plus smoothness, or relaxation of exchangeability & $O(n)$ to $O(n\log n)$; may need reweighting or online updates & Classification, structured output, sequences & Hore \& Barber \cite{Hore2024}; Gibbs et al.\ \cite{Gibbs2025}; Barber et al.\ \cite{Beyond} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Recent Progress, 2024--2026}
+\label{sec:recent}
+
+This section is organised by problem rather than by year, and it distinguishes peer-reviewed results from preprints at every step. The distinction is not cosmetic: three of the most cited 2026 claims in this area exist only as arXiv preprints, and a survey that presents them alongside journal articles invites the reader to over-weight them.
+
+\subsection{Conditional and group-conditional guarantees}
+
+The impossibility of distribution-free conditional coverage left two constructive routes, and both have been pursued to publishable conclusions in the last two years.
+
+The first route adds smoothness. If the conditional coverage function is assumed to vary slowly in $x$, then a local estimate of it can be calibrated, and the resulting guarantee is conditional up to the smoothness constant. Hore and Barber \cite{Hore2024} show that randomisation is what makes local weighting work: without it, the local weights needed for conditional validity are not identifiable from a finite sample, and with it the procedure attains a robust guarantee under weak conditions. The paper is notable for turning a negative result into a design principle, and its appearance in JRSSB rather than in a machine-learning venue reflects that the contribution is statistical rather than algorithmic.
+
+The second route targets groups. Gibbs, Cherian and Candès \cite{Gibbs2025} develop a framework in which coverage is required to hold on average within each of a collection of groups, which is a weaker target than pointwise conditional coverage and is attainable without smoothness assumptions when the groups are known in advance. The practical relevance is direct: a diagnostic system is often required to be equitable across demographic groups, and group-conditional coverage is the natural formalisation of that requirement.
+
+Neither route dissolves the impossibility. Both make a bet, one on smoothness and one on the availability of group labels, and the bet is stated rather than left implicit. That is already an improvement over the pre-2021 situation, in which the assumption was usually invisible.
+
+\subsection{Survey systematisation and the data perspective}
+
+Two surveys of 2024--2025 reorganised the field along axes that the guarantee-based organisation does not capture. Campos et al.\ \cite{Campos2024} survey conformal prediction for natural language processing, where the objects being predicted are sequences, the loss is often not coverage, and the exchangeability assumption is strained by the sequential structure of the data; the survey's contribution is to catalogue which constructions survive which of these departures. Zhou et al.\ \cite{Zhou2025} organise by data modality and by the assumption each modality violates, which produces a different map of the same territory: work that appears central under a guarantee-based ordering appears peripheral under a data-based one, and vice versa. Neither ordering is correct in isolation; a reader who consults both gets a more accurate picture than either alone provides.
+
+\subsection{Large-model deployment: factuality, selective prediction, abstention}
+
+The application that has driven the most recent activity is uncertainty quantification for large language models, and the reason is structural rather than fashionable. A language model's output is a sequence, so the natural prediction set is a set of sequences, which is not finite and cannot be enumerated; the loss that matters is usually factual error rather than coverage of a label; and the exchangeability assumption is violated by any deployment in which the model is updated, the prompt distribution drifts, or the retrieval corpus changes.
+
+Three lines of work respond to this. The first adapts the conformal machinery to sequence generation by defining nonconformity scores over sequences and calibrating a stopping rule rather than a set \cite{ConformalLM}. The second moves to risk control, because the quantity that can be bounded for a language model is the expected fraction of unsupported claims rather than the probability of missing a label \cite{CRC_LLM}. The third attacks the assumption directly, by auditing what happens to conformal guarantees when the model itself changes between calibration and deployment \cite{AuditCP}.
+
+Preprints in this area should be read with the usual caution. \cite{CRC_LLM} proves bounds and an impossibility result for certifying language-model outputs, and the impossibility is the more interesting half: it identifies conditions under which no calibration procedure can certify a stated error rate, which is a stronger and more useful claim than a positive result would be. \cite{HierCRC} extends group-conditional risk control to a hierarchy of groups, which is the right structure for selective prediction in a model with a taxonomy of tasks. \cite{IntroConformal} uses model introspection to construct scores for vision-language models, and \cite{ParaCP} uses paraphrase-invariant scoring to reduce the sensitivity of the score to surface form. All four are 2026 preprints and none has been peer reviewed at the time of writing.
+
+\subsection{Generative models, structured outputs, and new data regimes}
+
+A fourth cluster extends conformal prediction to settings where the output is not a label. Generative conformal prediction under covariate shift \cite{Li2026gen} adapts the reweighting idea of \cite{Tibshirani2019} to generative models, where the likelihood ratio must be estimated in a high-dimensional output space and the estimation error propagates into the guarantee. Ordinal classification \cite{OrdinalCRC} and cross-validated risk control \cite{XVCrc} address smaller but practically important gaps: the former because ordinal labels carry a distance structure that plain coverage ignores, the latter because it removes the efficiency loss of splitting the data once.
+
+A distinct and, in our view, under-exploited line uses the prediction set as a diagnostic rather than as a decision. Alur and Das \cite{Alur2026} observe that the size of the conformal set is itself a signal: a sudden inflation of set size on a deployed stream indicates that the input distribution has moved away from the calibration distribution, which makes set size a cheap and model-agnostic monitor for data corruption and label noise. This reframes conformal prediction from a wrapper that produces decisions to an instrument that produces measurements, and it is the reframing that the drift experiment of Section~\ref{sec:exp-drift} implicitly relies on.
+
+Table~\ref{tab:2} collects the 2024--2026 contributions with their status and their central claim.
+
+\begin{table}[pos=htbp]
+\centering
+\footnotesize
+\caption{Recent contributions, 2024--2026, by problem. Status is stated as published (with venue) or preprint (arXiv, not peer reviewed). The central claim column paraphrases the authors' own statement rather than our assessment.}
+\label{tab:2}
+\begin{tabularx}{\textwidth}{@{}Y{0.78}Y{1.14}Y{0.58}Y{1.60}Y{0.90}@{}}
+\toprule
+\textbf{Problem} & \textbf{Work} & \textbf{Year} & \textbf{Central claim} & \textbf{Status} \\
+\midrule
+Conditional coverage & Hore \& Barber \cite{Hore2024} & 2024 & Randomisation makes local weighting identifiable and yields robust conditional guarantees & JRSSB, published \\
+Conditional coverage & Gibbs et al.\ \cite{Gibbs2025} & 2025 & Group-conditional coverage is attainable without smoothness when groups are known & JRSSB, published \\
+Survey & Campos et al.\ \cite{Campos2024} & 2024 & Catalogues which conformal constructions survive the departures from exchangeability typical of NLP & TACL, published \\
+Survey & Zhou et al.\ \cite{Zhou2025} & 2025 & Organises the field by data modality and by the assumption each modality violates & ACM CSUR, published \\
+LLM risk control & \cite{CRC_LLM} & 2026 & Bounds and an impossibility result for certifying LLM output error rates & arXiv, preprint \\
+LLM selective prediction & \cite{HierCRC} & 2026 & Hierarchical group-conditional risk control for selective prediction & arXiv, preprint \\
+LLM factuality & \cite{IntroConformal} & 2026 & Introspection-based scores give factuality guarantees for VLMs & arXiv, preprint \\
+LLM auditing & \cite{AuditCP} & 2026 & Quantifies the loss of validity when the model changes between calibration and deployment & arXiv, preprint \\
+LLM scoring & \cite{ParaCP} & 2026 & Paraphrase-aware scores reduce sensitivity to surface form & arXiv, preprint \\
+Generative models & Li et al.\ \cite{Li2026gen} & 2026 & Extends covariate-shift reweighting to generative output spaces & JCGS, published \\
+Diagnostics & Alur \& Das \cite{Alur2026} & 2026 & Set size is a model-agnostic monitor for corruption and shift & IJDSA, published \\
+Ordinal tasks & Xu et al.\ \cite{OrdinalCRC} & 2024 & Risk control that respects the distance structure of ordinal labels & UAI, published \\
+Calibration efficiency & Cohen et al.\ \cite{XVCrc} & 2024 & Cross-validation removes the data-splitting efficiency loss & ISIT, published \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{An Original Empirical Study}
+\label{sec:experiments}
+
+A survey that only reports what others have measured inherits their choices about what is worth measuring. This section reports a small, fully reproducible study designed to make three specific claims visible: that the coverage guarantee holds at the nominal level for a badly under-trained model, that a confidence threshold cannot substitute for it, and that validity is not maintained for free under shift. The study is deliberately small so that every number can be checked; it makes no claim to scale.
+
+\subsection{Design}
+
+The data are the scikit-learn \texttt{digits} benchmark: $1797$ samples, $64$ features, $10$ classes, pixel values scaled to $[0,1]$. Each of ten seeds produces a stratified split into a training pool of $898$, a calibration set of $449$ and a test set of $449$. The model is a standardiser followed by multinomial logistic regression with $C=1.0$ and $3000$ iterations.
+
+One design choice requires justification because it looks like a mistake, and it was in fact reached by accident. The first implementation passed the target coverage rather than the error rate into the calibration routine, so the reported coverage came out at $0.09$ against a target of $0.90$: the sets had collapsed to singletons because the procedure was told to cover ten per cent of the time. Nothing raised an error. Conformal code fails quietly, and the failure looks like a result.
+
+Once that was corrected, a second problem appeared. The model is fitted on only $5\%$ of the training pool, roughly $44$ samples, which yields a test accuracy of $0.8207\pm0.0236$. Fitting on the full pool produces accuracy above $0.97$, and at that accuracy the conformal quantile is so small that the prediction set collapses to a singleton for almost every test point; the coverage guarantee still holds, but the experiment can no longer show anything about the coverage--efficiency trade-off, because there is no trade-off left to observe. The label-scarce regime is therefore chosen to keep the phenomenon in view, and it is also the regime in which conformal prediction is most useful in practice, since a well-trained model on abundant data needs the guarantee less.
+
+All reported quantities are means and standard deviations over the ten splits. Coverage is the empirical frequency with which the true label lies in the prediction set; set size is the mean cardinality; class-conditional coverage is computed separately for each of the ten classes. Sets are forced to be non-empty by including the argmax class when the threshold would otherwise exclude everything, which can only increase coverage and therefore preserves the $1-\alpha$ lower bound.
+
+\subsection{Experiment 1: coverage and efficiency across $\alpha$}
+
+Table~\ref{tab:3} reports empirical coverage and mean set size for the naive and APS scores at six values of $\alpha$, and Figure~\ref{fig:6} plots the same numbers.
+
+\begin{table}[pos=htbp]
+\centering
+\footnotesize
+\caption{Coverage and efficiency across $\alpha$ (ten repeated splits; mean $\pm$ standard deviation). The target column is $1-\alpha$. Empty-set rate is zero by construction. The last column is the largest absolute deviation of any single class's conditional coverage from the nominal level.}
+\label{tab:3}
+\begin{tabularx}{\textwidth}{@{}Y{0.52}Y{0.78}Y{0.58}Y{1.24}Y{1.16}Y{1.72}@{}}
+\toprule
+$\alpha$ & Score & Target & Empirical coverage & Mean set size & Max class deviation \\
+\midrule
+0.01 & naive & 0.99 & $0.9900\pm0.0072$ & $5.136\pm2.032$ & 0.014 \\
+0.01 & APS & 0.99 & $0.9902\pm0.0042$ & $5.361\pm1.591$ & 0.014 \\
+0.02 & naive & 0.98 & $0.9782\pm0.0101$ & $3.317\pm0.930$ & 0.032 \\
+0.02 & APS & 0.98 & $0.9784\pm0.0088$ & $3.733\pm0.957$ & 0.032 \\
+0.05 & naive & 0.95 & $0.9513\pm0.0130$ & $2.067\pm0.449$ & 0.063 \\
+0.05 & APS & 0.95 & $0.9620\pm0.0100$ & $2.501\pm0.410$ & 0.050 \\
+0.10 & naive & 0.90 & $0.8996\pm0.0189$ & $1.331\pm0.164$ & 0.124 \\
+0.10 & APS & 0.90 & $0.9436\pm0.0127$ & $1.832\pm0.177$ & 0.096 \\
+0.20 & naive & 0.80 & $0.8280\pm0.0205$ & $1.018\pm0.025$ & 0.180 \\
+0.20 & APS & 0.80 & $0.9082\pm0.0147$ & $1.421\pm0.076$ & 0.193 \\
+0.30 & naive & 0.70 & $0.8207\pm0.0236$ & $1.000\pm0.000$ & 0.277 \\
+0.30 & APS & 0.70 & $0.8707\pm0.0172$ & $1.226\pm0.053$ & 0.284 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The row at $\alpha=0.10$ was the first one we looked at. Coverage $0.8996$ against a target of $0.90$ is a deviation of $0.0004$, and a mean that close over ten splits is reassuring: the finite-sample correction and the implementation are both doing what they should.
+
+The row at $\alpha=0.30$ was the one we did not expect. The target is $0.70$, the model's accuracy is $0.8207$, and the measured coverage is $0.8207$ with a mean set size of $1.000$. All three numbers are correct, and together they say that the guarantee is satisfied for a reason that has nothing to do with conformal calibration: the model is accurate enough that a singleton already clears the target. The procedure is not wrong, but everything it contributes at this $\alpha$ is the message that it is not needed.
+
+Two things in the table are worth adding. The guarantee holds where it should: at $\alpha=0.01,0.02,0.05,0.10$ the naive score's coverage tracks the target closely, and the deviation at $\alpha=0.10$ is $0.0004$ in absolute terms, well inside one standard deviation of the sampling noise. And the APS score is systematically conservative at intermediate $\alpha$: its coverage exceeds the target by $0.044$ at $\alpha=0.10$, which is why its sets are larger. The conservatism is a known property of the randomised cumulative score at moderate sample sizes, and it is the price paid for the tighter class-conditional profile in the last column.
+
+\begin{figure}[pos=htbp]
+\centering
+\includegraphics[width=0.92\linewidth]{figures/fig5_examples.png}
+\caption{Prediction sets on clean test digits at $\alpha=0.10$, three multi-class cases and three singletons. A set of size two is the honest representation of a genuinely ambiguous input; the point prediction that would otherwise be reported is a lossy compression of the same information.}
+\label{fig:5}
+\end{figure}
+
+Figure~\ref{fig:5} shows what the sets look like on individual digits, deliberately mixing singleton and multi-class outcomes so that the reader sees both. The multi-class cases are the interesting ones: a $4$ that the model cannot separate from a $9$ receives a set $\{4,9\}$, which is the correct epistemic statement, whereas a point prediction would have asserted one of them with spurious confidence.
+
+\begin{figure}[pos=htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig6_tradeoff.png}
+\caption{Coverage and efficiency as functions of $\alpha$, ten repeated splits, error bars are one standard deviation. Left: empirical coverage against the nominal $1-\alpha$ line. Right: mean prediction-set size. The naive score tracks the target until the target falls below the model's accuracy, at which point both curves flatten at the accuracy floor.}
+\label{fig:6}
+\end{figure}
+
+\subsection{Experiment 2: confidence baselines versus conformal calibration}
+
+The second experiment asks whether the guarantee can be obtained more cheaply, by thresholding the model's own confidence. Four procedures are compared at a nominal $0.90$ target: a raw softmax threshold at $0.90$; the same threshold after temperature scaling fitted on the calibration set by minimising negative log-likelihood; split conformal with the naive score; and split conformal with APS. Results are in Table~\ref{tab:4} and Figure~\ref{fig:7}.
+
+\begin{table}[pos=htbp]
+\centering
+\footnotesize
+\caption{Confidence baselines versus conformal calibration at a nominal $0.90$ target (ten repeated splits). The last column is the mean absolute deviation of empirical coverage from $0.90$. Temperature scaling is fitted per split by minimising calibration negative log-likelihood; the fitted temperature averaged $0.749\pm0.088$ over the ten splits.}
+\label{tab:4}
+\begin{tabularx}{\textwidth}{@{}Y{1.24}Y{1.06}Y{0.88}Y{0.82}@{}}
+\toprule
+\textbf{Procedure} & \textbf{Empirical coverage} & \textbf{Mean set size} & \textbf{Mean $|$coverage$-0.90|$} \\
+\midrule
+Softmax threshold (raw) & $0.8207\pm0.0236$ & $1.000\pm0.000$ & $0.0793$ \\
+Temperature + threshold & $0.8207\pm0.0236$ & $1.000\pm0.000$ & $0.0793$ \\
+Split conformal (naive) & $0.8996\pm0.0189$ & $1.331\pm0.164$ & $0.0156$ \\
+Split conformal (APS) & $0.9436\pm0.0127$ & $1.832\pm0.177$ & $0.0436$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The result that matters is the identity of the first two rows, and it is the one that kept us looking at the output longest. The fitted temperature averaged $0.749\pm0.088$, so the rescaling was real and substantial; it simply does not touch the decision. We had assumed that better-calibrated scores would produce better-calibrated decisions, and the table does not support that assumption. Temperature scaling, which is the standard remedy for over-confidence and which does change the predicted probabilities, leaves coverage and set size exactly unchanged. The reason is structural: temperature scaling is a monotone transformation of the logits, so it preserves the ranking of classes and therefore preserves the argmax; a threshold applied to the rescaled probabilities selects the same singleton set as a threshold applied to the original ones. Calibration of the scores, in the sense of making probabilities match frequencies, is not the same thing as calibration of the decision, in the sense of making the set's error rate match the target. Conformal prediction does the second and does not need the first.
+
+The paired comparison over ten seeds gives a Wilcoxon signed-rank statistic of $4.0$ with $p=0.0137$ for the absolute coverage deviation of the raw softmax threshold against APS. We report the test because the sample is small and a difference of $0.0793$ versus $0.0436$ in mean absolute deviation should not be asserted as established on the basis of means alone; the test is consistent with a real difference at the $5\%$ level, and it is also consistent with a modest effect, which is the honest reading of ten paired splits.
+
+\begin{figure}[pos=htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig7_baselines.png}
+\caption{Coverage and efficiency of the four procedures at a nominal $0.90$ target. The two thresholding procedures are indistinguishable from each other and both fall short of the target by the model's error rate; the two conformal procedures reach the target, with APS overshooting because of the conservatism noted in Section~5.2.}
+\label{fig:7}
+\end{figure}
+
+\subsection{Experiment 3: validity under distribution shift}
+\label{sec:exp-drift}
+
+The third experiment violates exchangeability in a controlled way. A test stream of $450$ points is assembled by dividing the test set into nine consecutive blocks and adding Gaussian noise to the pixel values of block $k$ with standard deviation $\sigma_k$ increasing from $0$ to $0.60$, clipped to $[0,1]$. Two procedures are compared. The static procedure calibrates once on clean calibration data and applies the resulting quantile throughout. The adaptive procedure uses the same initial quantile but updates $\alpha$ after each observation according to
+\begin{equation}
+\alpha_{t+1} = \alpha_t + \gamma\,(\alpha_t - \mathbb{1}\{Y_t \notin \mathcal{C}_t\}),
+\label{eq:aci}
+\end{equation}
+with $\gamma=0.02$, clipped to $[0.001, 0.999]$, following the adaptive conformal inference of \cite{Gibbs2021ACI}.
+
+\begin{figure}[pos=htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig8_drift.png}
+\caption{Coverage under progressive corruption. The stream is divided into nine blocks with noise standard deviation increasing from $0$ to $0.60$. Static calibration, which is valid on the clean distribution, degrades monotonically; online adaptation tracks the target by inflating set size, and its own coverage falls off at the extreme end because the update cannot react faster than $\gamma$ allows.}
+\label{fig:8}
+\end{figure}
+
+The static procedure's overall coverage on the stream is $0.4644$, against a nominal $0.90$. Per block, it falls from $0.90$ at $\sigma=0$ to $0.24$ at $\sigma=0.45$ and recovers slightly to $0.28$ at the extreme end. The adaptive procedure attains $0.9111$ overall, with per-block coverage between $0.76$ and $0.98$. The cost is visible in set size: $1.256$ classes for the static procedure against $7.618$ for the adaptive one, which on a ten-class problem means that the adaptive sets approach the trivial set of all classes.
+
+The adaptive side is where we were surprised. The procedure knows nothing about $\sigma$; it observes only whether each prediction set covered, and it still recovers a coverage near the target. A rule that requires no model of the corruption process and no retraining is a genuinely useful object, and it is easy to see why this line of work attracted attention.
+
+The cost is equally visible, and we initially read the result as evidence that the method works. A closer reading is that it works at coverage and pays in information. A set containing $7.6$ of ten classes is close to the trivial set, and telling a clinician that the answer is one of eight possibilities is a formal way of saying that nothing is known. The guarantee is real; the information is not.
+
+Which of the two matters more depends on the application. For a screening task in which a missed case is costly, the adaptive set is worth its width. For a task in which a person has to act on the set, eight classes is not a decision aid.
+
+The final block, where adaptive coverage falls to $0.76$, puzzled us at first because the overall figure was on target. The update trajectory explains it: $\alpha_t$ ranges over $[0.001, 0.117]$ and $\gamma$ caps how far it can move in one step, so a corruption that arrives faster than the adaptation can track produces a transient loss. The limitation belongs to the update rule rather than to the framework. The step size $\gamma$ bounds how fast $\alpha_t$ can move, so a corruption that arrives faster than the adaptation can track will produce a transient loss of coverage. Choosing $\gamma$ is therefore a trade-off between responsiveness and stability, and it is not resolved by the theory.
+
+\begin{figure}[pos=htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig9_heatmap.png}
+\caption{Class-conditional coverage minus the nominal level at $\alpha=0.10$, by class and by score. Blue indicates over-coverage, red under-coverage. The naive score's deviations are larger in magnitude and less evenly distributed across classes; APS reduces the spread but does not eliminate it, which is the empirical counterpart of the impossibility result of Section~2.4.}
+\label{fig:9}
+\end{figure}
+
+\subsection{What the experiments do and do not show}
+
+The experiments show that the marginal guarantee holds exactly as stated for a model whose accuracy is $0.82$; that a confidence threshold, including one applied after temperature scaling, does not obtain the guarantee; that class-conditional coverage deviates substantially even when marginal coverage is nominal; and that static calibration loses validity under shift while online adaptation recovers it at a large efficiency cost.
+
+They do not show that conformal prediction is useful at scale, that the numbers transfer to image benchmarks of realistic size, or that the adaptive procedure is preferable to the static one in any particular deployment. The dataset is small, the model is deliberately weak, and the corruption is synthetic and one-dimensional. The purpose is to make the mechanisms visible, not to estimate their magnitudes in realistic settings, and a reader who takes the specific numbers as estimates of what would happen on ImageNet has misread the study.
+
+\begin{figure}[pos=htbp]
+\centering
+\includegraphics[width=0.92\linewidth]{figures/fig10_years.png}
+\caption{Year distribution of the 34 references cited in this survey, split by publication status. The counts describe this reference list and not the field's publication volume; a field-wide count would require a fixed query, a fixed database, and a stated inclusion rule, none of which is claimed here.}
+\label{fig:10}
+\end{figure}
+
+\section{Open Problems}
+\label{sec:open}
+
+The open problems below are separated into those that are theoretical obstructions, in the sense that a proof stands in the way, and those that are engineering gaps, in the sense that the obstruction is absent but the construction is missing.
+
+\subsection{Theoretical obstructions}
+
+\textbf{Conditional validity without assumptions.} The impossibility of \cite{Barber2021} rules out distribution-free pointwise conditional coverage. Every subsequent construction buys conditional validity with an assumption, and the assumptions are not interchangeable: smoothness, known groups, and estimable likelihood ratios lead to guarantees of different strengths and different failure modes. A unified account of which assumption buys which guarantee, and at what cost in efficiency, does not exist.
+
+\textbf{Exchangeability beyond the i.i.d.\ case.} The relaxation of \cite{Beyond} gives coverage guarantees under a quantified departure from exchangeability, but the quantification is in terms of a total-variation-like quantity that is not estimable from data in most applications. A version of the guarantee that is stated in terms of an observable diagnostic, rather than an unobservable distance, would be substantially more useful.
+
+\textbf{Sequence-level risk.} For language models the natural object is a distribution over sequences, and coverage of a set of sequences is either trivial (include everything) or undefined (the set is not enumerable). The risk-control formulations of \cite{CRC_LLM} and \cite{HierCRC} avoid this by bounding the expected fraction of unsupported claims, which is a different quantity from the probability that the output is correct. Whether a sequence-level analogue of coverage exists, and what it would mean, is open.
+
+\subsection{Engineering gaps}
+
+\textbf{Calibration under cost constraints.} Every method in this survey assumes a calibration set that is exchangeable with the deployment distribution and large enough for the quantile to be stable. In practice calibration data are expensive, and the sample-size requirement interacts with the target $\alpha$: the finite-sample correction costs one effective sample, and at $\alpha=0.01$ with a small calibration set the quantile is dominated by a handful of order statistics. A principled treatment of calibration-set design, as opposed to calibration-set size, is missing.
+
+\textbf{Composition.} A deployed system is a pipeline of models, and the guarantee is stated for one predictor. If a conformal set feeds a downstream model, the downstream model's inputs are sets rather than points, and the exchangeability of the composed system is not implied by the exchangeability of its parts. This is the practical analogue of the composition problem in differential privacy, and it has received little attention.
+
+\textbf{Diagnostics and monitoring.} The observation of \cite{Alur2026} that set size is a monitor is, in our view, the most immediately deployable idea in the recent literature, and it is also the least developed. A monitoring procedure built on set size would need a null distribution, a detection threshold, and a guarantee about false alarms, none of which currently exists.
+
+\subsection{Connections to selective inference}
+
+Conformal prediction and the selective-inference literature share a methodological commitment: both obtain finite-sample guarantees by calibrating against a held-out sample rather than by assuming a parametric model. Stability selection \cite{Meinshausen2010} and the knockoff filter \cite{Barber2015,Candès2018} control false-discovery rates in variable selection by constructing a comparison distribution; conformal prediction controls coverage by constructing a quantile. The two are instances of the same pattern, and the recent work on conditional calibration for knockoffs \cite{Luo2025} makes the connection explicit by importing a conformal-style calibration step into the knockoff construction. A general theory of calibration-based inference that subsumes both would be a significant contribution, and the ingredients for it appear to exist.
+
+\section{Conclusion}
+
+Three statements summarise the field as it stands. Conformal prediction delivers exactly what it promises: a finite-sample, distribution-free guarantee on marginal coverage, obtainable at the cost of one calibration pass over a model that need not be calibrated, correct, or even good. The last three years have extended the promise in two directions that matter, from coverage to arbitrary bounded risks and from marginal to conditional guarantees under explicit assumptions, and have mapped the boundary of what is attainable by proving that unconditional conditional validity is not. What remains unresolved is the practical cost of the guarantee: validity under shift is recoverable only by inflating sets to the point where they carry little information, conditional validity requires assumptions that are often unverifiable, and the calibration data that the whole construction rests on are treated as free when they are not.
+
+For a practitioner, the operational summary is short. If the requirement is a stated error rate on exchangeable data, split conformal with the finite-sample quantile correction delivers it, and a confidence threshold does not, no matter how well calibrated the probabilities are. If the requirement is per-group error rates, group-conditional calibration delivers it when the groups are known. If the data drift, static calibration will fail silently and online adaptation will recover validity at a set-size cost that should be measured before deployment rather than after.
+
+\section*{Data and code availability}
+
+The experiments of Section~\ref{sec:experiments} are implemented in a single Python script using scikit-learn, NumPy, SciPy and Matplotlib. The script fixes all random seeds, writes every reported number to a JSON file, and regenerates every figure; the numbers in Tables~\ref{tab:3} and~\ref{tab:4} and in the text of Section~\ref{sec:experiments} are read from that file rather than transcribed. The dataset is the \texttt{digits} benchmark distributed with scikit-learn; no external download is required. The reference metadata in the bibliography were resolved on 2026-11-04 through the OpenAlex API and the arXiv API.
+
+\begin{thebibliography}{34}
+
+\bibitem{Vovk2005} V.~Vovk, A.~Gammerman, G.~Shafer. \emph{Algorithmic Learning in a Random World}. Springer, New York, 2005. DOI \url{10.1007/b106715}. Second edition 2022, DOI \url{10.1007/978-3-031-06649-8}.
+
+\bibitem{Shafer2008} G.~Shafer, V.~Vovk. A Tutorial on Conformal Prediction. \emph{Journal of Machine Learning Research} 9 (2008) 371--421. DOI \url{10.5555/1390681.1390693}. Preprint \url{https://arxiv.org/abs/0706.3188}.
+
+\bibitem{Lei2018} J.~Lei, M.~G'Sell, A.~Rinaldo, R.~J.~Tibshirani, L.~Wasserman. Distribution-Free Predictive Inference for Regression. \emph{Journal of the American Statistical Association} 113(523) (2018) 1094--1111. DOI \url{10.1080/01621459.2017.1307116}. Preprint \url{https://arxiv.org/abs/1604.04173}.
+
+\bibitem{Sadinle2019} M.~Sadinle, J.~Lei, L.~Wasserman. Least Ambiguous Set-Valued Classifiers With Bounded Error Levels. \emph{Journal of the American Statistical Association} 114(525) (2019) 223--234. DOI \url{10.1080/01621459.2017.1395341}.
+
+\bibitem{Tibshirani2019} R.~J.~Tibshirani, R.~F.~Barber, E.~J.~Cand\`es, A.~Ramdas. Conformal Prediction Under Covariate Shift. \emph{Advances in Neural Information Processing Systems} 32 (NeurIPS 2019). Preprint \url{https://arxiv.org/abs/1904.06019}.
+
+\bibitem{Romano2020} Y.~Romano, M.~Sesia, E.~J.~Cand\`es. Classification with Valid and Adaptive Coverage. \emph{Advances in Neural Information Processing Systems} 33 (NeurIPS 2020). Preprint \url{https://arxiv.org/abs/2006.02544}.
+
+\bibitem{Barber2021} R.~F.~Barber, E.~J.~Cand\`es, A.~Ramdas, R.~J.~Tibshirani. The Limits of Distribution-Free Conditional Predictive Inference. \emph{Information and Inference} 10(2) (2021) 455--482. DOI \url{10.1093/imaiai/iaaa017}.
+
+\bibitem{Angelopoulos2021intro} A.~N.~Angelopoulos, S.~Bates. A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification. arXiv preprint (2021). \url{https://arxiv.org/abs/2107.07511}. Not peer reviewed.
+
+\bibitem{Bates2021} S.~Bates, A.~N.~Angelopoulos, L.~Lei, J.~Malik, M.~I.~Jordan. Distribution-Free, Risk-Controlling Prediction Sets. \emph{Journal of the ACM} 68(6) (2021) 1--34. DOI \url{10.1145/3478535}.
+
+\bibitem{LTT} A.~N.~Angelopoulos, S.~Bates, E.~J.~Cand\`es, M.~I.~Jordan, L.~Lei. Learn then Test: Calibrating Predictive Algorithms to Achieve Risk Control. \emph{Annals of Applied Statistics} 19(2) (2025) 1641--1662. DOI \url{10.1214/24-AOAS1998}. Preprint \url{https://arxiv.org/abs/2110.01052}.
+
+\bibitem{Gibbs2021ACI} I.~Gibbs, E.~J.~Cand\`es. Adaptive Conformal Inference Under Distribution Shift. \emph{Advances in Neural Information Processing Systems} 34 (NeurIPS 2021). Preprint \url{https://arxiv.org/abs/2106.00170}.
+
+\bibitem{Hore2024} R.~Hore, R.~F.~Barber. Conformal Prediction with Local Weights: Randomization Enables Robust Guarantees. \emph{Journal of the Royal Statistical Society: Series B} 87(2) (2024) 549--578. DOI \url{10.1093/jrsssb/qkae103}.
+
+\bibitem{Campos2024} M.~M.~Campos, A.~Farinhas, C.~Zerva, M.~A.~T.~Figueiredo, A.~F.~T.~Martins. Conformal Prediction for Natural Language Processing: A Survey. \emph{Transactions of the Association for Computational Linguistics} 12 (2024) 1274--1291. DOI \url{10.1162/tacl_a_00715}. Preprint \url{https://arxiv.org/abs/2405.01976}.
+
+\bibitem{Gibbs2025} I.~Gibbs, J.~J.~Cherian, E.~J.~Cand\`es. Conformal Prediction with Conditional Guarantees. \emph{Journal of the Royal Statistical Society: Series B} 87(4) (2025) 1100--1126. DOI \url{10.1093/jrsssb/qkaf008}.
+
+\bibitem{Zhou2025} X.~Zhou, B.~Chen, Y.~Gui, L.~Cheng, Z.~Deng, X.~Wang, et al. Conformal Prediction: A Data Perspective. \emph{ACM Computing Surveys} 58(2) (2025) 1--37. DOI \url{10.1145/3736575}.
+
+\bibitem{Luo2025} Y.~Luo, W.~Fithian, L.~Lei. Improving Knockoffs with Conditional Calibration. \emph{Annals of Statistics} 53(5) (2025) 2283--2302. DOI \url{10.1214/25-AOS2543}.
+
+\bibitem{Li2026gen} C.~Li, S.~Zheng, Y.~Lin, X.~Yao, H.~Zhang, et al. Generative Conformal Prediction Under Covariate Shift. \emph{Journal of Computational and Graphical Statistics} (2026). DOI \url{10.1080/10618600.2026.2703276}.
+
+\bibitem{Alur2026} A.~Alur, B.~Das. Prediction Set Size as a Diagnostic for Data Corruption: A Conformal Perspective on Label Noise and Distribution Shift. \emph{International Journal of Data Science and Analytics} (2026). DOI \url{10.1007/s41060-026-01331-2}.
+
+\bibitem{CRC_LLM} When Can Conformal Risk Control Certify LLM Outputs? Bounds, Impossibility, and Adaptation. arXiv preprint (2026). \url{https://arxiv.org/abs/2606.29054}. Not peer reviewed.
+
+\bibitem{HierCRC} Hierarchical Group-Conditional Conformal Risk Control for Selective Prediction in Language Models. arXiv preprint (2026). \url{https://arxiv.org/abs/2607.24562}. Not peer reviewed.
+
+\bibitem{IntroConformal} IntroConformal: Conformal Factuality Guarantees for Large Vision-Language Models via Introspection. arXiv preprint (2026). \url{https://arxiv.org/abs/2609.01375}. Not peer reviewed.
+
+\bibitem{AuditCP} Auditing Conformal Prediction for Language Models Under Inference-Time Model Shift. arXiv preprint (2026). \url{https://arxiv.org/abs/2610.28937}. Not peer reviewed.
+
+\bibitem{ParaCP} Conformal Prediction with Paraphrase-Aware Scoring for LLM Uncertainty Quantification. arXiv preprint (2026). \url{https://arxiv.org/abs/2610.04239}. Not peer reviewed.
+
+\bibitem{RAPS} A.~N.~Angelopoulos, S.~Bates, J.~Malik, M.~I.~Jordan. Uncertainty Sets for Image Classifiers using Conformal Prediction. \emph{International Conference on Learning Representations} (ICLR 2021). Preprint \url{https://arxiv.org/abs/2009.14193}.
+
+\bibitem{CRC} A.~N.~Angelopoulos, S.~Bates, A.~Fisch, L.~Lei, T.~Schuster. Conformal Risk Control. arXiv preprint (2022). \url{https://arxiv.org/abs/2208.02814}.
+
+\bibitem{Beyond} R.~F.~Barber, E.~J.~Cand\`es, A.~Ramdas, R.~J.~Tibshirani. Conformal Prediction Beyond Exchangeability. \emph{Annals of Statistics} 51(2) (2023) 816--845. DOI \url{10.1214/23-AOS2276}. Preprint \url{https://arxiv.org/abs/2202.13415}.
+
+\bibitem{NonExchgCRC} A.~Farinhas, C.~Zerva, D.~Ulmer, A.~F.~T.~Martins. Non-Exchangeable Conformal Risk Control. arXiv preprint (2023). \url{https://arxiv.org/abs/2310.01262}.
+
+\bibitem{XVCrc} K.~M.~Cohen, S.~Park, O.~Simeone, S.~S.~Shamai. Cross-Validation Conformal Risk Control. \emph{IEEE International Symposium on Information Theory} (ISIT 2024) 250--255. DOI \url{10.1109/isit57864.2024.10619172}. Preprint \url{https://arxiv.org/abs/2401.11974}.
+
+\bibitem{OrdinalCRC} Y.~Xu, W.~Guo, Z.~Wei. Conformal Risk Control for Ordinal Classification. \emph{Conference on Uncertainty in Artificial Intelligence} (UAI 2023), PMLR 216. Preprint \url{https://arxiv.org/abs/2405.00417}.
+
+\bibitem{TimeSeries} M.~Zaffran, A.~Dieuleveut, O.~F\'eron, Y.~Goude, J.~Josse. Adaptive Conformal Predictions for Time Series. arXiv preprint (2022). \url{https://arxiv.org/abs/2202.07282}.
+
+\bibitem{ConformalLM} V.~Quach, A.~Fisch, T.~Schuster, A.~Yala, J.~H.~Sohn. Conformal Language Modeling. arXiv preprint (2023). \url{https://arxiv.org/abs/2306.10193}.
+
+\bibitem{Meinshausen2010} N.~Meinshausen, P.~B\"uhlmann. Stability Selection. \emph{Journal of the Royal Statistical Society: Series B} 72(4) (2010) 417--473. DOI \url{10.1111/j.1467-9868.2010.00740.x}.
+
+\bibitem{Barber2015} R.~F.~Barber, E.~J.~Cand\`es. Controlling the False Discovery Rate via Knockoffs. \emph{Annals of Statistics} 43(5) (2015) 2055--2085. DOI \url{10.1214/15-AOS1337}.
+
+\bibitem{Candès2018} E.~J.~Cand\`es, Y.~Fan, L.~Janson, J.~Lv. Panning for Gold: `Model-X' Knockoffs for High Dimensional Controlled Variable Selection. \emph{Journal of the Royal Statistical Society: Series B} 80(3) (2018) 551--577. DOI \url{10.1111/rssb.12265}.
+
+\bibitem{Guo2017} C.~Guo, G.~Pleiss, Y.~Sun, K.~Q.~Weinberger. On Calibration of Modern Neural Networks. \emph{International Conference on Machine Learning} (ICML 2017) 1321--1330. Preprint \url{https://arxiv.org/abs/1706.04599}.
+
+\end{thebibliography}
+
+\end{document}

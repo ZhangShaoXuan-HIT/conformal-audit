@@ -1,0 +1,42 @@
+=== Base model accuracy (10 seeds): 0.8207 +/- 0.0236 ===
+=== E1 (alpha, method, coverage mean±std, size mean±std) ===
+a=0.01 naive  cov=0.9900±0.0072 size=5.136±2.032 empty=0.000 max|class dev|=0.0139
+a=0.01 APS    cov=0.9902±0.0042 size=5.361±1.591 empty=0.000 max|class dev|=0.0139
+a=0.02 naive  cov=0.9782±0.0101 size=3.317±0.930 empty=0.000 max|class dev|=0.0322
+a=0.02 APS    cov=0.9784±0.0088 size=3.733±0.957 empty=0.000 max|class dev|=0.0322
+a=0.05 naive  cov=0.9513±0.0130 size=2.067±0.449 empty=0.000 max|class dev|=0.0633
+a=0.05 APS    cov=0.9620±0.0100 size=2.501±0.410 empty=0.000 max|class dev|=0.0500
+a=0.10 naive  cov=0.8996±0.0189 size=1.331±0.164 empty=0.000 max|class dev|=0.1244
+a=0.10 APS    cov=0.9436±0.0127 size=1.832±0.177 empty=0.000 max|class dev|=0.0955
+a=0.20 naive  cov=0.8280±0.0205 size=1.018±0.025 empty=0.000 max|class dev|=0.1795
+a=0.20 APS    cov=0.9082±0.0147 size=1.421±0.076 empty=0.000 max|class dev|=0.1932
+a=0.30 naive  cov=0.8207±0.0236 size=1.000±0.000 empty=0.000 max|class dev|=0.2773
+a=0.30 APS    cov=0.8707±0.0172 size=1.226±0.053 empty=0.000 max|class dev|=0.2841
+
+=== E2 (target 0.90) ===
+Softmax threshold (raw)      cov=0.8207±0.0236 size=1.000±0.000 empty=0.000 |err|=0.0793
+Temperature + threshold      cov=0.8207±0.0236 size=1.000±0.000 empty=0.000 |err|=0.0793
+Split conformal (naive)      cov=0.8996±0.0189 size=1.331±0.164 empty=0.000 |err|=0.0156
+Split conformal (APS)        cov=0.9436±0.0127 size=1.832±0.177 empty=0.000 |err|=0.0436
+temperature {'T_mean': 0.7493093996674564, 'T_std': 0.08778770925723797}
+wilcoxon {'statistic': 4.0, 'p_value': 0.013671875, 'comparison': '|coverage - 0.90|, raw softmax threshold vs APS, paired over 10 seeds'}
+
+=== E3 ===
+static_overall_cov = 0.46444444444444444
+adaptive_overall_cov = 0.9111111111111111
+static_mean_size = 1.2555555555555555
+adaptive_mean_size = 7.6177777777777775
+alpha_final = 0.0010612080000000001
+alpha_min = 0.001
+alpha_max = 0.11716593810022656
+stream_len = 450
+per level:
+  sigma=0.00 static=0.900 adaptive=0.900 sizes=1.24/1.56
+  sigma=0.07 static=0.740 adaptive=0.920 sizes=1.38/4.00
+  sigma=0.15 static=0.580 adaptive=0.980 sizes=1.30/9.74
+  sigma=0.22 static=0.560 adaptive=0.980 sizes=1.30/9.84
+  sigma=0.30 static=0.340 adaptive=0.980 sizes=1.20/9.70
+  sigma=0.38 static=0.280 adaptive=0.940 sizes=1.28/9.30
+  sigma=0.45 static=0.240 adaptive=0.900 sizes=1.18/8.68
+  sigma=0.53 static=0.260 adaptive=0.840 sizes=1.28/8.40
+  sigma=0.60 static=0.280 adaptive=0.760 sizes=1.14/7.34
