@@ -239,3 +239,47 @@ def save_results(path, rows, generated_by, checks=None):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=1, allow_nan=False)
+
+
+# ---------------------------------------------------------------------------
+# CIFAR-10 helpers (phase 2). Features are cached by code/cifar_features.py.
+# ---------------------------------------------------------------------------
+
+def load_cifar_features(path=None):
+    path = path or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                "data", "cifar10_features.npz")
+    d = np.load(path)
+    return d["Xtr"].astype(np.float32), d["ytr"].astype(int), d["Xte"].astype(np.float32), d["yte"].astype(int)
+
+
+def make_splits_cifar(y, seed, n_cal=2000, n_train_pool=30000):
+    """Fixed 30k train pool; n_cal drawn from the remaining 20k.
+
+    The official 10k CIFAR-10 test set is used for evaluation, so only the
+    50k training labels are split here. Returns (train_pool_idx, cal_idx).
+    """
+    idx = np.arange(len(y))
+    pool, cal_pool = train_test_split(idx, train_size=n_train_pool, stratify=y, random_state=seed + 1)
+    if n_cal >= len(cal_pool):
+        cal = cal_pool
+    else:
+        cal, _ = train_test_split(cal_pool, train_size=n_cal, stratify=y[cal_pool], random_state=seed + 2)
+    return np.sort(pool), np.sort(cal)
+
+
+def fit_head(X, y, strength, seed, max_iter=1000):
+    """Standardiser + multinomial logistic regression on a fraction of the pool."""
+    if strength >= 1.0:
+        idx = np.arange(len(y))
+    else:
+        idx, _ = train_test_split(np.arange(len(y)), train_size=strength, stratify=y, random_state=seed + 7)
+    clf = make_pipeline(StandardScaler(), LogisticRegression(max_iter=max_iter, C=1.0))
+    clf.fit(X[idx], y[idx])
+    return clf, int(len(idx))
+
+
+def normal_ci(hits, z=1.96):
+    p = float(np.mean(hits))
+    n = len(hits)
+    se = float(np.sqrt(max(p * (1.0 - p), 1e-12) / n))
+    return max(0.0, p - z * se), min(1.0, p + z * se)

@@ -51,6 +51,7 @@ target-tracking guarantee and can look successful by collapsing to the clip.
 5.3 Audit B on digits and CIFAR.
 5.4 Audit C on controlled drift streams.
 5.5 Regime map: when do the traps matter?
+<!-- phase 2: empty rate, not accuracy, governs the forcing trap. CIFAR raw threshold empty 18-69%; conformal naive near zero; APS detached 7-9%. -->
 
 ## 6. A checklist for practitioners (600 words)
 
@@ -79,7 +80,10 @@ the absence of a reference in this bibliography.
 | F2 | coverage and size versus threshold | paper/figures/fig2_equivalence |
 | F3 | delta coverage versus raw empty rate | paper/figures/fig3_forcing |
 | F4 | coverage and alpha trajectories under drift | paper/figures/fig4_aci |
-| F5 | trap visibility versus model strength | paper/figures/fig5_regime |
+| T5 | CIFAR audit A | paper/tables/table5_cifar_equivalence.md |
+| T6 | CIFAR audit B | paper/tables/table6_cifar_postprocess.md |
+| T7 | CIFAR audit C | paper/tables/table7_cifar_aci.md |
+| F5 | trap visibility versus empty rate | paper/figures/fig5_regime |
 
 ## Claims ledger
 
@@ -89,4 +93,4 @@ the absence of a reference in this bibliography.
 | C2 | max-prob calibration misses the target | T2 | supported (digits) |
 | C3 | non-empty forcing inflates coverage | T3, F3 | supported (mean delta 0.077, max 0.318) |
 | C4 | the alpha_t update does not track the target | T4, F4 | supported (alpha collapses to clip, size +19%) |
-| C5 | traps matter only when sets are non-singleton | T1, F5 | pending |
+| C5 | the forcing trap is governed by the empty rate, not by model strength alone | T3, T6, F5 | supported (CIFAR naive near zero, APS 1-4%) |

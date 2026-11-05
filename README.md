@@ -42,6 +42,20 @@ refs/                      bibliography and screening log
 legacy/                    frozen old manuscript, read-only
 ```
 
+## Data (CIFAR-10)
+
+The CIFAR experiments use the fast.ai PNG mirror, because the Toronto server was
+slow from this machine.
+
+```
+curl -L -o data/cifar10.tgz https://s3.amazonaws.com/fast-ai-imageclas/cifar10.tgz
+tar -xzf data/cifar10.tgz -C data
+python code/cifar_features.py
+```
+
+This produces `data/cifar10_features.npz` (50k train, 10k test, 512-d ResNet-18
+features). The file is gitignored and can be regenerated.
+
 ## Environment
 
 Python 3.12.14, numpy 2.3.5, scipy 1.18.1, scikit-learn 1.9.1, matplotlib 3.11.2.
@@ -51,7 +65,15 @@ Python 3.12.14, numpy 2.3.5, scipy 1.18.1, scikit-learn 1.9.1, matplotlib 3.11.2
 
 Phase 0: scaffold, legacy freeze, audit A on digits.
 
-Phase 1: audits B and C on digits. Tables 2 to 4 and Figures 2 to 4 are
-generated from results JSON. Working notes in `paper/notes_phase1.md`.
+Phase 1: audits B and C on digits. Tables 2 to 4 and Figures 2 to 4.
 
-Next: phase 2, CIFAR-10 with two model strengths.
+Phase 2: CIFAR-10 replication with ResNet-18 features. Tables 5 to 7 and
+Figure 5. Working notes in `paper/notes_phase2.md`.
+
+Commands:
+```
+python code/run_all.py      # digits, about 90 seconds
+python code/run_cifar.py    # CIFAR-10, requires torch and data/cifar10_features.npz
+```
+
+Next: phase 3, literature and the two-axis map.

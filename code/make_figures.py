@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+from collections import defaultdict
 
 import numpy as np
 import matplotlib
@@ -165,10 +166,71 @@ def fig_aci():
     print("[fig] fig4_aci")
 
 
+
+def _regime_summary(rows):
+    pairs = {}
+    for r in rows:
+        key = (r["strength"], r["seed"], r["n_cal"], r["alpha"], r["score"])
+        pairs.setdefault(key, {})[r["postprocess"]] = r
+    acc, empty, delta = defaultdict(list), defaultdict(list), defaultdict(list)
+    for key, v in pairs.items():
+        if "raw" not in v or "forced" not in v:
+            continue
+        strength, seed, n_cal, alpha, score = key
+        acc[(strength, score)].append(v["raw"]["accuracy"])
+        empty[(strength, score)].append(v["raw"]["empty_rate"])
+        delta[(strength, score)].append(v["forced"]["coverage"] - v["raw"]["coverage"])
+    out = {}
+    for key in acc:
+        out[key] = {"acc": mean(acc[key]), "empty": mean(empty[key]), "delta": mean(delta[key])}
+    return out
+
+
+def fig_regime():
+    digits = [r for r in load("postprocess_digits.json")["rows"]
+              if abs(r["alpha"] - 0.10) < 1e-9 and r["n_cal"] == 449]
+    cifar = [r for r in load("postprocess_cifar.json")["rows"]
+             if abs(r["alpha"] - 0.10) < 1e-9 and r["n_cal"] == 500]
+    scores = ["naive", "aps_rand"]
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 3.7))
+    datasets = [("digits", digits, "-", "o", "digits (n_cal = 449)"),
+                ("cifar10", cifar, "--", "^", "CIFAR-10 (n_cal = 500)")]
+    for name, rows, ls, marker, label in datasets:
+        summ = _regime_summary(rows)
+        for score in scores:
+            pts = [(v["acc"], v["empty"], v["delta"]) for (s, sc), v in summ.items() if sc == score]
+            pts.sort()
+            if not pts:
+                continue
+            color = SCORE_COLOR[score]
+            axes[0].plot([p[0] for p in pts], [p[1] for p in pts], ls, marker=marker,
+                         markersize=5, color=color, linewidth=1.3, alpha=0.9)
+            axes[1].plot([p[0] for p in pts], [p[2] for p in pts], ls, marker=marker,
+                         markersize=5, color=color, linewidth=1.3, alpha=0.9)
+    axes[0].set_xlabel("test accuracy")
+    axes[0].set_ylabel("raw empty-set rate")
+    axes[0].set_title("(a) how often sets are empty", fontsize=9)
+    axes[1].set_xlabel("test accuracy")
+    axes[1].set_ylabel("coverage gain from forcing")
+    axes[1].set_title("(b) how much forcing inflates coverage", fontsize=9)
+    axes[1].axhline(0.0, color="#333333", linewidth=0.8, linestyle=":")
+    handles = [plt.Line2D([], [], marker="o", linestyle="", color=SCORE_COLOR[s],
+                          label=SCORE_LABEL[s], markersize=5) for s in scores]
+    handles += [plt.Line2D([], [], marker=mk, linestyle=ls, color="#666666",
+                           label=label, markersize=5) for _, _, ls, mk, label in datasets]
+    fig.legend(handles=handles, fontsize=7, ncol=4, loc="lower center", bbox_to_anchor=(0.5, -0.02), frameon=False)
+    fig.tight_layout(rect=(0, 0.07, 1, 1))
+    for ext in ("png", "pdf"):
+        fig.savefig(os.path.join(OUT, "fig5_regime." + ext), bbox_inches="tight")
+    plt.close(fig)
+    print("[fig] fig5_regime")
+
+
 def main():
     fig_equivalence()
     fig_forcing()
     fig_aci()
+    fig_regime()
 
 
 if __name__ == "__main__":
