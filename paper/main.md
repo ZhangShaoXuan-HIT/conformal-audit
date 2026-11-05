@@ -54,16 +54,85 @@ with alpha and with the empty rate. Report both raw and forced numbers.
 <!-- phase 1: mean delta 0.077, max 0.318; naive 0.041, APS rand 0.080, APS det 0.108, RAPS 0.078 -->
 
 ### 4.3 The alpha_t update is not ACI
-<!-- cite Susmann et al. 2023 (AdaptiveConformal). The update rule is not new; the audit of implementations is. -->
 
-### 4.4 Do real libraries do this?
-<!-- phase 3B. MAPIE 1.6.0 APS default include_last_label=True: 0.9457 +/- 0.0107 with
-0 empty sets; randomized: 0.8998 +/- 0.0105. TorchCP, puncc and crepes allow empty sets.
-coverforest exposes allow_empty_sets. MAPIE, TorchCP and AdaptiveConformal use fixed-alpha
-ACI; the alpha_t bug is a hand-written error, not an ecosystem default. See Table 8. -->
 ACI uses a fixed target alpha. Replacing it with alpha_t removes the
 target-tracking guarantee and can look successful by collapsing to the clip.
+
 <!-- phase 1, average over three schedules, gamma 0.02: fixed = 0.833 cov, 3.10 size, alpha 0.0082; buggy = 0.838 cov, 3.70 size, alpha 0.0011, near-trivial 17.3% vs 9.1%. At gamma 0.1 the buggy update diverges (seed SD 0.205). -->
+
+### 4.4 Do real libraries do this?
+
+The audit so far uses our own set constructor. A reader may ask whether the
+behaviour is an artifact of that choice. We inspected six implementations:
+MAPIE 1.6.0, TorchCP 1.2.1, puncc 0.9.3, crepes 0.9.1, coverforest 0.0.3,
+and the AdaptiveConformal R package. All six were read at the source level.
+MAPIE was also run, with five seeds on a synthetic five-class problem.
+
+The first finding is that the empty-set policy is a design choice, not a
+universal. MAPIE's APS implementation defaults to include_last_label=True,
+which adds the label that crosses the quantile and therefore never returns an
+empty set. TorchCP returns the boolean mask scores <= q_hat. puncc returns
+index lists. crepes returns p_values >= 1 - confidence. All three can return
+empty sets. coverforest exposes the choice directly, with allow_empty_sets=True
+as the default and documentation that recommends using False sparingly.
+Table 8 summarises the six implementations. It is a policy map, not a defect
+list.
+
+The second finding is that MAPIE's default is a non-empty rule of a different
+kind from the argmax fallback studied in Section 4.2. It does not insert the
+argmax. It inserts the last label whose cumulative mass crosses the threshold.
+The effect is nevertheless the same in kind. Over five seeds at alpha = 0.10,
+the default reaches 0.9457 +/- 0.0107 with zero empty sets and a mean size of
+3.676. The randomized setting, which is the exact conformal rule, reaches
+0.8998 +/- 0.0105 with an empty rate of 0.0004 and a mean size of 3.232. The
+False setting reaches 0.8284 +/- 0.0150, below the target. The two
+non-randomized settings therefore err in opposite directions. The default
+over-covers by 4.6 points; the exact rule lands on the target.
+
+The MAPIE documentation acknowledges that True and False "may result in a
+coverage higher than 1 - alpha", because neither creates empty sets. It does
+not quantify the gap, and it does not say that the default differs from the
+exact rule by enough to change a comparison between methods. That is the gap
+this section fills.
+
+This matters for how the result should be read. The phenomenon in Section 4.2
+is not specific to our argmax fallback. Any non-empty rule changes the
+coverage of the sets it produces, and the direction and size of the change
+depend on the rule. The argmax fallback produces the identity derived in
+Section 4.2, where the gain is the empty rate times the conditional accuracy
+of the argmax. The MAPIE default produces a different accounting, but the same
+qualitative outcome: coverage above the nominal level, larger sets, and a
+reported number that belongs to the post-processing rather than to the
+guarantee.
+
+The third finding concerns the ACI update. MAPIE's time-series regressor
+updates the level with a fixed target, alpha_t + gamma * (alpha_0 - error).
+TorchCP does the same with a fixed alpha. The AdaptiveConformal R package
+updates a quantile level against a fixed alpha. None of the three uses the
+alpha_t recursion studied in Section 4.3. The error is therefore a risk of
+hand-written implementations, not a default of the libraries we checked. That
+narrows the claim of Section 4.3. The value of the audit is not that the
+libraries are wrong. It is that the error is easy to make, produces a
+plausible-looking improvement, and is invisible in a coverage report alone.
+
+Two practical consequences follow. A user of MAPIE's default APS should report
+0.946, not 0.90, and should say that the number comes from a non-empty rule. A
+user who wants the exact guarantee should select the randomized setting, or
+report both the unmodified sets and the non-empty version. More generally, a
+coverage report is not interpretable without the set-construction rule that
+produced it. The rule is part of the method, and it belongs in the methods
+section.
+
+The audit has limits. Five of the six implementations were read but not run.
+The versions are those available on 2026-11-06, and line numbers will move.
+The MAPIE experiment uses synthetic data, so the 4.6-point gap should be read
+as an illustration of the mechanism rather than an estimate for a particular
+application. The claim we defend is narrow: in the implementations we audited,
+the non-empty policy varies, one widely used default over-covers by 4.6 points,
+and the three ACI implementations we checked use the correct fixed-target
+update.
+
+<!-- cite: mapie2026, torchcp2026, puncc2026, crepes2026, coverforest2026, adaptiveconformal2023 -->
 
 ## 5. Experiments (1800 words)
 
