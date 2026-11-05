@@ -25,21 +25,249 @@ in released code.
 - Avoid the word "pitfalls" in the title and abstract; use "audit" or "accounting".
 -->
 
-## 2. The guarantee in one page (1200 words)
+## 2. The guarantee in one page
 
-Exchangeability, the finite-sample quantile correction, the difference between
-marginal and conditional coverage, and why the guarantee is a lower bound rather
-than an equality. No history, no generations.
+### 2.1 Exchangeability and what the guarantee assumes
 
-## 3. A two-axis map (1200 words)
+A conformal predictor is a procedure, not a model. It takes a fitted classifier f, a
+calibration sample, and a target error rate α, and it returns a set C(x) for each input.
+The only assumption is that the calibration pairs and the test pair are exchangeable.
+Exchangeability means that the joint distribution is invariant under permutation of the
+indices. It is weaker than independence and identical distribution. Every i.i.d. sample is
+exchangeable, and so is any sample whose distribution is symmetric in the order of the
+observations.
 
-Table 1 gives the map. The rows are the guarantee a method pursues. The columns are the
-assumption it is willing to make. Each cell names a representative method, the assumption
-it needs, and the price it pays. The point of the table is not that every cell is full.
-The empty cells are the open problems, and they are more informative than a list of
-methods. A reader can see at a glance that pointwise conditional coverage is essentially
-empty outside the exchangeable column, and that risk control under covariate shift has no
-entry in the reviewed set.
+The assumption is easy to state and easy to violate. A calibration set drawn at random from
+the same collection as the test set is exchangeable with it. A calibration set drawn from
+last year's data and deployed against this year's data is not. A calibration set selected
+because it contains the cases the model finds hard is not. A test stream whose distribution
+changes after every observation is not. In each case the guarantee does not degrade
+gracefully. The coverage on the deployment distribution can fall far below 1 − α while
+every diagnostic computed on the calibration distribution looks correct. This is the
+failure mode that Section 5.4 measures.
+
+The guarantee is marginal in a second sense as well. It averages over the randomness of the
+calibration sample and the test point. It does not say that a particular realized set
+covers the particular test label. It says that the procedure covers with probability at
+least 1 − α over repeated draws. A single calibration set can produce coverage below
+1 − α, and the probability that it does is not zero. For a binary classifier, the
+calibration-conditional coverage follows a Beta law, and the probability of a shortfall can
+be computed exactly [@Aguru2026]. The practical consequence is that a single estimate of
+0.8996 against a target of 0.90 is not evidence of a bug, and a single estimate of 0.946 is
+not evidence of a better method. Both are draws from a procedure whose average is fixed.
+
+### 2.2 Split conformal
+
+The construction has three stages. Fit f on a training set. Pass a disjoint calibration set
+of size n through f and compute a nonconformity score s_i = s(X_i, Y_i) for each
+calibration pair, where a larger score means the pair is less consistent with the model.
+Sort the scores and take the k-th smallest, with k = ceil((n + 1)(1 − α)). For a new input
+x, the prediction set is the collection of labels y whose score does not exceed q.
+
+The index k is the part that is most often implemented incorrectly. The naive choice
+ceil(n(1 − α)) gives a threshold that is too small, and the resulting coverage is below the
+nominal level by a term of order 1/n. The choice ceil((n + 1)(1 − α)) costs one effective
+calibration sample and buys a guarantee that holds for every n, not only in the limit. With
+continuous scores, the coverage is exactly k/(n + 1), which exceeds 1 − α by at most
+1/(n + 1) [@Vovk2005; @Lei2018]. The correction is not cosmetic. It is the difference
+between a procedure with a finite-sample guarantee and a procedure with an asymptotic one.
+
+The guarantee is a lower bound, and the upper bound is also informative. At n = 100 and
+α = 0.10 the coverage is 91/101 = 0.901. At n = 10 it is 10/11 = 0.909. The absolute
+difference is small, but it is the difference between a guarantee that is tight at the
+nominal level and one that is visibly conservative. The calibration size is therefore a
+design variable, not a nuisance. Section 5 varies it explicitly.
+
+### 2.3 Scores and efficiency
+
+Once the quantile is fixed, the only design freedom is the score. For classification, the
+simplest choice is s(x, y) = 1 − p_y(x), which yields the set of labels whose predicted
+probability exceeds a threshold. This is the least-ambiguous classifier of Sadinle et al.
+[@Sadinle2019], and it is the score that split conformal reduces to when the threshold is
+chosen on the calibration set. The score is global. A class that the model systematically
+under-predicts is excluded more often than the nominal rate allows, and the marginal
+coverage is restored only by compensation across classes.
+
+Adaptive scores change the object being thresholded. The APS score accumulates probability
+mass in descending order until the true label is reached, so the score depends on the rank
+of the true label rather than on its absolute probability [@Romano2020]. The randomization
+in the score is what restores exact validity in the presence of ties. The regularized
+variant adds a penalty on the number of labels in the set and shrinks large sets at a small
+cost in coverage [@RAPS]. For regression, the analogous choice is the absolute residual,
+and the conformalized quantile regression of Romano et al. [@Romano2019CQR] uses a locally
+adaptive residual.
+
+Efficiency has no distribution-free optimum. There is no score that is uniformly smallest
+across distributions, and the achievable set size depends on the model and on the data. A
+better model produces smaller sets, and a worse model produces larger ones, but neither
+changes the validity of the procedure. This is why the efficiency literature is a sequence
+of score designs rather than a sequence of theorems, and why the choice of score is an
+empirical question. It is also why the score determines the empty-set behavior that Section
+4.2 measures. A score that can place every label above the threshold produces empty sets. A
+score that cannot produces sets that are never empty. The validity guarantee is silent on
+which case obtains.
+
+### 2.4 Marginal and conditional coverage
+
+Marginal coverage averages over the covariate distribution. Conditional coverage would
+require P(Y in C(X) | X = x) ≥ 1 − α for almost every x. The second statement is much
+stronger, and it is not attainable without assumptions. Barber et al. [@Barber2021] show
+that no distribution-free procedure can guarantee pointwise conditional coverage with
+non-trivial sets for all distributions. The intuition is that a finite calibration sample
+contains finite information about any particular x, and a procedure that must be valid for
+every distribution can always be confronted with a distribution that concentrates its mass
+elsewhere. In classification, the only procedure that attains the target everywhere is the
+trivial one that returns the entire label space.
+
+The field's responses weaken the target rather than the impossibility. Group-conditional
+coverage requires the guarantee to hold on average within each of a collection of groups.
+When the groups are known in advance, Mondrian calibration attains it by calibrating
+separately within each group [@Vovk2012]. The cost is a smaller effective calibration
+sample per group and the requirement that the group label be available at test time. Local
+weighting attains a smoother version of the target by assuming that the conditional
+coverage function varies slowly in x, and randomization makes the local weights
+identifiable [@Hore2024]. The assumption is explicit, and it is not verifiable from data
+alone.
+
+Class-conditional coverage is a group-conditional target, not a pointwise one. A
+class-conditional coverage below the nominal level for the worst-served class is a
+statement about a known group, and it is attainable with Mondrian calibration. It is not
+evidence for or against the pointwise impossibility of Barber et al. Treating the two as
+the same is a category error. The distinction matters for Section 5, where the
+class-conditional deviations are large while the marginal coverage is nominal.
+
+### 2.5 What the guarantee does not say
+
+The guarantee does not say that the set is small. It does not say that coverage holds for
+every subgroup. It does not say that the calibration set is representative of the deployment
+distribution. It does not survive non-exchangeability without modification. It is a
+statement about a procedure, not about a particular realized set, and it is a lower bound on
+an average, not a promise about the next prediction.
+
+These limits are not defects of the theory. They are the terms of the contract. The rest of
+the paper is about what happens when the terms are forgotten. A reported coverage number is
+the output of a pipeline that includes a score, a calibration set, a threshold rule, and a
+post-processing rule. The guarantee constrains one of those objects. It does not constrain
+the number that the pipeline prints.
+
+## 3. A two-axis map
+
+### 3.1 Why a map, not a chronology
+
+A chronological account of conformal prediction is easy to write and hard to use. The field
+did not develop in phases. The split construction, the adaptive score, the impossibility
+result, and the risk-control extension were motivated by different problems, and several of
+them overlap in time. A reader who memorizes the chronology learns a list of methods. A
+reader who follows the guarantee learns where each method breaks.
+
+The map in Table 1 has two axes. The rows are the guarantee a method pursues: marginal
+coverage, group-conditional coverage, pointwise conditional coverage, and risk control. The
+columns are the assumption it is willing to make: exchangeability, covariate shift,
+non-exchangeability, and known groups. A method is located by the pair. A method that
+claims a guarantee outside its column is mis-specified, and a method that is valid in one
+column need not be valid in another.
+
+The axes are not independent. Moving right weakens the data assumption. Moving down
+strengthens the guarantee. The two directions compete: a stronger guarantee usually requires a stronger assumption, a larger set, or both. The empty cells are where the competition has not been resolved.
+
+### 3.2 The rows
+
+The first row is marginal coverage. The guarantee is P(Y in C(X)) ≥ 1 − α, averaged over the data distribution. It is the base case, and it is the only case that is attainable
+without assumptions beyond exchangeability. The split construction of Vovk et al.
+[@Vovk2005], the regression analysis of Lei et al. [@Lei2018], and the tutorial of
+Angelopoulos and Bates [@Angelopoulos2021intro] all live here. The cost is one calibration
+pass, and the score is free. The guarantee is weak in the sense that it says nothing about
+any particular x. It is strong in the sense that it survives a badly misspecified model.
+
+The second row is group-conditional coverage. The guarantee is that coverage holds on
+average within each of a collection of groups. When the groups are known in advance,
+Mondrian calibration attains it by calibrating separately within each group [@Vovk2012].
+Gibbs et al. [@Gibbs2025] develop a framework for group-conditional coverage under weaker
+assumptions, and the cost is the same in kind: a smaller effective calibration sample per
+group, and the requirement that the group label be available at test time. The guarantee is
+stronger than marginal coverage and weaker than pointwise coverage. It is the right target
+when the deployment has a known partition, such as a demographic group or a class label.
+
+The third row is pointwise conditional coverage. The guarantee is P(Y in C(X) | X = x) ≥
+1 − α for almost every x. Barber et al. [@Barber2021] show that no distribution-free
+procedure can attain it with non-trivial sets for all distributions. The constructive route
+adds assumptions. Hore and Barber [@Hore2024] assume that the conditional coverage function
+varies slowly in x, and they show that randomization makes the local weights identifiable.
+The assumption is explicit, and it is not verifiable from data alone. The sets are larger
+than the marginal ones, and the guarantee is conditional only up to the smoothness
+constant.
+
+The fourth row is risk control. The guarantee is E[L(C(X), Y)] ≤ r for a bounded loss L, of
+which coverage is a special case. Bates et al. [@Bates2021] introduce the general
+construction, and later work extends it to a grid of risk levels with multiplicity control
+[@LTT] and to a cross-validated version that removes the data-splitting loss [@XVCrc]. The
+assumption is a monotone loss and exchangeability. The cost is a grid search over the risk
+level and a correction for the number of candidates. The guarantee is not a coverage
+statement, and it does not reduce to one unless the loss is the indicator of a miss.
+
+### 3.3 The columns
+
+The first column is exchangeability. It is the base assumption, and every method in the first
+column is valid under it. The column is not a statement about the data. It is a statement
+about the procedure's tolerance. A calibration set drawn at random from the same
+distribution as the test set satisfies it. A calibration set drawn from a different
+distribution does not.
+
+The second column is covariate shift. The guarantee is recovered by reweighting the
+calibration scores according to the likelihood ratio between the test and calibration
+covariate distributions [@Tibshirani2019]. The assumption is that the likelihood ratio is
+known or estimable. When it is estimated, the estimation error propagates into the
+guarantee, and the coverage is exact only if the ratio is exact. The column is therefore
+narrower than it looks. It is not a distribution-free guarantee under arbitrary shift. It
+is a guarantee under a shift that can be quantified.
+
+The third column is non-exchangeability. The guarantee is weakened to a bound that depends
+on a measure of the violation. Barber et al. [@Beyond] give a bound in terms of a
+total-variation-like quantity, and Oliveira et al. [@Oliveira2022] study the split
+construction under a known ordering. The bound is exact, but the quantity is not estimable
+from data in most applications. The alternative is online adaptation. Gibbs and Candès
+[@Gibbs2021ACI] update the target level after each observation, and the guarantee becomes
+an average over time rather than a statement about each step. The distinction matters. A
+per-step guarantee is not available without assumptions. An average guarantee is, and it is
+what the adaptive methods provide.
+
+The fourth column is known groups. The method is Mondrian calibration, and the guarantee is
+group-conditional [@Vovk2012]. The assumption is that the group label is known at
+calibration and at test time. The cost is a smaller effective sample per group, and the
+guarantee is only as good as the group definition. A group that is defined by a variable
+the model can see is easy. A group that is defined by a variable the model cannot see is
+not.
+
+### 3.4 The empty cells
+
+The map has empty cells, and they are the point. Pointwise conditional coverage under
+covariate shift is empty in the reviewed set. Pointwise conditional coverage under
+non-exchangeability is empty. Group-conditional coverage under covariate shift and under
+non-exchangeability is empty. Risk control under covariate shift is empty in the reviewed
+set. These are not claims that no method can exist. They are claims that no method in the
+reviewed set occupies the cell, and they are the open problems of Section 7.
+
+The empty cells also explain why the field's arguments often talk past each other. A method
+that is valid in the exchangeable column can be presented as if it were valid under shift,
+and a reader who does not check the column will believe it. The map makes the check
+explicit. It is the first question a practitioner should ask of a new method. Which cell
+does it occupy, and what does it assume to get there?
+
+### 3.5 What the map buys
+
+The map buys three things. First, it makes the assumptions explicit. A method's guarantee is
+a conditional statement, and the condition is the column. Second, it makes the costs
+comparable. A group-conditional guarantee costs a smaller effective sample. A pointwise
+guarantee costs an unverifiable smoothness assumption. A risk-control guarantee costs a
+grid and a multiplicity correction. Third, it makes the empirical audit interpretable. A
+reported coverage number is a property of a cell, not of a score. The same score can
+produce 0.90 in one cell and 0.95 in another, and the difference is the post-processing, not
+the guarantee.
+
+Table 9 places the map against four existing surveys. The comparison is about coverage, not
+quality. The map's contribution is the two-axis organization and the explicit empty cells.
+The empirical contribution is the audit of whether the reported numbers respect the cell.
+Neither is a substitute for the other.
 
 ## 4. Three implementation traps (2500 words)
 
