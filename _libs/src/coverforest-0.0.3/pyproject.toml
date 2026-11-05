@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools_scm[toml]>=8", "scipy", "Cython", "numpy>=1.26", "scikit-learn>=1.6.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coverforest"
+version = "0.0.3"
+authors = [
+  { name="Donlapark Ponnoprat", email="donlapark@gmail.com" },
+]
+description = "A simple and fast sklearn-compatible conformal predictions with random forests for both classification and regression tasks."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "scikit-learn>=1.6.0",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+]
+
+[project.urls]
+Homepage = "https://github.com/donlapark/coverforest"
+Issues = "https://github.com/donlapark/coverforest/issues"
+
+[tool.setuptools]
+packages.find.exclude = ["doc", 'coverforest*tests']
+include-package-data = false
+
+[tool.setuptools_scm]
+version_file = "coverforest/_version.py"
+
+
+[tool.cibuildwheel]
+skip = "cp36-* cp37-* cp38-* pp* *_ppc64le *_i686 *_s390x"
+
+[tool.cibuildwheel.linux]
+manylinux-x86_64-image = "manylinux2014"
+manylinux-aarch64-image = "manylinux2014"
+before-build = "bash wheels/cibw_before_build_linux.sh {project}"
+
+[tool.cibuildwheel.linux.environment]
+# /project will be the $PWD equivalent inside the docker used to build the wheel
+PKG_CONFIG_PATH = "/project/"
+
+[tool.cibuildwheel.macos]
+before-build = "bash wheels/cibw_before_build_macos.sh {project}"
+
+[tool.cibuildwheel.macos.environment]
+PKG_CONFIG_PATH = "{project}"
+
+[tool.cibuildwheel.windows]
+before-build = "bash wheels/cibw_before_build_win.sh {project}"
+repair-wheel-command = "bash wheels/repair_windows.sh {wheel} {dest_dir}"
+
+[tool.cibuildwheel.windows.environment]
+# This does not work because pkg-config does not like backslashes,
+PKG_CONFIG_PATH = "{project}"
+# do this instead (which will override this setting)
+# set CIBW_ENVIRONMENT_WINDOWS=PKG_CONFIG_PATH=PWD.replace('\\', '/')

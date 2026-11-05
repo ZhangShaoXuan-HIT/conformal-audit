@@ -1,0 +1,251 @@
+{
+ "library": "mapie",
+ "version": "1.6.0",
+ "alpha": 0.1,
+ "dataset": "make_classification 5 classes, 8000 samples, 5 seeds",
+ "rows": [
+  {
+   "seed": 0,
+   "score": "lac",
+   "include_last_label": true,
+   "coverage": 0.8955,
+   "empty_rate": 0.0,
+   "mean_size": 2.8655,
+   "accuracy": 0.487,
+   "n_test": 2000
+  },
+  {
+   "seed": 0,
+   "score": "aps",
+   "include_last_label": true,
+   "coverage": 0.9485,
+   "empty_rate": 0.0,
+   "mean_size": 3.4565,
+   "accuracy": 0.487,
+   "n_test": 2000
+  },
+  {
+   "seed": 0,
+   "score": "aps",
+   "include_last_label": false,
+   "coverage": 0.8095,
+   "empty_rate": 0.0,
+   "mean_size": 2.4755,
+   "accuracy": 0.487,
+   "n_test": 2000
+  },
+  {
+   "seed": 0,
+   "score": "aps",
+   "include_last_label": "randomized",
+   "coverage": 0.892,
+   "empty_rate": 0.001,
+   "mean_size": 3.021,
+   "accuracy": 0.487,
+   "n_test": 2000
+  },
+  {
+   "seed": 1,
+   "score": "lac",
+   "include_last_label": true,
+   "coverage": 0.903,
+   "empty_rate": 0.0,
+   "mean_size": 3.182,
+   "accuracy": 0.4985,
+   "n_test": 2000
+  },
+  {
+   "seed": 1,
+   "score": "aps",
+   "include_last_label": true,
+   "coverage": 0.9475,
+   "empty_rate": 0.0,
+   "mean_size": 3.7275,
+   "accuracy": 0.4985,
+   "n_test": 2000
+  },
+  {
+   "seed": 1,
+   "score": "aps",
+   "include_last_label": false,
+   "coverage": 0.8425,
+   "empty_rate": 0.0,
+   "mean_size": 2.736,
+   "accuracy": 0.4985,
+   "n_test": 2000
+  },
+  {
+   "seed": 1,
+   "score": "aps",
+   "include_last_label": "randomized",
+   "coverage": 0.9055,
+   "empty_rate": 0.0,
+   "mean_size": 3.291,
+   "accuracy": 0.4985,
+   "n_test": 2000
+  },
+  {
+   "seed": 2,
+   "score": "lac",
+   "include_last_label": true,
+   "coverage": 0.8935,
+   "empty_rate": 0.0,
+   "mean_size": 3.206,
+   "accuracy": 0.4955,
+   "n_test": 2000
+  },
+  {
+   "seed": 2,
+   "score": "aps",
+   "include_last_label": true,
+   "coverage": 0.9275,
+   "empty_rate": 0.0,
+   "mean_size": 3.65,
+   "accuracy": 0.4955,
+   "n_test": 2000
+  },
+  {
+   "seed": 2,
+   "score": "aps",
+   "include_last_label": false,
+   "coverage": 0.826,
+   "empty_rate": 0.0,
+   "mean_size": 2.658,
+   "accuracy": 0.4955,
+   "n_test": 2000
+  },
+  {
+   "seed": 2,
+   "score": "aps",
+   "include_last_label": "randomized",
+   "coverage": 0.8905,
+   "empty_rate": 0.0005,
+   "mean_size": 3.198,
+   "accuracy": 0.4955,
+   "n_test": 2000
+  },
+  {
+   "seed": 3,
+   "score": "lac",
+   "include_last_label": true,
+   "coverage": 0.914,
+   "empty_rate": 0.0,
+   "mean_size": 3.3915,
+   "accuracy": 0.449,
+   "n_test": 2000
+  },
+  {
+   "seed": 3,
+   "score": "aps",
+   "include_last_label": true,
+   "coverage": 0.956,
+   "empty_rate": 0.0,
+   "mean_size": 3.845,
+   "accuracy": 0.449,
+   "n_test": 2000
+  },
+  {
+   "seed": 3,
+   "score": "aps",
+   "include_last_label": false,
+   "coverage": 0.8445,
+   "empty_rate": 0.0,
+   "mean_size": 2.848,
+   "accuracy": 0.449,
+   "n_test": 2000
+  },
+  {
+   "seed": 3,
+   "score": "aps",
+   "include_last_label": "randomized",
+   "coverage": 0.9155,
+   "empty_rate": 0.0005,
+   "mean_size": 3.3875,
+   "accuracy": 0.449,
+   "n_test": 2000
+  },
+  {
+   "seed": 4,
+   "score": "lac",
+   "include_last_label": true,
+   "coverage": 0.902,
+   "empty_rate": 0.0,
+   "mean_size": 3.109,
+   "accuracy": 0.4875,
+   "n_test": 2000
+  },
+  {
+   "seed": 4,
+   "score": "aps",
+   "include_last_label": true,
+   "coverage": 0.949,
+   "empty_rate": 0.0,
+   "mean_size": 3.6985,
+   "accuracy": 0.4875,
+   "n_test": 2000
+  },
+  {
+   "seed": 4,
+   "score": "aps",
+   "include_last_label": false,
+   "coverage": 0.8195,
+   "empty_rate": 0.0,
+   "mean_size": 2.7035,
+   "accuracy": 0.4875,
+   "n_test": 2000
+  },
+  {
+   "seed": 4,
+   "score": "aps",
+   "include_last_label": "randomized",
+   "coverage": 0.8955,
+   "empty_rate": 0.0,
+   "mean_size": 3.262,
+   "accuracy": 0.4875,
+   "n_test": 2000
+  }
+ ],
+ "summary": [
+  {
+   "score": "lac",
+   "include_last_label": "True",
+   "coverage_mean": 0.9016,
+   "coverage_sd": 0.00804207684618846,
+   "empty_rate_mean": 0.0,
+   "size_mean": 3.1508,
+   "accuracy_mean": 0.4835
+  },
+  {
+   "score": "aps",
+   "include_last_label": "True",
+   "coverage_mean": 0.9457000000000001,
+   "coverage_sd": 0.010715642771201354,
+   "empty_rate_mean": 0.0,
+   "size_mean": 3.6755000000000004,
+   "accuracy_mean": 0.4835
+  },
+  {
+   "score": "aps",
+   "include_last_label": "False",
+   "coverage_mean": 0.8284,
+   "coverage_sd": 0.015001666574084376,
+   "empty_rate_mean": 0.0,
+   "size_mean": 2.6842,
+   "accuracy_mean": 0.4835
+  },
+  {
+   "score": "aps",
+   "include_last_label": "randomized",
+   "coverage_mean": 0.8997999999999999,
+   "coverage_sd": 0.010545141061171253,
+   "empty_rate_mean": 0.0004,
+   "size_mean": 3.2319000000000004,
+   "accuracy_mean": 0.4835
+  }
+ ],
+ "source": {
+  "predict_set": "mapie/classification.py:238-283",
+  "aps_doc": "mapie/conformity_scores/sets/aps.py:355-358",
+  "lac_rule": "mapie/conformity_scores/sets/lac.py:205-207"
+ }
+}

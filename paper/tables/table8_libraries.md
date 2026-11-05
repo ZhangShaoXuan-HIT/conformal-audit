@@ -1,0 +1,29 @@
+# Table 8. Library behavior audit
+
+Versions checked on 2026-11-06. Line numbers refer to the sources in _libs/src.
+Only MAPIE was run; the other rows are source inspection.
+
+| library | version | task | empty sets possible | default policy | evidence | ACI update |
+|---|---|---|---|---|---|---|
+| MAPIE | 1.6.0 | classification | LAC yes; APS policy-dependent | APS default include_last_label=True: no empty sets, coverage 0.9457 vs 0.90 | classification.py:238-283; aps.py:355-358; lac.py:205-207; results/mapie_empty.json | fixed alpha_0 (time_series_regression.py:329) |
+| TorchCP | 1.2.1 | classification | yes | no forcing; boolean mask (scores <= q_hat) | classification/predictor/base.py:111 | fixed alpha (regression/predictor/aci.py:197) |
+| puncc | 0.9.3 | classification | yes | no forcing; index lists, empty when no class passes | api/prediction_sets.py:70-78, 112-119 | not implemented |
+| crepes | 0.9.1 | classification | yes | no forcing; boolean mask (p_values >= 1-confidence) | base.py:340 | not implemented |
+| coverforest | 0.0.3 | classification | yes by default | allow_empty_sets=True default; False avoids empty sets; docs warn to use it sparingly | _forest.py:1457, 2006-2008 | not applicable |
+| AdaptiveConformal | GitHub main | regression intervals | not applicable | not applicable | R/aci_algorithm.R:78-81 | fixed alpha (correct) |
+
+## MAPIE 1.6.0, five seeds, alpha = 0.10
+
+Synthetic five-class data, logistic regression, 2,000 test points per seed.
+The correct randomised APS is the last row. The default is the second row.
+
+| score | include_last_label | coverage (mean +/- SD) | empty rate | size |
+|---|---|---|---|---|
+| LAC | True | 0.9016 +/- 0.0080 | 0.0000 | 3.151 |
+| APS, default | True | 0.9457 +/- 0.0107 | 0.0000 | 3.676 |
+| APS | False | 0.8284 +/- 0.0150 | 0.0000 | 2.684 |
+| APS, randomized | randomized | 0.8998 +/- 0.0105 | 0.0004 | 3.232 |
+
+The default APS setting over-covers by 4.6 points with zero empty sets. The randomised
+setting, which is the exact conformal rule, lands on the target. The difference is the
+non-empty post-processing, not the score.

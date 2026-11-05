@@ -76,4 +76,7 @@ python code/run_all.py      # digits, about 90 seconds
 python code/run_cifar.py    # CIFAR-10, requires torch and data/cifar10_features.npz
 ```
 
-Next: phase 3, literature and the two-axis map.
+Phase 3B: library behavior audit. Table 8, `results/mapie_empty.json`, notes in
+`refs/library_audit_notes.md`. MAPIE was run; the other libraries were source-inspected.
+
+Next: phase 3C, full literature search and the two-axis map.

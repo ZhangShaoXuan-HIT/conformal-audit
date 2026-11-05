@@ -55,6 +55,12 @@ with alpha and with the empty rate. Report both raw and forced numbers.
 
 ### 4.3 The alpha_t update is not ACI
 <!-- cite Susmann et al. 2023 (AdaptiveConformal). The update rule is not new; the audit of implementations is. -->
+
+### 4.4 Do real libraries do this?
+<!-- phase 3B. MAPIE 1.6.0 APS default include_last_label=True: 0.9457 +/- 0.0107 with
+0 empty sets; randomized: 0.8998 +/- 0.0105. TorchCP, puncc and crepes allow empty sets.
+coverforest exposes allow_empty_sets. MAPIE, TorchCP and AdaptiveConformal use fixed-alpha
+ACI; the alpha_t bug is a hand-written error, not an ecosystem default. See Table 8. -->
 ACI uses a fixed target alpha. Replacing it with alpha_t removes the
 target-tracking guarantee and can look successful by collapsing to the clip.
 <!-- phase 1, average over three schedules, gamma 0.02: fixed = 0.833 cov, 3.10 size, alpha 0.0082; buggy = 0.838 cov, 3.70 size, alpha 0.0011, near-trivial 17.3% vs 9.1%. At gamma 0.1 the buggy update diverges (seed SD 0.205). -->
@@ -98,6 +104,7 @@ the absence of a reference in this bibliography.
 | T5 | CIFAR audit A | paper/tables/table5_cifar_equivalence.md |
 | T6 | CIFAR audit B | paper/tables/table6_cifar_postprocess.md |
 | T7 | CIFAR audit C | paper/tables/table7_cifar_aci.md |
+| T8 | library behavior audit | paper/tables/table8_libraries.md |
 | F5 | trap visibility versus empty rate | paper/figures/fig5_regime |
 
 ## Claims ledger
@@ -109,3 +116,5 @@ the absence of a reference in this bibliography.
 | C3 | non-empty forcing inflates coverage | T3, F3 | supported (mean delta 0.077, max 0.318) |
 | C4 | the alpha_t update does not track the target | T4, F4 | supported (alpha collapses to clip, size +19%) |
 | C5 | the forcing trap is governed by the empty rate, not by model strength alone | T3, T6, F5 | supported (CIFAR naive near zero, APS 1-4%) |
+| C6 | real libraries expose or default to non-empty sets | T8, results/mapie_empty.json | supported (MAPIE default 0.9457 vs 0.90, 0 empties) |
+| C7 | the alpha_t bug is a hand-written error, not an ecosystem default | T8 source audit | supported (MAPIE, TorchCP, AdaptiveConformal use fixed alpha) |
