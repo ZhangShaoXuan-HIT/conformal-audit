@@ -569,14 +569,184 @@ update.
 
 <!-- cite: mapie2026, torchcp2026, puncc2026, crepes2026, coverforest2026, adaptiveconformal2023 -->
 
-## 5. Experiments (1800 words)
+## 5. Experiments
 
-5.1 Setup: digits and CIFAR-10, two model strengths, n_cal sweep, 5 seeds.
-5.2 Audit A on digits and CIFAR.
-5.3 Audit B on digits and CIFAR.
-5.4 Audit C on controlled drift streams.
-5.5 Regime map: when do the traps matter?
-<!-- phase 2: empty rate, not accuracy, governs the forcing trap. CIFAR raw threshold empty 18-69%; conformal naive near zero; APS detached 7-9%. -->
+### 5.1 Design
+
+The experiments test three claims, not the accuracy of conformal prediction on a
+benchmark. The first claim is that a probability threshold is a calibration rule,
+and that the correct calibration is split conformal. The second is that non-empty
+post-processing changes the coverage a pipeline reports. The third is that the
+α_t update is not ACI. The design varies the quantities that should matter for
+these claims: the score, the target level, the calibration size, the model
+strength, and the dataset.
+
+Two datasets are used. The digits benchmark has 1,797 images of 8 by 8 pixels in
+ten classes. A stratified split holds out 450 test points and 898 training points,
+and the calibration set is drawn from the remaining 449. The model is a
+standardiser followed by multinomial logistic regression. The training set is
+subsampled to 5, 25, and 100 percent of the pool, which gives 44, 224, and 898
+training points and a test accuracy that ranges from about 0.83 to 0.96. CIFAR-10
+has 50,000 training images and 10,000 test images in ten classes. The images are
+passed through a pretrained ResNet-18, and the 512-dimensional penultimate
+features are used with a logistic-regression head. The training pool is 30,000
+images, and the head is fitted on 100, 1,000, 5,000, or 30,000 of them, which
+gives a test accuracy from 0.69 to 0.86. The calibration set is drawn from the
+remaining 20,000, with sizes 500, 2,000, and 10,000. The official test set is used
+unchanged.
+
+The two datasets are chosen for contrast, not for scale. Digits is small enough
+that every number can be checked by hand, and CIFAR-10 is large enough that the
+coverage estimates are tight. Neither is a deployment benchmark, and Section 5.6
+is explicit about the limits.
+
+Four scores are compared. The naive score is 1 − p_y. The randomized APS score
+accumulates the probability mass of the classes ranked above the true class and
+adds a uniform fraction of the true class's probability. The deterministic APS
+score uses the cumulative mass through the true class and no randomization. The RAPS variant adds a penalty on the number of classes in the set, with λ = 0.01 and k_reg = 2 fixed rather than tuned.
+The scores are implemented from the papers rather than imported from a library, so
+the audit measures the method, not a library default. Section 4.4 audits the
+libraries separately.
+
+The post-processing is the variable that the audit turns on. Every cell is
+evaluated twice. The raw evaluation keeps empty sets as empty. The forced
+evaluation inserts the argmax into every empty set. The forced evaluation is a
+measurement device, not a method. It answers the question "what would this
+pipeline report if it forced a non-empty output?" The two evaluations share the
+same sets, the same scores, and the same calibration. The only difference is the
+post-processing.
+
+The metrics are coverage, mean set size, empty rate, class-conditional coverage,
+expected calibration error, and negative log-likelihood. Coverage and size are the
+primary quantities. The empty rate is the mechanism behind the post-processing
+result. The class-conditional coverage is reported because it is often confused
+with pointwise conditional coverage; Section 2.4 explains the difference. The
+calibration metrics are reported because the scores are built on probability
+outputs, and a reader should be able to see whether the model is over- or
+under-confident.
+
+Every cell is repeated over five seeds, except the CIFAR-10 drift experiment,
+which uses three. The digits confidence intervals are bootstrap intervals over
+the test points; the CIFAR-10 intervals are normal approximations, which are tight
+at 10,000 test points. The seeds change the split, the calibration draw, and the
+model fit. The reported numbers are means over seeds, and the tables report the
+standard deviation where it matters.
+
+Table 10 summarises the grid. The full grid is larger than the tables. The digits
+audit B has 540 cells and the CIFAR-10 audit B has 720. The tables report the
+cells at α = 0.10, and the figures report the full range.
+
+### 5.2 Audit A: the threshold is a calibration rule
+
+Audit A compares four threshold rules at α = 0.10. The rules are the raw threshold
+at 0.90, the max-probability quantile, the true-class quantile, and split
+conformal. They are evaluated on digits with n_cal = 449 and on CIFAR-10 with
+n_cal = 2,000, across the model strengths.
+
+The result is a check, not a discovery. The true-class rule and split conformal
+are identical pointwise. The raw threshold is degenerate. The max-probability rule
+is between the two and is not exact. Table 2 and Table 5 give the numbers, Figure
+2 plots them, and Section 4.1 reads the table. The purpose of the audit is to
+establish the baseline for the next two. If the threshold is a calibration rule,
+then the interesting comparison is between scores and between post-processing
+rules, not between conformal and a raw threshold.
+
+### 5.3 Audit B: the post-processing
+
+Audit B varies the score, the target level, the calibration size, and the model
+strength. On digits the grid has 540 cells. On CIFAR-10 it has 720. Each cell is
+evaluated raw and forced, so the audit produces 1,080 and 1,440 rows. The full
+results are in Table 3 and Table 6, and Figure 3 plots the change against the
+empty rate.
+
+The summary is in Section 4.2. Three features of the design are worth stating
+here. First, the grid is balanced over the score and the calibration size, so the
+ranking of the scores is not an artifact of one calibration size. Second, the
+model strength is varied independently of the calibration size, because the
+training pool and the calibration pool are disjoint and the calibration size is
+drawn from a fixed pool. Third, the forced evaluation is applied to the same sets
+as the raw evaluation, so the change is not confounded by a different threshold or
+a different score.
+
+The grid also produces the exception that Section 4.2 discusses. Deterministic APS
+at 5,000 CIFAR-10 images is already conservative before the fallback, with a
+coverage of 0.994 and a mean set size of 6.08. The fallback has nothing to do. The
+cell is not a failure of the audit. It is a reminder that over-coverage can come
+from the score as well as from the post-processing.
+
+### 5.4 Audit C: the update rule
+
+Audit C compares two update rules on controlled drift streams. The digits stream
+has 450 points in nine blocks, with Gaussian noise increasing from 0 to 0.60.
+Three schedules are used: linear, step, and abrupt. The CIFAR-10 stream has 2,000
+images in 20 blocks, with pixel noise increasing from 0 to 0.40. The calibration
+set is clean in both cases, so the drift is a violation of exchangeability rather
+than a corrupted calibration.
+
+The digits grid varies the step size over six values from 0.005 to 0.2, the update
+rule over two values, and the seed over five. The CIFAR-10 grid uses two step sizes
+and three seeds. The static procedure is included as a baseline. Table 4 and Table
+7 report the results, and Figure 4 plots the coverage and the level trajectories
+for the linear schedule at γ = 0.02.
+
+The design separates the two questions that a coverage number confounds. The first
+is whether the method adapts. The second is whether the adaptation is bought with
+larger sets. The grid reports both, along with the level trajectory, the fraction
+of steps at a clip bound, and the share of near-trivial sets. A reader who only
+looks at the coverage cannot answer either question.
+
+### 5.5 The regime map
+
+The 1,260 cells of audit B are the raw material for a different view. Figure 5
+plots the raw empty rate and the coverage gain against the test accuracy, at
+α = 0.10 and a calibration size of 449 for digits and 500 for CIFAR-10. Each point
+is a model strength, averaged over seeds. The figure compares the naive score and
+the randomized APS.
+
+The view is not a model-strength story. On digits the empty rate rises with
+accuracy, from 0 to 7.8 percent for the naive score and from 3.4 to 7.0 percent for
+APS. On CIFAR-10 the naive score is at zero at every strength, and APS is between
+1.0 and 3.5 percent. The difference is the score and the calibration, not the
+accuracy. A stronger model can have a higher empty rate if the score is more
+likely to cross the threshold on every label. The figure makes the mechanism
+visible and prevents the reader from reading the audit as a statement about weak
+models.
+
+The 5,000-image APS cell is the exception again. It is the only point where the
+empty rate falls below the neighboring strengths, and it is the point where the
+score is already conservative. The exception is a useful warning. The empty rate
+is not a monotone function of accuracy, and a reader who expects a smooth curve
+will misread the figure.
+
+### 5.6 What the experiments do and do not show
+
+The experiments show that the three mechanisms are real, that they are
+reproducible across two datasets and a range of model strengths, and that their
+magnitudes are large enough to change a comparison. The raw threshold can turn 70
+percent of a test set into abstentions and then report the model's accuracy. The
+post-processing can add 9.5 points of coverage on CIFAR-10 and 8.4 points on
+digits, with no change to the score. The wrong update can add 12.4 points of
+coverage on CIFAR-10 while inflating the set size by 25 percent. These are not
+small effects, and they are not artifacts of a single seed.
+
+The experiments do not show that the traps are common across all libraries.
+Section 4.4 shows the opposite for the update rule: three libraries use the
+fixed-target update. They do not show that the magnitudes transfer to ImageNet, to
+language models, or to a deployment with a different model class. The models are
+linear heads on small images, the drift is synthetic and one-dimensional, and the
+datasets are two. The results are about mechanisms, not about scale.
+
+The experiments also do not establish that the correct ACI is a good method. On
+the streams we tested it fails to reach the target, for reasons that Section 4.3
+explains. A reader who wants a positive result about ACI will not find it here. A
+reader who wants to know how the method fails, and how the failure can be mistaken
+for success, will.
+
+The code is a single script that fixes the seeds and writes every reported number
+to a JSON file. The tables and figures are generated from that file. The data are
+public, and the experiments can be rerun on a laptop. The reproducibility is not a
+claim about the importance of the results. It is a condition for the reader to
+check them.
 
 ## 6. A checklist for practitioners (600 words)
 
@@ -610,6 +780,7 @@ the absence of a reference in this bibliography.
 | T7 | CIFAR audit C | paper/tables/table7_cifar_aci.md |
 | T8 | library behavior audit | paper/tables/table8_libraries.md |
 | T9 | coverage against four surveys | paper/tables/table9_coverage.md |
+| T10 | experimental grid | paper/tables/table10_grid.md |
 | F5 | trap visibility versus empty rate | paper/figures/fig5_regime |
 
 ## Claims ledger
