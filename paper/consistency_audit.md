@@ -288,7 +288,7 @@ articles to 20 pages and Application Notes to 15, so it is not yet compliant.
 ## Update: JAS Application Note (2026-11-06)
 
 The Application Note version is built at paper/jas_an/main_an.pdf (15 pages,
-3,448 words, 4 tables, 4 figures) with main_an.docx, supplement_an.pdf (9 pages)
+3,350 words, 4 tables, 4 figures (abstract 172)) with main_an.docx, supplement_an.pdf (9 pages)
 and cover_letter.md. It uses the four-section structure the journal requests:
 introduction with the data challenge, methodology/approach (the audit protocol),
 application to three datasets and eight implementations, and conclusion.
@@ -296,3 +296,9 @@ application to three datasets and eight implementations, and conclusion.
 The declaration of generative AI use and CRediT statement are included. The
 15-page limit is met. The full tables, map, grid and checklist are in the
 supplement. This version supersedes the 42-page main_jas.pdf for JAS submission.
+
+
+The Application Note prose was revised to remove AI-style patterns: the
+"not X but Y" constructions, the "first/second/third finding" scaffolding, the
+one-line section closers and the uniform paragraph rhythm. Facts, numbers,
+citations and tables are unchanged.

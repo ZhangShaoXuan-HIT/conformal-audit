@@ -4,9 +4,9 @@ Dear Editor,
 
 I submit the manuscript "When Reported Coverage Is Not Coverage: A Controlled Audit of Conformal Prediction Implementations" as an Application Note for the Journal of Applied Statistics.
 
-The data challenge is practical. A practitioner sets a 0.90 coverage target, thresholds the output, and reports the fraction of test points on which the true label is in the set. The number looks like a coverage guarantee, but it is a property of the threshold rule. Three implementation choices move it without changing the guarantee: the calibration of the threshold, the treatment of empty sets, and the update rule of adaptive conformal inference.
+The manuscript addresses a practical problem. A practitioner sets a 0.90 coverage target, thresholds the output, and reports the fraction of test points on which the true label is in the set. That number is often read as a coverage guarantee, although it is a property of the threshold rule. Three implementation choices move it without changing the guarantee: the calibration of the threshold, the treatment of empty sets, and the update rule of adaptive conformal inference.
 
-The Approach is an audit protocol that uses existing conformal constructions as probes. It composes a threshold probe, an empty-set probe and an update probe with a coverage accounting identity and a cost rule. The protocol is not a new estimator; it is an innovative use of existing methods to answer a question that a standard application does not answer: whether the reported number estimates the nominal level.
+The Approach is an audit protocol built from existing conformal constructions. It combines a threshold probe, an empty-set probe and an update probe with a coverage accounting identity and a cost rule. The protocol introduces no new estimator; its contribution is to apply existing methods systematically to a question that a standard application does not answer: whether the reported number estimates the nominal level.
 
 I apply the protocol to digits, CIFAR-10 and covertype, and to eight public implementations. The main text is 15 pages. The supplementary file contains the full tables, the two-axis map, the complete grid, the per-corruption results and a reporting checklist.
 
