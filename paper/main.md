@@ -567,10 +567,7 @@ the sets are large, not because the level tracked the target.
 The experiment compares the two rules on controlled drift streams. On digits, the
 stream has 450 points in nine blocks, with Gaussian noise increasing from 0 to
 0.60. On CIFAR-10, it has 3,000 images in three blocks of 1,000, one block for each
-severity, across five corruption types. The calibration set is clean in both cases. The grid varies the
-step size from 0.005 to 0.2, the update rule, and the seed. Table 4 and Table 7
-report the results, and Figure 4 plots the coverage and the level trajectories for
-the linear schedule at γ = 0.02.
+severity, across five corruption types. The calibration set is clean in both cases. The digits grid varies the step size from 0.005 to 0.2, the update rule, and the seed; the CIFAR-10 grid uses a single step size, 0.02. Table 4 and Table 7 report the results, and Figure 4 plots the digits coverage and level trajectories for the linear schedule at γ = 0.02.
 
 On digits, the static procedure covers 0.666 of the stream. The correct update at
 γ = 0.02 covers 0.836 with a mean set size of 3.44. The incorrect update covers
