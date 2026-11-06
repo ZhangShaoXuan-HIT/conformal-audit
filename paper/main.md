@@ -995,7 +995,7 @@ covertype, 0.3 percent are affected, so the same choice moves it by less than ha
 a point. The threshold is small in every dataset; the exposure is not.
 
 We also tested the per-point version. On the same three datasets, at alpha = 0.10
-with deterministic APS, it coincides with uniform forcing above c_a/c_e = 0.05:
+with deterministic APS, it coincides with uniform forcing at or above c_a/c_e = 0.05:
 the empty sets are high-confidence, so the proxy forces them all. The per-point
 rule does not improve on the population rule. The negative result is consistent
 with the high a_E. When the argmax is right on 94 to 99 percent of the empty sets,
