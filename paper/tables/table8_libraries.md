@@ -1,7 +1,8 @@
 # Table 8. Library behavior audit
 
 Versions checked on 2026-11-06. Line numbers refer to the sources in _libs/src.
-Only MAPIE was run; the other rows are source inspection.
+Runtime: MAPIE, puncc, and crepes. Source inspection: TorchCP, coverforest, and
+AdaptiveConformal.
 
 | library | version | task | empty sets possible | default policy | evidence | ACI update |
 |---|---|---|---|---|---|---|
