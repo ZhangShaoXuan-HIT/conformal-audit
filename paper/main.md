@@ -567,8 +567,8 @@ the sets are large, not because the level tracked the target.
 
 The experiment compares the two rules on controlled drift streams. On digits, the
 stream has 450 points in nine blocks, with Gaussian noise increasing from 0 to
-0.60. On CIFAR-10, it has 2,000 images in 20 blocks, with pixel noise increasing
-from 0 to 0.40. The calibration set is clean in both cases. The grid varies the
+0.60. On CIFAR-10, it has 3,000 images in three blocks of 1,000, one block for each
+severity, across five corruption types. The calibration set is clean in both cases. The grid varies the
 step size from 0.005 to 0.2, the update rule, and the seed. Table 4 and Table 7
 report the results, and Figure 4 plots the coverage and the level trajectories for
 the linear schedule at γ = 0.02.
@@ -578,21 +578,17 @@ On digits, the static procedure covers 0.666 of the stream. The correct update a
 0.869 with a mean set size of 4.58. The coverage gain is 3.3 points. The set-size
 cost is 33 percent. The share of near-trivial sets, those containing at least nine
 of the ten labels, rises from 10.8 to 24.4 percent. The final level is 0.0074 for
-the correct rule and 0.0011 for the incorrect one, which is the lower clip. On
-CIFAR-10 the static procedure covers 0.272. The correct update covers 0.677 with a
-mean size of 5.13. The incorrect update covers 0.801 with a mean size of 6.39. The
-coverage gain is 12.4 points, the set-size cost is 25 percent, and the
-near-trivial share rises from 4.6 to 12.9 percent. In both datasets the incorrect
+the correct rule and 0.0011 for the incorrect one, which is the lower clip. On CIFAR-10 with five corruption types and three severities, the static procedure covers 0.451. The correct update covers 0.828 with a mean size of 4.93. The incorrect update covers 0.936 with a mean size of 6.97. The coverage gain is 10.8 points, the set-size cost is 41 percent, and the near-trivial share rises from 14.5 to 38.0 percent. In both datasets the incorrect
 rule wins the coverage comparison and loses the information comparison.
 
 The correct rule also fails to reach 0.90 on these streams. On digits it reaches
-0.836 with the level at 0.0074. On CIFAR-10 it reaches 0.677 with the level at the
-lower clip. The failure is not a bug in the update. It is the finite-time behavior
+0.836 with the level at 0.0074. On CIFAR-10 it reaches 0.828 with the level at 0.0106. The failure is not a bug in the update. It is the finite-time behavior
 of the method. The calibration scores bound how far the quantile can move. Once
 the level is at the clip, the set is the largest the calibration sample allows,
 and a corrupted point can still fall outside it. The step size bounds how fast the
 level can move, and a drift that is faster than the step size produces a transient
-loss. The two mechanisms are visible in the block curves of Figure 4. The correct
+loss. The two mechanisms are visible in the block curves of Figure 4 for digits and in
+Table 7 for CIFAR-10. The correct
 rule tracks the target at the beginning of the stream and falls behind as the
 corruption increases.
 
@@ -805,14 +801,14 @@ from the score as well as from the post-processing.
 
 Audit C compares two update rules on controlled drift streams. The digits stream
 has 450 points in nine blocks, with Gaussian noise increasing from 0 to 0.60.
-Three schedules are used: linear, step, and abrupt. The CIFAR-10 stream has 2,000
-images in 20 blocks, with pixel noise increasing from 0 to 0.40. The calibration
-set is clean in both cases, so the drift is a violation of exchangeability rather
+Three schedules are used: linear, step, and abrupt. The CIFAR-10 stream has 3,000
+images in three blocks of 1,000, one for each severity of a corruption type,
+across five corruption types. The calibration set is clean in both cases, so the drift is a violation of exchangeability rather
 than a corrupted calibration.
 
 The digits grid varies the step size over six values from 0.005 to 0.2, the update
-rule over two values, and the seed over five. The CIFAR-10 grid uses two step sizes
-and three seeds. The static procedure is included as a baseline. Table 4 and Table
+rule over two values, and the seed over five. The CIFAR-10 grid uses a single step
+size, 0.02, five corruption types, and three seeds. The static procedure is included as a baseline. Table 4 and Table
 7 report the results, and Figure 4 plots the coverage and the level trajectories
 for the linear schedule at γ = 0.02.
 
@@ -852,8 +848,7 @@ reproducible across two datasets and a range of model strengths, and that their
 magnitudes are large enough to change a comparison. The raw threshold can turn 70
 percent of a test set into abstentions and then report the model's accuracy. At α = 0.10, the
 post-processing can add 9.7 points of coverage on digits and 9.5 points on
-CIFAR-10, with no change to the score. The wrong update can add 12.4 points of
-coverage on CIFAR-10 while inflating the set size by 25 percent. These are not
+CIFAR-10, with no change to the score. The wrong update can add 10.8 points of coverage on CIFAR-10 while inflating the set size by 41 percent. These are not
 small effects, and they are not artifacts of a single seed.
 
 The experiments do not show that the traps are common across all libraries.
