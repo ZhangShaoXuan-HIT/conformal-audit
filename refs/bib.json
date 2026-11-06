@@ -823,5 +823,14 @@
   "arxiv": "2312.00448",
   "url": "https://github.com/herbps10/AdaptiveConformal",
   "source": "software"
+ },
+ "Blackard1998": {
+  "authors": "Blackard J A",
+  "title": "Covertype",
+  "venue": "UCI Machine Learning Repository",
+  "year": 1998,
+  "status": "dataset",
+  "doi": "10.24432/C50K5N",
+  "url": "https://doi.org/10.24432/C50K5N"
  }
 }

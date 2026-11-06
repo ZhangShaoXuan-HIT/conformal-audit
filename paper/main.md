@@ -5,7 +5,7 @@
 guarantee. The number a pipeline reports does not. We audit three choices that sit
 between the guarantee and the reported number: the calibration of the threshold,
 the treatment of empty sets, and the update rule of adaptive conformal inference.
-On two datasets and across a range of model strengths, a fixed probability
+Across two image datasets, a tabular benchmark, and a range of model strengths, a fixed probability
 threshold is not a coverage method, a threshold calibrated on the true-class
 probability is exactly split conformal, forcing the argmax into empty sets raises
 the reported coverage by up to 9.7 points at α = 0.10, and the common α_t update is not
@@ -83,7 +83,7 @@ meaningless.
 
 ### 1.3 What this paper does
 
-We audit the three choices on two datasets. The digits benchmark is small enough
+We audit the three choices on two image datasets and a tabular benchmark. The digits benchmark is small enough
 to check by hand. CIFAR-10 is large enough that the coverage estimates are tight.
 We vary the score, the target level, the calibration size, and the model strength,
 and we evaluate every cell twice, once with the empty sets kept and once with the
@@ -101,7 +101,7 @@ open problems of Section 7.
 
 The paper makes four contributions. First, the map, which makes the assumptions
 explicit and the costs comparable. Second, the audit, which measures the three
-choices on two datasets and separates the raw from the forced evaluation. Third,
+choices across two image datasets and a tabular benchmark, and separates the raw from the forced evaluation. Third,
 the library policy map, which shows that the empty-set policy varies, that one
 widely used default over-covers by 4.6 points, and that three ACI implementations
 use the correct fixed-target update. Fourth, a six-item checklist for
@@ -124,8 +124,9 @@ the software versions are listed there as well.
 
 ### 1.5 Scope
 
-The paper is an audit, not a benchmark. The datasets are two, the models are
-linear heads, and the drift is synthetic and one-dimensional. The claims are about
+The paper is an audit, not a benchmark. The datasets are three, the models are linear
+heads, and the drift is a synthetic ramp on digits and a corruption family on
+CIFAR-10. The claims are about
 mechanisms, not about the magnitudes that a deployment should expect. The
 bibliography is a curated pool, not a systematic census; the cited subset is what the argument needs. The empty
 cells of the map mean "no method in the reviewed set," not "no method can exist."
@@ -700,7 +701,7 @@ post-processing changes the coverage a pipeline reports. The third is that the
 these claims: the score, the target level, the calibration size, the model
 strength, and the dataset.
 
-Two datasets are used. The digits benchmark has 1,797 images of 8 by 8 pixels in
+Three datasets are used: two image benchmarks and one tabular benchmark. The digits benchmark has 1,797 images of 8 by 8 pixels in
 ten classes. A stratified split holds out 450 test points and 898 training points,
 and the calibration set is drawn from the remaining 449. The model is a
 standardiser followed by multinomial logistic regression. The training set is
@@ -712,9 +713,12 @@ features are used with a logistic-regression head. The training pool is 30,000
 images, and the head is fitted on 100, 1,000, 5,000, or 30,000 of them, which
 gives a test accuracy from 0.69 to 0.86. The calibration set is drawn from the
 remaining 20,000, with sizes 500, 2,000, and 10,000. The official test set is used
-unchanged.
+unchanged. Covertype is a 581,012-row, 54-feature, seven-class tabular dataset from
+the UCI repository [@Blackard1998]. We use a 120,000-row stratified subset, a
+logistic regression, training sizes of 6,000 and 60,000, a calibration set of
+20,000, and a test set of 40,000. The audit B grid is repeated on it.
 
-The two datasets are chosen for contrast, not for scale. Digits is small enough
+The benchmarks are chosen for contrast, not for scale. Digits is small enough
 that every number can be checked by hand, and CIFAR-10 is large enough that the
 coverage estimates are tight. Neither is a deployment benchmark, and Section 5.6
 is explicit about the limits.
@@ -793,6 +797,13 @@ coverage of 0.994 and a mean set size of 6.08. The fallback has nothing to do. T
 cell is not a failure of the audit. It is a reminder that over-coverage can come
 from the score as well as from the post-processing.
 
+Table 11 repeats the audit on covertype. At alpha = 0.10 the empty rate is 0.1 to
+0.4 percent, and the forcing change is 0.1 to 0.3 points. The identity holds; the
+magnitude is governed by the empty rate. The trap is a regime effect, not a
+universal constant: on a well-calibrated tabular model with seven classes, the
+same post-processing is nearly invisible. This is the correct reading of the
+audit. The empty rate is the diagnostic, and it travels across datasets.
+
 ### 5.4 Audit C: the update rule
 
 Audit C compares two update rules on controlled drift streams. The digits stream
@@ -839,20 +850,21 @@ will misread the figure.
 
 ### 5.6 What the experiments do and do not show
 
-The experiments show that the three mechanisms are real, that they are
-reproducible across two datasets and a range of model strengths, and that their
-magnitudes are large enough to change a comparison. The raw threshold can turn 70
+The experiments show that the three mechanisms are real and that they are
+reproducible in direction across three datasets and a range of model strengths,
+though the magnitudes vary with the empty rate. They also show that on digits and
+CIFAR-10 the magnitudes are large enough to change a comparison. The raw threshold can turn 70
 percent of a test set into abstentions and then report the model's accuracy. At α = 0.10, the
 post-processing can add 9.7 points of coverage on digits and 9.5 points on
-CIFAR-10, with no change to the score. The wrong update can add 10.8 points of coverage on CIFAR-10 while inflating the set size by 41 percent. These are not
-small effects, and they are not artifacts of a single seed.
+CIFAR-10, with no change to the score. On covertype it adds 0.1 to 0.3 points, because the empty rate is 0.1 to 0.4 percent. The wrong update can add 10.8 points of coverage on CIFAR-10 while inflating the set size by 41 percent. On digits and CIFAR-10 these are not small effects, and they are not artifacts of
+a single seed. On covertype they are small, and the empty rate explains why.
 
 The experiments do not show that the traps are common across all libraries.
 Section 4.4 shows the opposite for the update rule: three libraries use the
 fixed-target update. They do not show that the magnitudes transfer to ImageNet, to
 language models, or to a deployment with a different model class. The models are
-linear heads on small images, the drift is synthetic and one-dimensional, and the
-datasets are two. The results are about mechanisms, not about scale.
+linear heads on small images and a tabular benchmark; the drift is a synthetic
+ramp on digits and a corruption family on CIFAR-10; the datasets are three. The results are about mechanisms, not about scale.
 
 The experiments also do not establish that the correct ACI is a good method. On
 the streams we tested it fails to reach the target, for reasons that Section 4.3
@@ -1048,6 +1060,7 @@ supplementary material.
 | T8 | library behavior audit | paper/tables/table8_libraries.md |
 | T9 | coverage against four surveys | paper/tables/table9_coverage.md |
 | T10 | experimental grid | paper/tables/table10_grid.md |
+| T11 | covertype audit B | paper/tables/table11_tabular.md |
 | F1 | pipeline and the three trap locations | paper/figures/fig1_pipeline |
 | F2 | coverage and size versus threshold | paper/figures/fig2_equivalence |
 | F3 | delta coverage versus raw empty rate | paper/figures/fig3_forcing |
