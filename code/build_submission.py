@@ -39,16 +39,6 @@ def cite(m):
 
 main = re.sub(r"\[@([^\]]+)\]", cite, main)
 
-subtitle = "## A Controlled Audit of Calibrated Set-Valued Classification"
-author = """
-
-::: {.author}
-**Author:** [Name]  
-**Affiliation:** [Institution]  
-**Corresponding author:** [email]
-:::
-"""
-main = main.replace(subtitle, subtitle + author, 1)
 
 tables = [
     (1, "table1_map.md"), (2, "table2_equivalence.md"), (3, "table3_postprocess.md"),
