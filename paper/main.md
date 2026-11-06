@@ -8,7 +8,7 @@ the treatment of empty sets, and the update rule of adaptive conformal inference
 On two datasets and across a range of model strengths, a fixed probability
 threshold is not a coverage method, a threshold calibrated on the true-class
 probability is exactly split conformal, forcing the argmax into empty sets raises
-the reported coverage by up to 9.5 points, and the common α_t update is not
+the reported coverage by up to 9.7 points at α = 0.10, and the common α_t update is not
 ACI and reports higher coverage by inflating sets. The audit of six libraries
 shows that the empty-set policy varies, that one widely used default over-covers
 by 4.6 points, and that three ACI implementations use the correct fixed-target
@@ -59,8 +59,8 @@ falls short of the target.
 The second is the empty set. A conformal set can be empty, and many
 implementations insert the argmax so that the output is never empty. The insertion
 is a post-processing rule, and it changes the reported coverage by the empty rate
-times the conditional accuracy of the argmax on the empty sets. On CIFAR-10 the
-change reaches 9.5 points. On digits it reaches 8.4. The effect is not a property
+times the conditional accuracy of the argmax on the empty sets. At α = 0.10, the change reaches 9.7 points on
+digits and 9.5 on CIFAR-10. The effect is not a property
 of the score. It is a property of the interaction between the score and the
 post-processing, and it can turn a method that is on target into one that
 over-covers by several points.
@@ -503,8 +503,9 @@ APS produces 6.9 to 9.5 percent empty sets and changes coverage by 6.8 to 9.5
 points.
 
 The change is not confined to weak models. On CIFAR-10 with 100 training images, deterministic APS goes from 0.904 to 0.972, a change of 6.8 points. With 1,000 images it goes from 0.902 to 0.993, a change of 9.1 points. At
-30,000 images it goes from 0.899 to 0.994, a change of 9.5 points. The change does
-not shrink with model strength, because the empty rate does not shrink. The naive
+30,000 images it goes from 0.899 to 0.994, a change of 9.5 points. On digits the
+largest cell is 9.7 points at 224 training points. The change does not shrink with
+model strength, because the empty rate does not shrink. The naive
 score is the exception: it produces no empty sets on CIFAR-10 at any strength, and
 the change is zero. The naive score on digits at full strength produces 7.8
 percent empty sets and changes coverage by 5.4 points. The empty rate is a
@@ -837,9 +838,9 @@ will misread the figure.
 The experiments show that the three mechanisms are real, that they are
 reproducible across two datasets and a range of model strengths, and that their
 magnitudes are large enough to change a comparison. The raw threshold can turn 70
-percent of a test set into abstentions and then report the model's accuracy. The
-post-processing can add 9.5 points of coverage on CIFAR-10 and 8.4 points on
-digits, with no change to the score. The wrong update can add 12.4 points of
+percent of a test set into abstentions and then report the model's accuracy. At α = 0.10, the
+post-processing can add 9.7 points of coverage on digits and 9.5 points on
+CIFAR-10, with no change to the score. The wrong update can add 12.4 points of
 coverage on CIFAR-10 while inflating the set size by 25 percent. These are not
 small effects, and they are not artifacts of a single seed.
 
