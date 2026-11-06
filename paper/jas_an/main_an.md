@@ -62,7 +62,7 @@ The grid also serves as the simulation study, varying the factors a deployment c
 
 ### 2.3 Implementations
 
-We inspect eight implementations: MAPIE 1.6.0, TorchCP 1.2.1, puncc 0.9.3, crepes 0.9.1, coverforest 0.0.3, nonconformist 2.1.0, conformal 0.1 and the AdaptiveConformal R package [@mapie2026; @torchcp2026; @puncc2026; @crepes2026; @coverforest2026; @nonconformist2017; @conformal2017; @adaptiveconformal2023]. All eight were read at source level. Five were run on a common synthetic five-class task, with five seeds for MAPIE and one for the others; TorchCP, coverforest and AdaptiveConformal were read only. The sample deliberately includes two older, smaller packages and covers eight public implementations; a complete census remains future work.
+We inspect eight implementations: MAPIE 1.6.0 [@mapie2026], TorchCP 1.2.1 [@torchcp2026], puncc 0.9.3 [@puncc2026], crepes 0.9.1 [@crepes2026], coverforest 0.0.3 [@coverforest2026], nonconformist 2.1.0 [@nonconformist2017], conformal 0.1 [@conformal2017] and the AdaptiveConformal R package [@adaptiveconformal2023]. All eight were read at source level. Five were run on a common synthetic five-class task, with five seeds for MAPIE and one for the others; TorchCP, coverforest and AdaptiveConformal were read only. The sample deliberately includes two older, smaller packages and covers eight public implementations; a complete census remains future work.
 
 ### 2.4 Metrics and the cost rule
 

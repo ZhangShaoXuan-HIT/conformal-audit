@@ -331,3 +331,19 @@ The citation style was switched from author-date to the numbered style used by
 the JAS article supplied by the author: bracketed numbers in the text, sorted
 numerically, and an alphabetically ordered numbered reference list. The ACI
 source (Gibbs and Candes) was added; there are now 25 references, all cited.
+
+
+## Citation audit (2026-11-06)
+
+There are 25 references and 25 distinct in-text citation keys. The mapping is
+one-to-one: every reference is cited and every citation resolves. References are
+numbered alphabetically, with same-author entries ordered by year; in-text
+numbers are bracketed and sorted within a group.
+
+Fixed during the audit: the ACI source (Gibbs and Candes, [12]) was missing and
+is now cited; the Zhou et al. entry now carries "et al."; the eight software
+citations are attached to their packages individually in Section 2.3. The
+survey sentence in 1.3 cites [4, 7, 10, 25], which are Angelopoulos and Bates,
+Campos et al., Fontana et al., and Zhou et al. Remaining differences from the
+JAS example are cosmetic: full journal names rather than abbreviations, and a
+few early-access/software entries without volume or pages.

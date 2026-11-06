@@ -72,13 +72,15 @@ def ref(key):
     return " ".join(bits).replace("--", "–")
 
 
-def fmt_authors_num(names):
+def fmt_authors_num(names, etal=False):
     parts = []
     for surname, initials in names:
         if initials:
             parts.append("".join(i + "." for i in initials) + " " + surname)
         else:
             parts.append(surname)
+    if etal:
+        return ", ".join(parts) + ", et al."
     if len(parts) == 1:
         return parts[0]
     if len(parts) == 2:
@@ -89,7 +91,7 @@ def fmt_authors_num(names):
 def ref_num(key, n):
     v = bib[key]
     year = str(v["year"])
-    authors = fmt_authors_num(parse_names(v["authors"]))
+    authors = fmt_authors_num(parse_names(v["authors"]), etal=("et al" in v["authors"].lower()))
     title = v["title"].rstrip(".")
     venue = (v.get("venue") or "").rstrip(".")
     bits = ["[%d] %s, %s." % (n, authors, title)]
@@ -131,7 +133,11 @@ for m in re.finditer(r"\[@([^\]]+)\]", md):
         if k in bib:
             text_keys.append(k)
 text_keys = sorted(set(text_keys))
-ordered_keys = sorted(text_keys, key=lambda k: ref(k).lower())
+def sort_key(k):
+    names = parse_names(bib[k]["authors"])
+    return (names[0][0].lower() if names else "", str(bib[k]["year"]), bib[k]["title"].lower())
+
+ordered_keys = sorted(text_keys, key=sort_key)
 num = {k: i + 1 for i, k in enumerate(ordered_keys)}
 
 
