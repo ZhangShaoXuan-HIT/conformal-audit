@@ -127,7 +127,7 @@ papers rather than repeating them.
 The paper is an audit, not a benchmark. The datasets are two, the models are
 linear heads, and the drift is synthetic and one-dimensional. The claims are about
 mechanisms, not about the magnitudes that a deployment should expect. The
-bibliography is a curated set of 69 references, not a systematic census. The empty
+bibliography is a curated pool, not a systematic census; the cited subset is what the argument needs. The empty
 cells of the map mean "no method in the reviewed set," not "no method can exist."
 A reader who wants a positive result about adaptive inference will not find it
 here. A reader who wants to know how the reported number can move without the
@@ -172,7 +172,7 @@ not evidence of a better method. Both are draws from a procedure whose average i
 ### 2.2 Split conformal
 
 Figure 1 shows the three stages and the three places where the reported number can
-move. The construction has three stages. Fit f on a training set. Pass a disjoint calibration set
+move. Fit f on a training set. Pass a disjoint calibration set
 of size n through f and compute a nonconformity score s_i = s(X_i, Y_i) for each
 calibration pair, where a larger score means the pair is less consistent with the model.
 Sort the scores and take the k-th smallest, with k = ceil((n + 1)(1 − α)). For a new input
