@@ -926,9 +926,12 @@ A deployment that runs the audit on its own calibration and test data can estima
 a_E, plug in its costs, and decide. The six numbers of the checklist are the
 inputs to the rule.
 
-The library defaults are uniform versions of the rule. MAPIE's
-include_last_label=True and puncc's rand=False always force. They are optimal for
-a deployment whose c_a is high relative to c_e (1 - a_E), and suboptimal for a
+The library defaults are uniform versions of the decision, though not all of them
+insert the argmax. MAPIE's include_last_label=True adds the last label that
+crosses the quantile; puncc's rand=False adds labels until the set is non-empty.
+Both are non-empty policies of the same kind, and the same cost comparison applies
+with a_E replaced by the accuracy of the label the rule inserts. They are optimal
+for a deployment whose c_a is high relative to c_e (1 - a_E), and suboptimal for a
 deployment that values abstention. The library cannot know the ratio. This is why
 the default should be the exact rule, which carries the guarantee, and the
 non-empty rule should be an explicit option. coverforest exposes the option with
