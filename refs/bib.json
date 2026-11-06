@@ -78,13 +78,13 @@
  },
  "Angelopoulos2021intro": {
   "authors": "Angelopoulos A N, Bates S",
-  "title": "A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification",
-  "venue": "arXiv preprint",
-  "year": 2021,
-  "status": "preprint",
-  "doi": null,
+  "title": "Conformal Prediction: A Gentle Introduction",
+  "venue": "Foundations and Trends in Machine Learning 16(4), 494-591",
+  "year": 2023,
+  "status": "published",
+  "doi": "10.1561/2200000101",
   "arxiv": "2107.07511",
-  "url": "https://arxiv.org/abs/2107.07511",
+  "url": "https://doi.org/10.1561/2200000101",
   "source": "seed"
  },
  "Bates2021": {
@@ -124,7 +124,7 @@
   "authors": "Hore R, Barber R F",
   "title": "Conformal Prediction with Local Weights: Randomization Enables Robust Guarantees",
   "venue": "Journal of the Royal Statistical Society: Series B 87(2), 549--578",
-  "year": 2024,
+  "year": 2025,
   "status": "published",
   "doi": "10.1093/jrsssb/qkae103",
   "arxiv": null,
@@ -134,7 +134,7 @@
  "Campos2024": {
   "authors": "Campos M M, Farinhas A, Zerva C, Figueiredo M A T, Martins A F T",
   "title": "Conformal Prediction for Natural Language Processing: A Survey",
-  "venue": "Transactions of the Association for Computational Linguistics 12, 1274--1291",
+  "venue": "Transactions of the Association for Computational Linguistics 12, 1497-1516",
   "year": 2024,
   "status": "published",
   "doi": "10.1162/tacl_a_00715",
@@ -456,9 +456,9 @@
   "venue": "arXiv",
   "year": 2025,
   "status": "preprint",
-  "doi": "10.1007/978-3-031-44336-7_20",
+  "doi": null,
   "arxiv": "2506.18162",
-  "url": "http://arxiv.org/abs/2506.18162v1",
+  "url": "https://arxiv.org/abs/2506.18162",
   "source": "recent"
  },
  "Aguru2026": {
@@ -475,7 +475,7 @@
  "Gauthier2025": {
   "authors": "Gauthier E, Bach F, Jordan MI",
   "title": "Adaptive Coverage Policies in Conformal Prediction",
-  "venue": "arXiv (Cornell University)",
+  "venue": "arXiv preprint",
   "year": 2025,
   "status": "preprint",
   "doi": "10.48550/arxiv.2510.04318",
@@ -607,7 +607,7 @@
  "Combes2026": {
   "authors": "Combes J, Coeurjolly J, Derville A",
   "title": "Macro Mondrian Conformal Risk Control",
-  "venue": "arXiv (Cornell University)",
+  "venue": "arXiv preprint",
   "year": 2026,
   "status": "preprint",
   "doi": "10.48550/arxiv.2610.35035",
@@ -651,7 +651,7 @@
  "Oliveira2022": {
   "authors": "Oliveira RI, Orenstein P, Ramos TR, Romano JV",
   "title": "Split Conformal Prediction and Non-Exchangeable Data",
-  "venue": "arXiv (Cornell University)",
+  "venue": "arXiv preprint",
   "year": 2022,
   "status": "preprint",
   "doi": "10.48550/arxiv.2203.15885",
@@ -757,5 +757,71 @@
   "arxiv": "2507.20975",
   "url": "http://arxiv.org/abs/2507.20975v5",
   "source": "recent"
+ },
+ "mapie2026": {
+  "authors": "MAPIE contributors",
+  "title": "MAPIE: a scikit-learn-contrib package for conformal prediction",
+  "venue": "version 1.6.0",
+  "year": 2026,
+  "status": "software",
+  "doi": null,
+  "arxiv": null,
+  "url": "https://pypi.org/project/mapie/",
+  "source": "software"
+ },
+ "torchcp2026": {
+  "authors": "TorchCP contributors",
+  "title": "TorchCP: a Python library for conformal prediction",
+  "venue": "version 1.2.1",
+  "year": 2026,
+  "status": "software",
+  "doi": null,
+  "arxiv": null,
+  "url": "https://pypi.org/project/torchcp/",
+  "source": "software"
+ },
+ "puncc2026": {
+  "authors": "puncc contributors",
+  "title": "puncc: predictive uncertainty calibration and conformal prediction",
+  "venue": "version 0.9.3",
+  "year": 2026,
+  "status": "software",
+  "doi": null,
+  "arxiv": null,
+  "url": "https://pypi.org/project/puncc/",
+  "source": "software"
+ },
+ "crepes2026": {
+  "authors": "crepes contributors",
+  "title": "crepes: conformal regressors and predictive systems",
+  "venue": "version 0.9.1",
+  "year": 2026,
+  "status": "software",
+  "doi": null,
+  "arxiv": null,
+  "url": "https://pypi.org/project/crepes/",
+  "source": "software"
+ },
+ "coverforest2026": {
+  "authors": "coverforest contributors",
+  "title": "coverforest: conformal prediction with random forests",
+  "venue": "version 0.0.3",
+  "year": 2026,
+  "status": "software",
+  "doi": null,
+  "arxiv": null,
+  "url": "https://pypi.org/project/coverforest/",
+  "source": "software"
+ },
+ "adaptiveconformal2023": {
+  "authors": "Susmann H, Chambaz A, Josse J",
+  "title": "AdaptiveConformal: an R package for adaptive conformal inference",
+  "venue": "arXiv preprint",
+  "year": 2023,
+  "status": "preprint",
+  "doi": null,
+  "arxiv": "2312.00448",
+  "url": "https://github.com/herbps10/AdaptiveConformal",
+  "source": "software"
  }
 }

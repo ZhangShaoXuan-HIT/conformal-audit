@@ -77,3 +77,31 @@ refs/bib.json (69-entry pool, 26 cited in prose).
   step before submission.
 - The bibliography metadata of the recent entries (some author strings come from
   OpenAlex and need a Crossref pass).
+
+
+## Reference list update (2026-11-06)
+
+The reference list is built as paper/references.md: 36 entries, 30 papers and 6
+software entries. The cited-key set is the union of the prose citations (27 keys),
+the keys used in Table 1 (15 keys), and the software entries (6 keys). Item 1 of
+the remaining issues is resolved.
+
+Four metadata errors were fixed during the build:
+
+| entry | fix |
+|---|---|
+| Angelopoulos2021intro | cited as the 2023 Foundations and Trends version (16(4), 494-591, DOI 10.1561/2200000101), not the 2021 preprint |
+| Campos2024 | pages corrected to 1497-1516 (Crossref) |
+| Hore2024 | issue year set to 2025, matching volume 87 and the Gibbs 2025 entry |
+| Mehrtens2025 | book-chapter DOI removed; the entry is the 2025 arXiv preprint (2506.18162), marked preprint |
+
+Preprints are marked in the list. The remaining list-level issues are:
+
+1. Vovk2012 has no DOI or arXiv identifier; it uses the PMLR URL. This is a
+   persistent identifier but not the DOI/arXiv rule in the protocol.
+2. The software entries use organisational authors (MAPIE contributors, TorchCP
+   contributors, and so on). A journal may require the package authors.
+3. The HTML key comments in paper/references.md must be stripped in the
+   submission build.
+4. The citation keys in the manuscript are still [@key] placeholders. They must be
+   converted to the target journal's numeric or author-year style.
