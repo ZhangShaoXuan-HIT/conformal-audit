@@ -5,7 +5,7 @@ Requires torch, torchvision and data/cifar10_features.npz.
 import os, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-STEPS = ["exp_cifar.py", "exp_cifar_aci.py", "make_cifar_tables.py", "make_figures.py"]
+STEPS = ["exp_cifar.py", "exp_cifar_c.py", "make_cifar_tables.py", "make_figures.py"]
 
 
 def main():

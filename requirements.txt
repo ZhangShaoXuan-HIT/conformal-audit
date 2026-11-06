@@ -3,3 +3,14 @@ scipy==1.18.1
 scikit-learn==1.9.1
 matplotlib==3.11.2
 pandas==3.0.1
+torch==2.5.1
+torchvision==0.20.1
+mapie==1.6.0
+puncc==0.9.3
+crepes==0.9.1
+coverforest==0.0.3
+imagecorruptions==1.1.2
+nonconformist==2.1.0
+conformal==0.1
+scikit-image==0.26.0
+opencv-python==5.0.0.93

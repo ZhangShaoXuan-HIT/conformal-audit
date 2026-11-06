@@ -191,13 +191,17 @@ def fig_regime():
               if abs(r["alpha"] - 0.10) < 1e-9 and r["n_cal"] == 449]
     cifar = [r for r in load("postprocess_cifar.json")["rows"]
              if abs(r["alpha"] - 0.10) < 1e-9 and r["n_cal"] == 500]
-    covertype = [r for r in load("tabular.json")["rows"]
-                 if abs(r["alpha"] - 0.10) < 1e-9]
+    try:
+        covertype = [r for r in load("tabular.json")["rows"]
+                     if abs(r["alpha"] - 0.10) < 1e-9]
+    except FileNotFoundError:
+        covertype = []
     scores = ["naive", "aps_rand"]
     fig, axes = plt.subplots(1, 2, figsize=(9.2, 3.7))
     datasets = [("digits", digits, "-", "o", "digits (n_cal = 449)"),
-                ("cifar10", cifar, "--", "^", "CIFAR-10 (n_cal = 500)"),
-                ("covertype", covertype, ":", "s", "covertype (n_cal = 20,000)")]
+                ("cifar10", cifar, "--", "^", "CIFAR-10 (n_cal = 500)")]
+    if covertype:
+        datasets.append(("covertype", covertype, ":", "s", "covertype (n_cal = 20,000)"))
     for name, rows, ls, marker, label in datasets:
         summ = _regime_summary(rows)
         for score in scores:

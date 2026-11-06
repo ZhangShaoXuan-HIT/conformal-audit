@@ -16,11 +16,11 @@ Coverage and mean set size, averaged over three seeds.
 
 | corruption | static | fixed | buggy |
 |---|---|---|---|
-| gaussian_noise | 0.22 / 1.3 | 0.66 / 5.4 | 0.81 / 7.0 |
-| defocus_blur | 0.24 / 1.4 | 0.85 / 7.5 | 0.98 / 9.4 |
-| contrast | 0.52 / 1.3 | 0.87 / 4.9 | 0.98 / 7.4 |
-| brightness | 0.80 / 1.1 | 0.90 / 1.9 | 0.94 / 3.7 |
-| jpeg_compression | 0.47 / 1.3 | 0.86 / 4.9 | 0.97 / 7.3 |
+| gaussian_noise | 0.22 / 1.34 | 0.66 / 5.45 | 0.81 / 7.02 |
+| defocus_blur | 0.24 / 1.37 | 0.85 / 7.52 | 0.98 / 9.42 |
+| contrast | 0.52 / 1.33 | 0.87 / 4.94 | 0.98 / 7.42 |
+| brightness | 0.80 / 1.15 | 0.90 / 1.88 | 0.94 / 3.70 |
+| jpeg_compression | 0.47 / 1.32 | 0.86 / 4.87 | 0.97 / 7.28 |
 
 The incorrect update reports 10.8 points more coverage than the correct one, at a
 41 percent larger mean set size, and raises the share of near-trivial sets from

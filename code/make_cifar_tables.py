@@ -142,10 +142,62 @@ def aci_table():
     print("\n".join(out))
 
 
+def cifar_c_table():
+    rows = load("aci_cifar_c.json")["rows"]
+    out = [
+        "# Table 7. CIFAR-10-C style drift",
+        "",
+        "Five corruption types (gaussian_noise, defocus_blur, contrast, brightness,",
+        "jpeg_compression), three severities (1, 3, 5), 1,000 images per block, 3,000",
+        "points per stream, 3 seeds, alpha = 0.10, gamma = 0.02. Calibration is clean.",
+        "",
+        "| update | coverage | mean size | block sev 1 | block sev 3 | block sev 5 | alpha final | clip | sets >= 9 |",
+        "|---|---|---|---|---|---|---|---|---|",
+    ]
+    for update in ["static", "fixed", "buggy"]:
+        sub = [r for r in rows if r["update"] == update]
+        block = np.mean([r["block_cov"] for r in sub], axis=0)
+        out.append("| %s | %.3f | %.2f | %.3f | %.3f | %.3f | %s | %s | %.3f |" % (
+            update,
+            mean([r["coverage"] for r in sub]),
+            mean([r["size"] for r in sub]),
+            float(block[0]), float(block[1]), float(block[2]),
+            "—" if update == "static" else "%.4f" % mean([r["alpha_final"] for r in sub]),
+            "—" if update == "static" else "%.2f" % mean([r["clip_fraction"] for r in sub]),
+            mean([r["frac_sets_ge9"] for r in sub]),
+        ))
+    out += ["", "## Per corruption", "",
+            "Coverage and mean set size, averaged over three seeds.", "",
+            "| corruption | static | fixed | buggy |", "|---|---|---|---|"]
+    for corruption in ["gaussian_noise", "defocus_blur", "contrast", "brightness", "jpeg_compression"]:
+        cells = []
+        for update in ["static", "fixed", "buggy"]:
+            sub = [r for r in rows if r["schedule"] == corruption and r["update"] == update]
+            cells.append("%.2f / %.2f" % (mean([r["coverage"] for r in sub]),
+                                         mean([r["size"] for r in sub])))
+        out.append("| %s | %s | %s | %s |" % (corruption, cells[0], cells[1], cells[2]))
+    fixed = [r for r in rows if r["update"] == "fixed"]
+    buggy = [r for r in rows if r["update"] == "buggy"]
+    gap = round(mean([r["coverage"] for r in buggy]), 3) - round(mean([r["coverage"] for r in fixed]), 3)
+    size_pct = mean([r["size"] for r in buggy]) / mean([r["size"] for r in fixed]) - 1.0
+    out += ["",
+            "The incorrect update reports %.1f points more coverage than the correct one, at a" % (100 * gap),
+            "%.0f percent larger mean set size, and raises the share of near-trivial sets from" % (100 * size_pct),
+            "%.1f to %.1f percent. The correct update also falls short of 0.90, at %.3f." % (
+                100 * mean([r["frac_sets_ge9"] for r in fixed]),
+                100 * mean([r["frac_sets_ge9"] for r in buggy]),
+                mean([r["coverage"] for r in fixed])),
+            ]
+    path = os.path.join(TAB, "table7_cifar_aci.md")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(out) + "\n")
+    print("\n".join(out))
+
+
 def main():
     equivalence_table()
     postprocess_table()
-    aci_table()
+    cifar_c_table()
 
 
 if __name__ == "__main__":

@@ -1,82 +1,130 @@
 # cp-audit
 
-A controlled audit of conformal prediction implementations.
+Code and results for **What Does Conformal Prediction Add? A Controlled Audit of
+Calibrated Set-Valued Classification**.
 
-## Design rules
+The paper audits three implementation choices that sit between the conformal
+guarantee and the coverage a pipeline reports: the calibration of the threshold,
+the treatment of empty sets, and the update rule of adaptive conformal inference.
+It uses three datasets (digits, CIFAR-10, covertype), eight public implementations,
+and a cost rule for the non-empty fallback.
 
-1. `build_sets` never forces non-empty sets. Forcing is a separate step.
-2. Every result row records `postprocess = raw | forced`.
-3. Every table and figure is generated from `results/*.json`.
-4. No number is typed into the manuscript by hand.
+## Quick start
 
-## Quickstart
-
-```
-python code/exp_equiv.py
-python code/make_tables.py
-```
-
-or simply:
-
-```
-python code/run_all.py
+```bash
+python code/run_paper.py --dry-run   # print the full step list
+python code/run_paper.py             # full pipeline, about 20 minutes on the reference machine
 ```
 
-## Structure
+Partial runs:
 
+```bash
+python code/run_all.py               # digits: audits A/B/C, tables 2-4, figures 2-5 (~90 s)
+python code/cifar_features.py        # once, after data/cifar10 is present
+python code/run_cifar.py             # CIFAR: audits A/B/C, tables 5-7
+python code/exp_tabular.py           # covertype: table 11 (~30 s after the OpenML cache)
+python code/exp_cifar_c.py           # CIFAR-10-C style drift: table 7
+python code/exp_library_runtime.py   # eight-library runtime audit: table 8 rows
+python code/exp_mapie_empty.py       # MAPIE five-seed empty-set experiment
+python code/exp_cost_perpoint.py     # per-point cost check (Section 6.2)
+python code/make_tables.py           # tables 2-4
+python code/make_cifar_tables.py     # tables 5-7
+python code/make_tabular_table.py    # table 11
+python code/make_cost_table.py       # table 12
+python code/make_fig1.py             # figure 1
+python code/make_figures.py          # figures 2-5
+python code/build_references.py      # paper/references.md
 ```
-paper/main.md              single source of truth
-paper/tables/              generated tables
-paper/figures/             generated figures
-code/common.py             data, models, scores, sets, metrics
-code/exp_equiv.py          audit A: calibrated threshold = split conformal
-code/exp_postprocess.py    audit B: non-empty post-processing
-code/exp_aci.py            audit C: ACI update comparison
-code/exp_cifar.py          phase 2: CIFAR-10 replication
-code/make_tables.py        JSON to Markdown tables
-code/make_figures.py       JSON to figures
-code/audit.py              manuscript-number reconciliation
-code/refcheck.py           bibliography verification
-results/                   every number, as JSON
-refs/                      bibliography and screening log
-legacy/                    frozen old manuscript, read-only
+
+`run_all.py` regenerates figure 5 with covertype only if
+`results/tabular.json` exists; otherwise the figure uses digits and CIFAR-10.
+
+## Environment
+
+The reference run used Python 3.12.14, numpy 2.3.5, scipy 1.18.1,
+scikit-learn 1.9.1, matplotlib 3.11.2, torch 2.5.1+cu121,
+torchvision 0.20.1+cu121, and a single RTX 4060 (8 GB). The CIFAR feature
+extraction uses CUDA; the rest runs on CPU.
+
+```bash
+pip install -r requirements.txt
 ```
 
-## Data (CIFAR-10)
+For CUDA 12.1, install torch first:
 
-The CIFAR experiments use the fast.ai PNG mirror, because the Toronto server was
-slow from this machine.
-
+```bash
+pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cu121
 ```
+
+`coverforest` 0.0.3 builds, but its forest code is incompatible with
+scikit-learn 1.9 at runtime; the library audit records it as source-only.
+`torchcp` and `AdaptiveConformal` are source-only for the same kind of reason
+(optional graph dependencies; R not installed).
+
+## Data
+
+- **digits**: bundled with scikit-learn; no download.
+- **CIFAR-10**: the fast.ai PNG mirror, because the Toronto server was slow from
+  this machine.
+
+```bash
 curl -L -o data/cifar10.tgz https://s3.amazonaws.com/fast-ai-imageclas/cifar10.tgz
 tar -xzf data/cifar10.tgz -C data
 python code/cifar_features.py
 ```
 
-This produces `data/cifar10_features.npz` (50k train, 10k test, 512-d ResNet-18
-features). The file is gitignored and can be regenerated.
+  This gives `data/cifar10/train|test/<class>/*.png` and
+  `data/cifar10_features.npz` (50k train, 10k test, 512-d ResNet-18 features).
+  Both are gitignored and can be regenerated.
+- **CIFAR-10-C style corruptions**: generated locally with `imagecorruptions`
+  from the CIFAR-10 test PNGs; the 2.9 GB official archive is not needed.
+- **covertype**: `sklearn.datasets.fetch_openml("covertype", version=3)`;
+  scikit-learn caches it after the first run.
 
-## Environment
+## Tables and figures
 
-Python 3.12.14, numpy 2.3.5, scipy 1.18.1, scikit-learn 1.9.1, matplotlib 3.11.2.
-`requirements.txt` is the contract. CIFAR-10 will add torch in phase 2.
+| output | source |
+|---|---|
+| Table 1, two-axis map | conceptual; `paper/tables/table1_map.md` |
+| Tables 2-4, digits audits A/B/C | `code/make_tables.py` from `results/*.json` |
+| Tables 5-6, CIFAR audits A/B | `code/make_cifar_tables.py` |
+| Table 7, CIFAR-10-C style drift | `code/make_cifar_tables.py` from `results/aci_cifar_c.json` |
+| Table 8, library audit | source-policy columns curated from `_libs/src`; runtime rows from `results/library_runtime.json` |
+| Table 9, coverage matrix | conceptual; `paper/tables/table9_coverage.md` |
+| Table 10, experimental grid | design table; `paper/tables/table10_grid.md` |
+| Table 11, covertype audit | `code/make_tabular_table.py` from `results/tabular.json` |
+| Table 12, cost-sensitive reading | `code/make_cost_table.py` from `results/*.json` |
+| Figure 1, pipeline | `code/make_fig1.py` |
+| Figures 2-5 | `code/make_figures.py` |
 
-## Status
+## Design rules
 
-Phase 0: scaffold, legacy freeze, audit A on digits.
+1. `build_sets` never forces non-empty sets; forcing is a separate
+   post-processing step, tagged `postprocess = raw | forced` in every row.
+2. Quantitative tables 2-7, 11 and 12 are generated from `results/*.json`.
+3. Table 8's source-policy columns are a curated reading of the code; its
+   runtime rows come from `results/library_runtime.json`.
+4. Tables 1, 9 and 10 are conceptual or design tables.
+5. The JSON files are the source of truth for every empirical number in the
+   manuscript.
 
-Phase 1: audits B and C on digits. Tables 2 to 4 and Figures 2 to 4.
+## Notes and limits
 
-Phase 2: CIFAR-10 replication with ResNet-18 features. Tables 5 to 7 and
-Figure 5. Working notes in `paper/notes_phase2.md`.
+- The library sample is eight public implementations, not a census. Five were
+  run (MAPIE, puncc, crepes, nonconformist, conformal); three were read at the
+  source level (TorchCP, coverforest, AdaptiveConformal).
+- The CIFAR-10-C experiment uses `imagecorruptions` on the local CIFAR-10 test
+  images. It follows the corruption families of CIFAR-10-C but is not the
+  official archive.
+- Seeds: five for audits A/B, three for the CIFAR-10-C stream, one for the
+  library runtime. The paper states this in Section 5.
+- `data/` and `_libs/` are gitignored. The source snapshots in `_libs/src` were
+  downloaded for the Table 8 audit; the table records the versions and line
+  numbers.
+- `legacy/` is the frozen earlier manuscript, kept for comparison and not part
+  of the paper.
 
-Commands:
-```
-python code/run_all.py      # digits, about 90 seconds
-python code/run_cifar.py    # CIFAR-10, requires torch and data/cifar10_features.npz
-```
+## Citation
 
-Phase 3B: library behavior audit. Table 8, `results/mapie_empty.json`, notes in
-`refs/library_audit_notes.md`. MAPIE was run; the other libraries were source-inspected.
-
-Next: phase 3C, full literature search and the two-axis map.
+The paper is in preparation. The reference list is `paper/references.md`;
+author and venue information will be added at submission.

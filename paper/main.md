@@ -1082,10 +1082,12 @@ fill them.
 ## Data and code availability
 
 The experiments are implemented in a single Python repository with fixed seeds.
-Every reported number is written to a JSON file, and the tables and figures are
-generated from that file. The digits benchmark is distributed with scikit-learn;
-CIFAR-10 is public. The repository and the exact commands are provided in the
-supplementary material.
+Every empirical number is written to a JSON file, and the tables and figures are
+generated from those files. The digits benchmark is distributed with scikit-learn;
+CIFAR-10 and covertype are public. README.md documents the environment, the data,
+and the commands that regenerate Tables 2-7, 11 and 12 and Figures 1-5. Table 8's
+source-policy columns are a curated reading of the code; its runtime rows come
+from results/library_runtime.json.
 
 ---
 
