@@ -684,7 +684,7 @@ section.
 
 The audit has limits. Three of the six implementations were run. TorchCP,
 coverforest, and AdaptiveConformal were read at the source level. coverforest
-could not be installed against scikit-learn 1.9, and TorchCP's optional graph
+could not be run against scikit-learn 1.9, and TorchCP's optional graph
 dependencies are not available on this machine.
 The versions are those available on 2026-11-06, and line numbers will move.
 The MAPIE experiment uses synthetic data, so the 4.6-point gap should be read

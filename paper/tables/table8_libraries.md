@@ -32,8 +32,8 @@ non-empty post-processing, not the score.
 ## Runtime cross-check
 
 Same synthetic five-class task for all libraries: 8,000 samples, logistic
-regression, 2,000 test points, alpha = 0.10, test accuracy 0.487. One seed for
-puncc and crepes; the MAPIE rows in the table above use five seeds.
+regression, 2,000 test points, alpha = 0.10, test accuracy 0.487. One seed for every library in this table; the MAPIE numbers in the table above
+use five seeds.
 
 | library | setting | coverage | empty rate | mean size |
 |---|---|---|---|---|
