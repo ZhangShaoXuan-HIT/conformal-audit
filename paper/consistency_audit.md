@@ -259,5 +259,5 @@ The submission PDF was rebuilt.
 
 Author block added from ORCID 0009-0001-4103-6099: Shaoxuan Zhang, Faculty of
 Computing, Harbin Institute of Technology, Harbin, Heilongjiang, China. The
-ORCID is linked in the PDF; links are styled as plain text for print. ORCID has
-no public email, so the corresponding-author email is still a placeholder.
+ORCID is linked in the PDF; links are styled as plain text for print. The corresponding-author email is
+2023113033@stu.hit.edu.cn.

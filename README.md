@@ -141,7 +141,7 @@ hard-codes the Windows Edge path, so another OS needs a different browser path.
 ## Citation
 
 The paper is in preparation. Author: Shaoxuan Zhang (ORCID:
-https://orcid.org/0009-0001-4103-6099). The code and results are at
+https://orcid.org/0009-0001-4103-6099; email: 2023113033@stu.hit.edu.cn). The code and results are at
 https://github.com/ZhangShaoXuan-HIT/conformal-audit and archived at
 https://doi.org/10.5281/zenodo.24001054 (v1.0.0; concept DOI
 https://doi.org/10.5281/zenodo.24001053). The reference list is
