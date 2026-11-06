@@ -269,27 +269,231 @@ quality. The map's contribution is the two-axis organization and the explicit em
 The empirical contribution is the audit of whether the reported numbers respect the cell.
 Neither is a substitute for the other.
 
-## 4. Three implementation traps (2500 words)
+## 4. Three implementation traps
 
 ### 4.1 A calibrated threshold is split conformal
-<!-- cite Aguru 2026 for the binary threshold fact; our contribution is the multi-class consequence and the equivalence in practice, not the geometry. -->
-The set {y : p_y >= 1-q} with q the conformal quantile of 1-p_true is exactly
-the naive split conformal set. The distinction is calibration, not set
-construction. Calibrating on the max probability instead of the true-class
-probability fails to reach the target.
+
+The simplest baseline for a coverage target is a probability threshold. Choose
+t = 1 − α, keep the labels whose predicted probability exceeds t, and report the
+empirical coverage on a test set. The procedure is one line of code, it is
+available in every classifier, and it is not a coverage method. The audit in this
+section shows why, and it shows that the correct version of the baseline is
+exactly split conformal.
+
+The identity is one line. For the naive score s(x, y) = 1 − p_y(x), the conformal
+set is {y : 1 − p_y(x) ≤ q} = {y : p_y(x) ≥ 1 − q}, where q is the k-th smallest
+calibration score. The right-hand side is a threshold rule with t = 1 − q. The conformal quantile is the (1 − α) quantile of 1 − p_true, so 1 − q is the corresponding quantile of the true-class probability, and the calibrated threshold is the same object. The set
+construction is not doing any work beyond the calibration of the threshold. This
+is a known consequence of the score definition, and for binary classifiers the
+threshold geometry has been stated explicitly [@Aguru2026]. In multi-class
+classification it is an immediate corollary of the probabilities summing to one.
+We do not claim the identity. We measure what follows from ignoring it.
+
+The measurement uses four rules at α = 0.10. The raw threshold fixes t = 0.90. The
+max-probability rule chooses t as the α-quantile of the maximum predicted
+probability on the calibration set. The true-class rule chooses t as the
+α-quantile of the true-class probability. The conformal rule uses t = 1 − q. The
+first is the baseline a practitioner writes. The second is the repair a careful
+practitioner tries. The third is the correct calibration. The fourth is split
+conformal.
+
+Table 2 reports the digits results at n_cal = 449, and Table 5 reports CIFAR-10 at
+n_cal = 2000, across four training-set sizes. Three facts are stable across the
+two datasets.
+
+First, the raw threshold is degenerate. At α = 0.10 and a training set of 44
+digits, the raw threshold returns an empty set for 70.1 percent of the test
+points, and its coverage is 0.294. Forcing the argmax into the empty sets raises
+the coverage to 0.833, which is the model's accuracy. On CIFAR-10 with 30,000
+training images and 85.5 percent accuracy, the raw threshold still returns an
+empty set for 24.4 percent of the test points, and forcing the argmax raises the
+coverage from 0.716 to 0.855. The pattern is the same at every strength. The raw
+threshold is not a weak coverage method. It is a singleton rule with an
+abstention region, and its coverage is the accuracy of the model on the points it
+does not abstain on.
+
+Second, the max-probability calibration is closer but not exact. On CIFAR-10 the
+coverage is 0.668, 0.762, 0.771, and 0.810 at the four strengths. On digits it is
+0.800, 0.886, and 0.901. It is close to the target only when the model is accurate
+enough that the argmax is almost always the true class. The rule calibrates the
+wrong quantity. The threshold should be chosen on the true-class probability,
+because that is the event the coverage statement is about. Calibrating the
+maximum probability answers a different question, and the answer is right only
+when the two probabilities coincide.
+
+Third, the true-class calibration and split conformal are the same rule. The
+pointwise set comparison has zero mismatches on 450 test points times five seeds
+times three strengths for digits, and on 10,000 test points times five seeds times
+four strengths for CIFAR-10. The two rows in Table 2 and Table 5 are not
+approximately equal. They are equal. The equivalence is the empirical form of the
+identity, and it is the reason the correct baseline for a threshold comparison is
+split conformal.
+
+The practical consequence is a change in what a baseline is. A paper that
+compares conformal prediction to a raw 0.90 threshold is comparing a calibrated
+rule to an uncalibrated one, and the comparison is guaranteed to favor conformal
+for a reason that has nothing to do with set construction. A paper that compares
+conformal to a threshold calibrated on the true-class probability is comparing
+two implementations of the same rule, and the comparison should find no
+difference. The interesting comparison is the third one: conformal against a
+different score, or against a different calibration set, or against a different
+post-processing rule. The first two comparisons are already decided by the
+algebra.
+
+Figure 2 plots the coverage and the mean set size for the six rules at the three
+digits strengths. The raw threshold sits at the accuracy floor, the
+max-probability rule sits between the floor and the target, and the true-class,
+conformal, and threshold-at-1−q rules sit on top of each other. The figure is a
+visual proof of the identity, and it is the first thing a reader should look at
+before reading the rest of the section.
+
+The identity is not a criticism of conformal prediction. It is a clarification of
+what the method adds. The method adds the calibration of the threshold, not the
+shape of the set. Once the threshold is calibrated, the set is determined by the
+score. Section 4.2 is about what happens when the score produces an empty set and
+the implementation fills it.
 
 ### 4.2 Non-empty post-processing inflates coverage
-<!-- novel core. Cite Gauthier 2025 and Al Bataineh 2026 for empty sets as a known phenomenon; distinguish: they use or avoid empty sets, we measure forced non-empty reporting. -->
-Forcing the argmax into empty sets raises coverage and size. The inflation grows
-with alpha and with the empty rate. Report both raw and forced numbers.
-<!-- phase 1: mean delta 0.077, max 0.318; naive 0.041, APS rand 0.080, APS det 0.108, RAPS 0.078 -->
+
+A conformal set can be empty. The construction does not forbid it. If the score of
+every label exceeds the threshold, the set has no elements. Some implementations
+leave the empty set as it is, and some insert the argmax so that the output is
+never empty. The choice is usually presented as a convenience. It is a
+post-processing rule, and it changes the coverage of the procedure. This section
+measures the change.
+
+The accounting is exact. Let E be the set of test points whose raw set is empty,
+and let a_E be the fraction of those points on which the argmax is correct.
+Forcing the argmax adds one covered point for each point in E on which the argmax
+is correct, and no coverage for the others. The change in coverage is therefore
+|E|/N times a_E, which is the empty rate times the conditional accuracy of the
+argmax on the empty sets. The identity is not an approximation. It is the
+definition of the two quantities.
+
+The experiment varies the score, the target level, the calibration size, and the
+model strength. On digits the grid has 540 cells, 4 scores times 3 levels times 3
+calibration sizes times 3 strengths times 5 seeds. On CIFAR-10 it has 720 cells,
+with 4 strengths instead of 3. Every cell is evaluated twice, once with the empty
+sets kept and once with the argmax forced. The full results are in Table 3 and
+Table 6, and Figure 3 plots the change against the empty rate.
+
+Across the 540 digits cells the mean change is 0.077 and the largest is 0.318. The
+mean is 0.041 for the naive score, 0.080 for randomized APS, 0.108 for
+deterministic APS, and 0.078 for RAPS. The ranking is the ranking of the empty
+rates. The naive score produces few empty sets because its threshold is low. The
+deterministic APS produces many because its cumulative score can exceed the
+threshold for every label. On CIFAR-10 the naive score produces no empty sets at
+any strength, and the change is zero. The randomized APS produces 1.0 to 3.7
+percent empty sets and changes coverage by 0.9 to 3.6 points. The deterministic
+APS produces 6.9 to 9.5 percent empty sets and changes coverage by 6.8 to 9.5
+points.
+
+The change is not confined to weak models. On CIFAR-10 with 100 training images, deterministic APS goes from 0.904 to 0.972, a change of 6.8 points. With 1,000 images it goes from 0.902 to 0.993, a change of 9.1 points. At
+30,000 images it goes from 0.899 to 0.994, a change of 9.5 points. The change does
+not shrink with model strength, because the empty rate does not shrink. The naive
+score is the exception: it produces no empty sets on CIFAR-10 at any strength, and
+the change is zero. The naive score on digits at full strength produces 7.8
+percent empty sets and changes coverage by 5.4 points. The empty rate is a
+property of the score and the calibration, not of the model alone.
+
+The 5,000-image CIFAR-10 cell is the exception that proves the rule.
+Deterministic APS reaches 0.994 coverage with a mean set size of 6.08 and no empty
+sets. The score is already conservative, so the fallback has nothing to do. The
+cell is a reminder that there are two ways to over-cover: a non-empty rule, and a
+score that is too conservative. The audit isolates the first, but a reader who
+only looks at the coverage cannot tell them apart.
+
+Figure 3 plots the change against the empty rate for all 1,260 cells. The points
+lie just below the identity line, and the distance from the line is the
+conditional accuracy of the argmax on the empty sets. The naive points are
+furthest below, because the argmax is less often correct when the naive set is
+empty. The APS points are close to the line, because the argmax is often correct
+when the APS set is empty. The figure is the visual form of the accounting
+identity, and it is the reason the change is predictable from the empty rate
+alone.
+
+The result has a direct consequence for the library audit in Section 4.4. MAPIE's
+default APS reaches 0.9457 with zero empty sets. The randomized setting reaches
+0.8998. The 4.6-point gap is the non-empty rule, not the score. The corrected
+conclusion is that the default is not the exact conformal rule, and the coverage
+it reports is the coverage of the post-processing.
+
+The recommendation is not to ban the fallback. An empty set is a valid output, and
+a deployment may prefer a guess to an abstention. The recommendation is to report
+both numbers and to compare methods at the same post-processing rule. A comparison
+between a forced method and an unforced method is a comparison between two
+procedures, not between two scores. Section 4.4 shows that the choice is exposed
+in some libraries and hidden in others, and that the default in one widely used
+library is the non-empty rule.
 
 ### 4.3 The alpha_t update is not ACI
 
-ACI uses a fixed target alpha. Replacing it with alpha_t removes the
-target-tracking guarantee and can look successful by collapsing to the clip.
+Adaptive conformal inference replaces the fixed target with an online update.
+After each observation, the procedure observes whether the set covered the true
+label, and it moves the target level in the direction that would have corrected
+the error. The update in Gibbs and Candès [@Gibbs2021ACI] is
+α_{t+1} = α_t + γ(α − err_t), where err_t is one if the set missed and zero
+otherwise, and α is the fixed nominal level. The rule is simple, and the fixed
+target is the part that makes it work. The level moves toward the value at which
+the long-run error rate is α.
 
-<!-- phase 1, average over three schedules, gamma 0.02: fixed = 0.833 cov, 3.10 size, alpha 0.0082; buggy = 0.838 cov, 3.70 size, alpha 0.0011, near-trivial 17.3% vs 9.1%. At gamma 0.1 the buggy update diverges (seed SD 0.205). -->
+A common implementation error replaces the fixed α with the current α_t. The
+recursion becomes α_{t+1} = α_t + γ(α_t − err_t). The difference looks small, and
+it is not. The correct rule has a fixed point at err = α. The incorrect rule has a
+fixed point at err = α_t, and because the procedure is calibrated at every level,
+that condition is satisfied, to first order, at every α_t. There is no restoring
+force toward the nominal level. The rule has a positive feedback term. When the
+set covers, α_t increases by γα_t, and when it misses, α_t decreases by
+γ(1 − α_t). At α_t = 0.10 the downward step is nine times the upward step, so a
+run of misses drives the level to the lower clip, where the sets are as large as
+the calibration scores allow. The procedure then reports a high coverage because
+the sets are large, not because the level tracked the target.
+
+The experiment compares the two rules on controlled drift streams. On digits, the
+stream has 450 points in nine blocks, with Gaussian noise increasing from 0 to
+0.60. On CIFAR-10, it has 2,000 images in 20 blocks, with pixel noise increasing
+from 0 to 0.40. The calibration set is clean in both cases. The grid varies the
+step size from 0.005 to 0.2, the update rule, and the seed. Table 4 and Table 7
+report the results, and Figure 4 plots the coverage and the level trajectories for
+the linear schedule at γ = 0.02.
+
+On digits, the static procedure covers 0.666 of the stream. The correct update at
+γ = 0.02 covers 0.836 with a mean set size of 3.44. The incorrect update covers
+0.869 with a mean set size of 4.58. The coverage gain is 3.3 points. The set-size
+cost is 33 percent. The share of near-trivial sets, those containing at least nine
+of the ten labels, rises from 10.8 to 24.4 percent. The final level is 0.0074 for
+the correct rule and 0.0011 for the incorrect one, which is the lower clip. On
+CIFAR-10 the static procedure covers 0.272. The correct update covers 0.677 with a
+mean size of 5.13. The incorrect update covers 0.801 with a mean size of 6.39. The
+coverage gain is 12.4 points, the set-size cost is 25 percent, and the
+near-trivial share rises from 4.6 to 12.9 percent. In both datasets the incorrect
+rule wins the coverage comparison and loses the information comparison.
+
+The correct rule also fails to reach 0.90 on these streams. On digits it reaches
+0.836 with the level at 0.0074. On CIFAR-10 it reaches 0.677 with the level at the
+lower clip. The failure is not a bug in the update. It is the finite-time behavior
+of the method. The calibration scores bound how far the quantile can move. Once
+the level is at the clip, the set is the largest the calibration sample allows,
+and a corrupted point can still fall outside it. The step size bounds how fast the
+level can move, and a drift that is faster than the step size produces a transient
+loss. The two mechanisms are visible in the block curves of Figure 4. The correct
+rule tracks the target at the beginning of the stream and falls behind as the
+corruption increases.
+
+The incorrect rule is also unstable. At γ = 0.1 on the abrupt schedule, two of the five digits seeds drive the level above 0.69, one of them to 0.998, and coverage falls to 0.436 and 0.162. The seed standard deviation of coverage is 0.205 on the linear
+schedule, against 0.046 for the correct rule at the same step size. The positive
+feedback term can push the level to either clip, and the direction depends on the
+sequence of errors. A method that reports a single coverage number and hides the
+level trajectory can present a divergent run as a successful one.
+
+The library audit in Section 4.4 changes the scope of this result. MAPIE, TorchCP,
+and AdaptiveConformal all use the fixed-target update. The error is a risk of
+hand-written implementations, not a default of the libraries we checked. The
+audit's value is therefore narrower than "the ecosystem is wrong." It is that the
+error is easy to make, it produces a plausible-looking improvement, and a coverage
+report alone cannot detect it. The report needs the level trajectory, the clip
+fraction, and the set-size distribution. Section 4.4 gives the library evidence,
+and Section 6 turns it into a checklist.
 
 ### 4.4 Do real libraries do this?
 
