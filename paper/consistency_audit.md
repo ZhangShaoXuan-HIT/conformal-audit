@@ -306,8 +306,10 @@ citations and tables are unchanged.
 
 
 Tables and figures are embedded at the point of first reference: Table 1 after
-Section 3.1, Table 2 after 3.2, Table 3 after 3.3, Table 4 after 3.4; Figure 1
-after 2.1, Figures 2-4 with the corresponding results. The end-of-document
+Section 3.1, Table 2 after 3.2, Table 3 (cost) after 3.3, Table 4 (ACI) after
+3.4; Figure 1 after 2.1, Figures 2-4 with the corresponding results. Sections
+3.3 and 3.4 were reordered so the cost rule follows the empty-set identity and
+ACI follows as the update probe. The end-of-document
 table/figure sections and the separate caption list were removed.
 
 

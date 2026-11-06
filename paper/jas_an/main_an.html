@@ -133,9 +133,9 @@ the reporting step (dashed), with the three places where the reported
 number can move.</figcaption>
 </figure>
 <p>The dashed reporting step is where the three probes act; each probe
-holds the other two stages fixed. The probes are applied in Sections 3.1
-to 3.3, and Section 3.4 turns the empty-set identity into the cost
-rule.</p>
+holds the other two stages fixed. The probes are applied in Sections
+3.1, 3.2 and 3.4, and Section 3.3 turns the empty-set identity into the
+cost rule.</p>
 <h3 id="data-and-experimental-grid">2.2 Data and experimental grid</h3>
 <p>Digits contains 1,797 images of 8 by 8 pixels in ten classes. A
 stratified split holds out 450 test points and 898 training points, with
@@ -416,17 +416,63 @@ raw empty rate across the image cells.</figcaption>
 <p>The cluster near the origin is the low-empty-rate regime, where the
 policy barely matters; the spread at higher rates is where it changes
 the reported number.</p>
-<h3 id="adaptive-conformal-inference">3.3 Adaptive conformal
+<h3 id="the-cost-rule">3.3 The cost rule</h3>
+<p>The empty-set identity also prices the fallback. Table 3 reduces the
+calculation to a single ratio: on digits the mean a_E is 0.99, so the
+cost threshold c_a / c_e is 0.01; on CIFAR-10 it lies between 0.96 and
+0.99, giving a threshold of 0.01 to 0.04; on covertype it is 0.94,
+giving 0.06. Forcing is preferable to abstaining unless abstaining costs
+less than one to six percent of an error. The defaults are therefore
+rational for most deployments, although the decision is usually made
+silently, and the reported coverage no longer estimates the nominal
+level once the fallback is active.</p>
+<section id="table-3.-cost-rule" class="keep">
+<h3>Table 3. Cost rule</h3>
+<table>
+<thead>
+<tr>
+<th>dataset</th>
+<th>mean a_E</th>
+<th>threshold c_a / c_e</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>digits</td>
+<td>0.99</td>
+<td>0.01</td>
+</tr>
+<tr>
+<td>CIFAR-10</td>
+<td>0.96 to 0.99</td>
+<td>0.01 to 0.04</td>
+</tr>
+<tr>
+<td>covertype</td>
+<td>0.94</td>
+<td>0.06</td>
+</tr>
+</tbody>
+</table>
+<p>Forcing is better than abstaining when c_a / c_e exceeds 1 - a_E. The
+threshold is small in every dataset; the empty rate determines the
+exposure.</p>
+</section>
+<p>The per-point proxy, which uses the maximum probability for a_E,
+coincides with uniform forcing at or above 0.05 on all three datasets,
+so it adds nothing to the population rule.</p>
+<h3 id="adaptive-conformal-inference">3.4 Adaptive conformal
 inference</h3>
-<p>On digits, the static procedure covers 0.666 of the stream. The
-correct update at gamma = 0.02 covers 0.836 with a mean size of 3.44,
-while the incorrect update covers 0.869 with a mean size of 4.58. The
-extra 3.3 points of coverage come with a 33 percent increase in size and
-a rise in the near-trivial share from 10.8 to 24.4 percent. The final
-level is 0.0074 for the correct rule and 0.0011 for the incorrect one,
-at the lower clip. At gamma = 0.1, two of the five digits seeds drive
-the level above 0.69, one of them to 0.998, and coverage falls to 0.436
-and 0.162.</p>
+<p>The first two probes concern the set; the third concerns the update.
+On digits, the static procedure covers 0.666 of the stream. The correct
+update at gamma = 0.02 covers 0.836 with a mean size of 3.44, while the
+incorrect update covers 0.869 with a mean size of 4.58. The extra 3.3
+points of coverage come with a 33 percent increase in size and a rise in
+the near-trivial share from 10.8 to 24.4 percent. The final level is
+0.0074 for the correct rule and 0.0011 for the incorrect one, at the
+lower clip. At gamma = 0.1, two of the five digits seeds drive the level
+above 0.69, one of them to 0.998, and coverage falls to 0.436 and
+0.162.</p>
 <p>On CIFAR-10 with five corruption types and three severities, the
 static procedure covers 0.451; the correct update covers 0.828 with a
 mean size of 4.93, and the incorrect update covers 0.936 with a mean
@@ -436,10 +482,11 @@ under the correct rule is 0.853, 0.829 and 0.802 at the three
 severities, and under the incorrect rule it is 0.940, 0.939 and 0.928.
 The correct rule falls short of 0.90, while the incorrect rule exceeds
 it by inflating the sets.</p>
-<p>Table 3 sets the three updates side by side. The incorrect variant
+<p>Table 4 sets the three updates side by side. The incorrect variant
 buys 3.3 points on digits and 10.8 on CIFAR-10, and pays for them with
 33 and 41 percent more set size.</p>
-<h3 id="table-3.-aci-update">Table 3. ACI update</h3>
+<section id="table-4.-aci-update" class="keep">
+<h3>Table 4. ACI update</h3>
 <table>
 <thead>
 <tr>
@@ -505,6 +552,7 @@ buys 3.3 points on digits and 10.8 on CIFAR-10, and pays for them with
 <p>The incorrect update reports more coverage at a larger size and a
 larger near-trivial share. The correct update also falls short of
 0.90.</p>
+</section>
 <p>The table adds the levels. In the incorrect row the final level sits
 at the lower clip; in the correct row it stays away from the clip, even
 though that row misses the target. Three of the eight implementations
@@ -512,53 +560,8 @@ though that row misses the target. Three of the eight implementations
 update; the others do not implement ACI. The correct rule also misses
 0.90 on these streams; the shortfall follows from finite-time behaviour
 and limited calibration support.</p>
-<h3 id="the-cost-rule">3.4 The cost rule</h3>
-<p>Table 4 reduces the cost calculation to a single ratio. The audit
-also yields the quantity a deployment needs: on digits the mean a_E is
-0.99, so the cost threshold c_a / c_e is 0.01; on CIFAR-10 it lies
-between 0.96 and 0.99, giving a threshold of 0.01 to 0.04; on covertype
-it is 0.94, giving 0.06. Forcing is preferable to abstaining unless
-abstaining costs less than one to six percent of an error. The defaults
-are therefore rational for most deployments, although the decision is
-usually made silently, and the reported coverage no longer estimates the
-nominal level once the fallback is active.</p>
-<section id="table-4.-cost-rule" class="keep">
-<h3>Table 4. Cost rule</h3>
-<table>
-<thead>
-<tr>
-<th>dataset</th>
-<th>mean a_E</th>
-<th>threshold c_a / c_e</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>digits</td>
-<td>0.99</td>
-<td>0.01</td>
-</tr>
-<tr>
-<td>CIFAR-10</td>
-<td>0.96 to 0.99</td>
-<td>0.01 to 0.04</td>
-</tr>
-<tr>
-<td>covertype</td>
-<td>0.94</td>
-<td>0.06</td>
-</tr>
-</tbody>
-</table>
-<p>Forcing is better than abstaining when c_a / c_e exceeds 1 - a_E. The
-threshold is small in every dataset; the empty rate determines the
-exposure.</p>
-</section>
-<p>The per-point proxy, which uses the maximum probability for a_E,
-coincides with uniform forcing at or above 0.05 on all three datasets,
-so it adds nothing to the population rule.</p>
 <p>Figure 4 returns to the update results and shows the trajectories
-behind Table 3. The correct rule recovers after each block; the
+behind Table 4. The correct rule recovers after each block; the
 incorrect rule drifts upward and never returns.</p>
 <figure>
 <img src="../figures/fig4_aci.png"

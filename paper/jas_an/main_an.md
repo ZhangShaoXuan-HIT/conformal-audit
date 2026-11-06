@@ -48,7 +48,7 @@ Figure 1 shows the pipeline and the three probes, which work with existing score
 
 ![Figure 1. The three stages (solid) and the reporting step (dashed), with the three places where the reported number can move.](../figures/fig1_pipeline.png)
 
-The dashed reporting step is where the three probes act; each probe holds the other two stages fixed. The probes are applied in Sections 3.1 to 3.3, and Section 3.4 turns the empty-set identity into the cost rule.
+The dashed reporting step is where the three probes act; each probe holds the other two stages fixed. The probes are applied in Sections 3.1, 3.2 and 3.4, and Section 3.3 turns the empty-set identity into the cost rule.
 
 
 
@@ -144,39 +144,12 @@ The cluster near the origin is the low-empty-rate regime, where the policy barel
 
 
 
-### 3.3 Adaptive conformal inference
+### 3.3 The cost rule
 
-On digits, the static procedure covers 0.666 of the stream. The correct update at gamma = 0.02 covers 0.836 with a mean size of 3.44, while the incorrect update covers 0.869 with a mean size of 4.58. The extra 3.3 points of coverage come with a 33 percent increase in size and a rise in the near-trivial share from 10.8 to 24.4 percent. The final level is 0.0074 for the correct rule and 0.0011 for the incorrect one, at the lower clip. At gamma = 0.1, two of the five digits seeds drive the level above 0.69, one of them to 0.998, and coverage falls to 0.436 and 0.162.
-
-On CIFAR-10 with five corruption types and three severities, the static procedure covers 0.451; the correct update covers 0.828 with a mean size of 4.93, and the incorrect update covers 0.936 with a mean size of 6.97. The gain is 10.8 points, the size cost is 41 percent, and the near-trivial share rises from 14.5 to 38.0 percent. Block coverage under the correct rule is 0.853, 0.829 and 0.802 at the three severities, and under the incorrect rule it is 0.940, 0.939 and 0.928. The correct rule falls short of 0.90, while the incorrect rule exceeds it by inflating the sets.
-
-Table 3 sets the three updates side by side. The incorrect variant buys 3.3 points on digits and 10.8 on CIFAR-10, and pays for them with 33 and 41 percent more set size.
-
-### Table 3. ACI update
-
-| dataset | update | coverage | size | near-trivial | alpha final |
-|---|---|---|---|---|---|
-| digits | static | 0.666 | — | — | — |
-| digits | correct | 0.836 | 3.44 | 0.108 | 0.0074 |
-| digits | incorrect | 0.869 | 4.58 | 0.244 | 0.0011 |
-| CIFAR-10 | static | 0.451 | 1.30 | 0.000 | — |
-| CIFAR-10 | correct | 0.828 | 4.93 | 0.145 | 0.0106 |
-| CIFAR-10 | incorrect | 0.936 | 6.97 | 0.380 | 0.0019 |
-
-The incorrect update reports more coverage at a larger size and a larger near-trivial share. The correct update also falls short of 0.90.
-
-The table adds the levels. In the incorrect row the final level sits at the lower clip; in the correct row it stays away from the clip, even though that row misses the target. Three of the eight implementations (MAPIE, TorchCP and AdaptiveConformal) use the correct fixed-target update; the others do not implement ACI. The correct rule also misses 0.90 on these streams; the shortfall follows from finite-time behaviour and limited calibration support.
-
-
-
-
-
-### 3.4 The cost rule
-
-Table 4 reduces the cost calculation to a single ratio. The audit also yields the quantity a deployment needs: on digits the mean a_E is 0.99, so the cost threshold c_a / c_e is 0.01; on CIFAR-10 it lies between 0.96 and 0.99, giving a threshold of 0.01 to 0.04; on covertype it is 0.94, giving 0.06. Forcing is preferable to abstaining unless abstaining costs less than one to six percent of an error. The defaults are therefore rational for most deployments, although the decision is usually made silently, and the reported coverage no longer estimates the nominal level once the fallback is active.
+The empty-set identity also prices the fallback. Table 3 reduces the calculation to a single ratio: on digits the mean a_E is 0.99, so the cost threshold c_a / c_e is 0.01; on CIFAR-10 it lies between 0.96 and 0.99, giving a threshold of 0.01 to 0.04; on covertype it is 0.94, giving 0.06. Forcing is preferable to abstaining unless abstaining costs less than one to six percent of an error. The defaults are therefore rational for most deployments, although the decision is usually made silently, and the reported coverage no longer estimates the nominal level once the fallback is active.
 
 ::: {.keep}
-### Table 4. Cost rule
+### Table 3. Cost rule
 
 | dataset | mean a_E | threshold c_a / c_e |
 |---|---|---|
@@ -189,13 +162,36 @@ Forcing is better than abstaining when c_a / c_e exceeds 1 - a_E. The threshold 
 
 The per-point proxy, which uses the maximum probability for a_E, coincides with uniform forcing at or above 0.05 on all three datasets, so it adds nothing to the population rule.
 
-Figure 4 returns to the update results and shows the trajectories behind Table 3. The correct rule recovers after each block; the incorrect rule drifts upward and never returns.
+### 3.4 Adaptive conformal inference
+
+The first two probes concern the set; the third concerns the update. On digits, the static procedure covers 0.666 of the stream. The correct update at gamma = 0.02 covers 0.836 with a mean size of 3.44, while the incorrect update covers 0.869 with a mean size of 4.58. The extra 3.3 points of coverage come with a 33 percent increase in size and a rise in the near-trivial share from 10.8 to 24.4 percent. The final level is 0.0074 for the correct rule and 0.0011 for the incorrect one, at the lower clip. At gamma = 0.1, two of the five digits seeds drive the level above 0.69, one of them to 0.998, and coverage falls to 0.436 and 0.162.
+
+On CIFAR-10 with five corruption types and three severities, the static procedure covers 0.451; the correct update covers 0.828 with a mean size of 4.93, and the incorrect update covers 0.936 with a mean size of 6.97. The gain is 10.8 points, the size cost is 41 percent, and the near-trivial share rises from 14.5 to 38.0 percent. Block coverage under the correct rule is 0.853, 0.829 and 0.802 at the three severities, and under the incorrect rule it is 0.940, 0.939 and 0.928. The correct rule falls short of 0.90, while the incorrect rule exceeds it by inflating the sets.
+
+Table 4 sets the three updates side by side. The incorrect variant buys 3.3 points on digits and 10.8 on CIFAR-10, and pays for them with 33 and 41 percent more set size.
+
+::: {.keep}
+### Table 4. ACI update
+
+| dataset | update | coverage | size | near-trivial | alpha final |
+|---|---|---|---|---|---|
+| digits | static | 0.666 | — | — | — |
+| digits | correct | 0.836 | 3.44 | 0.108 | 0.0074 |
+| digits | incorrect | 0.869 | 4.58 | 0.244 | 0.0011 |
+| CIFAR-10 | static | 0.451 | 1.30 | 0.000 | — |
+| CIFAR-10 | correct | 0.828 | 4.93 | 0.145 | 0.0106 |
+| CIFAR-10 | incorrect | 0.936 | 6.97 | 0.380 | 0.0019 |
+
+The incorrect update reports more coverage at a larger size and a larger near-trivial share. The correct update also falls short of 0.90.
+:::
+
+The table adds the levels. In the incorrect row the final level sits at the lower clip; in the correct row it stays away from the clip, even though that row misses the target. Three of the eight implementations (MAPIE, TorchCP and AdaptiveConformal) use the correct fixed-target update; the others do not implement ACI. The correct rule also misses 0.90 on these streams; the shortfall follows from finite-time behaviour and limited calibration support.
+
+Figure 4 returns to the update results and shows the trajectories behind Table 4. The correct rule recovers after each block; the incorrect rule drifts upward and never returns.
 
 ![Figure 4. Coverage and level trajectories under drift on digits.](../figures/fig4_aci.png)
 
 The divergence persists across blocks and reflects the fixed point of the variant.
-
-
 
 ### 3.5 Simulation and the boundary
 
