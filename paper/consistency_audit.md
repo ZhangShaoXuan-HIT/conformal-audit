@@ -134,12 +134,12 @@ explicitly in 5.3 and 5.6, and the abstract limits the 9.7-point figure to the
 image benchmarks. The reference list is 37 entries after adding the Covertype
 dataset citation.
 
-The paper is 11,300 words, 37 references, 11 tables and 5 figures.
+At that point the paper was 11,300 words, 37 references, 11 tables and 5 figures.
 
 
 ## Re-audit after CIFAR-C and covertype (2026-11-06)
 
-Checks: 11,688 words; Tables 1-11 all referenced and present; Figures 1-5 all
+Checks: 11,688 words; Tables 1-12 all referenced and present; Figures 1-5 all
 referenced and present; 28 citation keys in prose, all in the bibliography; 37
 entries in the reference list (28 prose plus 3 map-only keys plus 6 software).
 Stale CIFAR numbers (0.272, 0.677, 0.801, 12.4, 25 percent, 12.9) are gone.
