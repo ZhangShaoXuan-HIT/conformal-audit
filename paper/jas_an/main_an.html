@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>When Reported
+Coverage Is Not Coverage</title>
+<link rel="stylesheet" href="style.css"></head><body><h1
+id="when-reported-coverage-is-not-coverage-a-controlled-audit-of-conformal-prediction-implementations">When
+Reported Coverage Is Not Coverage: A Controlled Audit of Conformal
+Prediction Implementations</h1>
+<div class="author">
+<p>Shaoxuan Zhang</p>
+<p>Faculty of Computing, Harbin Institute of Technology, Harbin,
+Heilongjiang, China</p>
+<p>ORCID: 0009-0001-4103-6099</p>
+<p>Corresponding author: 2023113033@stu.hit.edu.cn</p>
+</div>
+<p><strong>Abstract.</strong> A conformal predictor comes with a
+finite-sample coverage guarantee. The number a pipeline reports does
+not. We present an audit protocol for three implementation choices
+between the guarantee and the reported number: the calibration of the
+threshold, the treatment of empty sets, and the update rule of adaptive
+conformal inference. The protocol composes existing conformal
+constructions with a coverage accounting identity and a cost rule for
+the empty-set fallback. We apply it to digits, CIFAR-10 and covertype,
+and to eight public implementations. A fixed probability threshold is
+not a coverage method; a true-class threshold is exactly split
+conformal; forcing the argmax into empty sets raises the reported
+coverage by up to 9.7 points on the image benchmarks, while a tabular
+benchmark shows the effect is near zero when the empty rate is near
+zero; the common alpha_t update is not ACI and reports higher coverage
+by inflating sets. Three of the eight libraries use the correct
+fixed-target update.</p>
+<p><strong>Keywords.</strong> conformal prediction; coverage;
+calibration; post-processing; adaptive conformal inference;
+implementation audit.</p>
+<h2 id="introduction">1. Introduction</h2>
+<h3 id="the-data-challenge">1.1 The data challenge</h3>
+<p>A practitioner sets a 0.90 coverage target. The simplest way to meet
+it is to threshold the softmax at 0.90, keep the labels above the
+threshold, and report the fraction of test points on which the true
+label is in the set. The reported number is usually close to the model’s
+accuracy, and it is often presented as evidence that the pipeline is
+calibrated. It is not. The threshold is a fixed probability, not a
+calibrated quantile, and the set it produces is a singleton or empty.
+The number is a property of the threshold rule, not of the
+guarantee.</p>
+<p>The conformal alternative replaces the fixed threshold with a
+quantile of the calibration scores. The resulting set satisfies a
+finite-sample coverage guarantee under exchangeability (Vovk et al.,
+2005; Angelopoulos &amp; Bates, 2023). The guarantee is real. It is also
+a statement about the procedure, not about the number a particular
+pipeline prints. Between the procedure and the number sit at least three
+choices: how the threshold is calibrated, what the implementation does
+with an empty set, and how an adaptive method updates its target. Each
+choice can move the reported coverage without changing the guarantee.
+The resulting data challenge is practical: a deployment that compares
+methods, or that decides whether to abstain, cannot tell from the
+printed number whether the guarantee is doing any work.</p>
+<h3 id="relevant-data">1.2 Relevant data</h3>
+<p>We study the challenge on three public datasets. Digits is small
+enough to check by hand. CIFAR-10 is large enough that the coverage
+estimates are tight. Covertype is a tabular benchmark that tests whether
+the mechanism survives a different modality. We vary the score, the
+target level, the calibration size and the model strength, and we
+evaluate every cell twice, once with the empty sets kept and once with
+the argmax forced. The image grid has 1,260 cells; the tabular
+replication adds 180 rows. We also run eight public implementations on a
+common synthetic task. The data, code and every table are available at
+https://github.com/ZhangShaoXuan-HIT/conformal-audit and archived at
+https://doi.org/10.5281/zenodo.24001054.</p>
+<h3 id="approach-and-contributions">1.3 Approach and contributions</h3>
+<p>The approach is an audit protocol, not a new estimator. It uses
+existing conformal constructions as probes. The first probe asks which
+threshold is calibrated. The second asks what the implementation does
+when the set is empty. The third asks whether an adaptive method updates
+a fixed target or its own current target. The protocol returns coverage,
+set size, empty rate, the conditional accuracy of the inserted label,
+and a cost rule for the fallback. This is an innovative use of existing
+methods: the object of study is the implementation, and the output is a
+decision, not a new predictor.</p>
+<p>The paper makes four contributions. First, the protocol: three probes
+and an accounting identity that separate the score from the
+post-processing. Second, an empirical audit on three datasets and 1,260
+image cells. Third, a library policy map over eight implementations,
+five of which were run. Fourth, a cost rule that turns the empty-set
+decision into a comparison of two losses. The audit complements four
+surveys and tutorials (Angelopoulos &amp; Bates, 2023; Fontana et al.,
+2023; Campos et al., 2024; Zhou et al., 2025) and the closest 2025-2026
+work (Aguru, 2026; Mehrtens et al., 2025; Gauthier et al., 2025; Al
+Bataineh, 2026; Boman, 2026). It does not claim the threshold identity
+as new; it measures what follows from using the wrong threshold, the
+wrong post-processing, or the wrong update.</p>
+<h2 id="methodologyapproach">2. Methodology/Approach</h2>
+<h3 id="the-audit-protocol">2.1 The audit protocol</h3>
+<p>A conformal pipeline has three stages: fit a model f, calibrate a
+quantile q on held-out data, and form the set C(x) = {y : s(x,y) &lt;=
+q}. The protocol probes each stage with a counterfactual that a
+practitioner might plausibly use.</p>
+<p>Probe 1, threshold calibration. We compare four rules: a raw
+threshold at 0.90, a quantile of the maximum probability, a quantile of
+the true-class probability, and split conformal with the naive score.
+The first returns a singleton or an empty set. The second is a quantile
+of the wrong quantity. The third is exactly split conformal: for the
+naive score s(x,y) = 1 - p_y, the true-class threshold t satisfies p_y
+&gt;= 1 - q, which is the conformal set. We verify the identity
+pointwise, not only in coverage.</p>
+<p>Probe 2, empty-set post-processing. We keep the raw set and the
+forced set, where forcing inserts the argmax only when the raw set is
+empty. Let e be the empty rate and a_E the fraction of empty-set points
+on which the argmax is correct. Forcing adds one covered point for each
+empty point on which the argmax is correct, so the coverage gain is
+exactly delta = e a_E. The identity is not an approximation. It also
+gives a cost rule. Let c_a be the loss of abstaining and c_e the loss of
+a wrong answer. Forcing is better than abstaining exactly when c_e (1 -
+a_E) &lt; c_a, or c_a / c_e &gt; 1 - a_E. The audit estimates a_E as
+delta / e.</p>
+<p>Probe 3, adaptive conformal inference. The published update is
+alpha_{t+1} = alpha_t + gamma (alpha - err_t), where err_t is one if the
+set missed. The fixed target alpha is what creates a restoring force. A
+common implementation replaces it with the current level, alpha_{t+1} =
+alpha_t + gamma (alpha_t - err_t). The replacement removes the restoring
+force and adds a positive feedback term. We compare the static
+procedure, the correct update and the incorrect update on controlled
+streams, and we report coverage, set size, the share of near-trivial
+sets containing at least nine of the ten labels, and the final
+level.</p>
+<p>Figure 1 shows the pipeline and the three probes. The protocol is the
+methodological contribution. It does not require a new score or a new
+estimator; it requires that the implementation be treated as the object
+of study, and that the reported number be decomposed into the quantities
+that produce it.</p>
+<h3 id="data-and-experimental-grid">2.2 Data and experimental grid</h3>
+<p>Digits has 1,797 images of 8 by 8 pixels in ten classes. A stratified
+split holds out 450 test points and 898 training points; the calibration
+set is drawn from the remaining 449. The model is a standardiser
+followed by multinomial logistic regression. The training set is
+subsampled to 5, 25 and 100 percent, giving 44, 224 and 898 training
+points. CIFAR-10 has 50,000 training and 10,000 test images. A
+pretrained ResNet-18 provides 512-dimensional features; a
+logistic-regression head is fitted on 100, 1,000, 5,000 or 30,000
+images. The calibration set is drawn from the remaining 20,000, with
+sizes 500, 2,000 and 10,000. Covertype is a 581,012-row, 54-feature,
+seven-class tabular dataset. We use a 120,000-row stratified subset, a
+logistic regression, training sizes of 6,000 and 60,000, a calibration
+set of 20,000 and a test set of 40,000.</p>
+<p>Four scores are compared: the naive score 1 - p_y, randomized APS,
+deterministic APS, and RAPS. The grid varies the score, the target level
+(0.05, 0.10, 0.20), the calibration size and the model strength. Audit A
+uses alpha = 0.10 and the four threshold rules. Audit B uses the full
+score-by-level-by-calibration-by-strength grid: 540 digits cells and 720
+CIFAR-10 cells, each evaluated raw and forced. Audit C uses controlled
+drift streams. The digits stream has 450 points in nine blocks, with
+Gaussian noise increasing from 0 to 0.60; the CIFAR-10 stream has 3,000
+images in three blocks, one for each severity of a corruption type,
+across five corruption types. Seeds are five for audits A and B, three
+for the CIFAR-10 drift stream.</p>
+<p>The grid is also the simulation study. It varies the factors that
+should matter, and it includes regimes in which the effect should be
+large and regimes in which it should vanish. The tabular replication is
+the stress test: a different modality, a different model and a different
+empty rate.</p>
+<h3 id="implementations">2.3 Implementations</h3>
+<p>We inspect eight implementations: MAPIE 1.6.0, TorchCP 1.2.1, puncc
+0.9.3, crepes 0.9.1, coverforest 0.0.3, nonconformist 2.1.0, conformal
+0.1 and the AdaptiveConformal R package. All eight were read at the
+source level. MAPIE, puncc, crepes, nonconformist and conformal were run
+on a common synthetic five-class task; MAPIE was run with five seeds,
+the others with one. TorchCP, coverforest and AdaptiveConformal were
+read only. The sample includes two older, smaller packages on purpose;
+it is a sample of public implementations, not a census.</p>
+<h3 id="metrics-and-the-cost-rule">2.4 Metrics and the cost rule</h3>
+<p>For each cell we record coverage, mean set size, the raw empty rate,
+the share of near-trivial sets, class coverage, expected calibration
+error and negative log-likelihood. For each raw/forced pair we record
+delta = coverage_forced - coverage_raw and a_E = delta / e. The cost
+rule is the threshold c_a / c_e = 1 - a_E. A deployment that reports
+both numbers can apply the rule; a deployment that reports only coverage
+cannot.</p>
+<h2 id="application-of-the-methodology">3. Application of the
+Methodology</h2>
+<h3 id="threshold-calibration">3.1 Threshold calibration</h3>
+<p>On digits with 44 training points, the raw 0.90 threshold returns an
+empty set for 70.1 percent of the test points and covers 0.294; forcing
+the argmax raises coverage to 0.833, which is the model’s accuracy. The
+max-probability rule reaches 0.668. The true-class rule reaches 0.800
+and has no empty sets. At 898 training points the raw threshold covers
+0.855 with 14.0 percent empty; the max-probability rule reaches 0.771;
+the true-class rule reaches 0.901. At a calibration size of 449, the
+true-class rule and split conformal coincide at 0.919, and the pointwise
+set comparison has zero mismatches over 450 test points times five seeds
+times three strengths.</p>
+<p>On CIFAR-10 with 30,000 training images, the raw threshold returns an
+empty set for 24.4 percent of the test points even though the model is
+85.5 percent accurate; its coverage is 0.716 and forcing the argmax
+raises it to 0.855. The max-probability rule reaches 0.810 at a target
+of 0.90. The true-class rule and split conformal agree pointwise over
+10,000 test points times five seeds times four strengths.</p>
+<p>Table 1 summarises the threshold results. The first finding is
+therefore simple and uncomfortable: a fixed probability threshold is not
+a coverage method, and the number it reports is accuracy on the points
+on which the model does not abstain. A quantile of the maximum
+probability is not a repair. The only correct calibration of the naive
+score is a quantile of the true-class probability.</p>
+<h3 id="empty-set-post-processing">3.2 Empty-set post-processing</h3>
+<p>On digits, across the 540 cells, the mean coverage gain from forcing
+is 0.077 and the largest is 0.318. The mean is 0.041 for the naive
+score, 0.080 for randomized APS, 0.108 for deterministic APS and 0.078
+for RAPS. The ranking is the ranking of the empty rates: the naive score
+produces few empty sets, deterministic APS produces many. On CIFAR-10
+the naive score produces no empty sets at any strength. Randomized APS
+produces 1.0 to 3.7 percent empty sets and changes coverage by 0.9 to
+3.6 points. Deterministic APS produces 6.9 to 9.5 percent empty sets and
+changes coverage by 6.8 to 9.5 points. The 5,000-image APS cell is the
+exception: it is already conservative at 0.994 coverage and a mean size
+of 6.08, so the fallback has nothing to do.</p>
+<p>The accounting identity explains the pattern. The gain is the empty
+rate times the conditional accuracy of the argmax on the empty sets. The
+conditional accuracy is high, between 0.94 and 0.99, because the model
+is usually right even when the set is empty. The empty rate is the
+mediator. On covertype the mean empty rate is 0.3 percent and the gain
+is 0.0 to 0.4 points; the same post-processing is nearly invisible.</p>
+<p>The library audit shows the same mechanism in released code. MAPIE’s
+APS default inserts the last label that crosses the quantile, so it
+never returns an empty set; over five seeds it reaches 0.9457 with zero
+empty sets, against 0.8998 for the randomized rule, a 4.6-point gap.
+puncc’s APS with randomization off reaches 0.977 with no empty sets;
+with randomization on it reaches 0.889. The LAC implementations of
+MAPIE, puncc and crepes agree to three decimals at 0.895 and a mean size
+of 2.87, which is a consistency check on the audit. nonconformist and
+conformal also return no empty sets on the common task.</p>
+<p>Table 2 summarises the library behaviour. The second finding is that
+the empty-set policy is a decision, not a detail. It changes the
+reported coverage by several points when the empty rate is high, and by
+almost nothing when it is low. The empty rate is the diagnostic.</p>
+<h3 id="adaptive-conformal-inference">3.3 Adaptive conformal
+inference</h3>
+<p>On digits, the static procedure covers 0.666 of the stream. The
+correct update at gamma = 0.02 covers 0.836 with a mean size of 3.44.
+The incorrect update covers 0.869 with a mean size of 4.58. The gain is
+3.3 points; the size cost is 33 percent; the share of near-trivial sets
+rises from 10.8 to 24.4 percent. The final level is 0.0074 for the
+correct rule and 0.0011 for the incorrect one, which is the lower clip.
+At gamma = 0.1, two of the five digits seeds drive the level above 0.69,
+one of them to 0.998, and coverage falls to 0.436 and 0.162.</p>
+<p>On CIFAR-10 with five corruption types and three severities, the
+static procedure covers 0.451. The correct update covers 0.828 with a
+mean size of 4.93. The incorrect update covers 0.936 with a mean size of
+6.97. The gain is 10.8 points; the size cost is 41 percent; the
+near-trivial share rises from 14.5 to 38.0 percent. The block coverage
+of the correct rule is 0.853, 0.829 and 0.802 at the three severities;
+the incorrect rule is 0.940, 0.939 and 0.928. The correct rule does not
+reach 0.90. The incorrect rule does, by inflating the sets.</p>
+<p>Table 3 summarises the update results. The third finding is that the
+incorrect update is not a harmless variant. It removes the fixed target
+that creates the restoring force, drives the level to a clip, and
+reports a higher coverage because the sets are larger. Three of the
+eight implementations (MAPIE, TorchCP and AdaptiveConformal) use the
+correct fixed-target update; the others do not implement ACI. The
+correct rule also fails to reach the target on these streams; the
+failure is finite-time behaviour and calibration support, not a bug. A
+reader who wants a positive result about ACI will not find it here. A
+reader who wants to know how the method fails, and how the failure can
+be mistaken for success, will.</p>
+<h3 id="the-cost-rule">3.4 The cost rule</h3>
+<p>The audit also supplies the quantity that a deployment needs. On
+digits the mean a_E is 0.99, so the threshold c_a / c_e is 0.01. On
+CIFAR-10 it is 0.96 to 0.99, so the threshold is 0.01 to 0.04. On
+covertype it is 0.94, so the threshold is 0.06. Forcing is better than
+abstaining unless abstaining costs less than one to six percent of an
+error. The defaults are therefore rational for most deployments; the
+problem is that the decision is made silently and that the reported
+coverage no longer estimates the nominal level.</p>
+<p>Table 4 gives the cost threshold. A per-point version of the rule,
+using the model’s maximum probability as a proxy for a_E, coincides with
+uniform forcing at or above c_a / c_e = 0.05 on all three datasets. The
+proxy does not improve on the population rule. The audit supports the
+average rule, not a per-point heuristic.</p>
+<h3 id="simulation-and-the-boundary">3.5 Simulation and the
+boundary</h3>
+<p>Figure 2, Figure 3 and Figure 4 show the threshold, forcing and
+update results. The 1,260 image cells are the simulation component: they
+hold the data fixed and vary the score, the target level, the
+calibration size and the model strength. The effect is not a
+model-strength story: a stronger model can have a higher empty rate if
+the score is more likely to cross the threshold on every label. The grid
+shows that the ranking of the scores is the ranking of the empty rates,
+and that the forced evaluation can reverse the ranking of two methods
+that differ only in their post-processing.</p>
+<p>The covertype replication is the boundary. At alpha = 0.10 the empty
+rate is 0.0 to 0.4 percent and the forcing gain is 0.0 to 0.4 points.
+The identity holds; the magnitude is governed by the empty rate. This is
+what the protocol predicts, not a failure of the protocol. A method that
+reports a large gain on images and a near-zero gain on a well-calibrated
+tabular model is not inconsistent; it is telling the deployment where
+the exposure is.</p>
+<h2 id="conclusion-and-discussion">4. Conclusion and Discussion</h2>
+<p>The guarantee constrains the procedure, not the number that the
+pipeline prints. The audit protocol separates the number into three
+choices, and the three choices have different signatures. The threshold
+probe shows that a fixed probability threshold is not a coverage method
+and that the true-class threshold is split conformal. The empty-set
+probe shows that the reported coverage can be raised by several points
+without changing the score, and that the gain is the empty rate times
+the conditional accuracy of the inserted label. The update probe shows
+that the common alpha_t recursion is not ACI, and that it can report a
+higher coverage by inflating the sets. The library audit shows that
+these are not hypothetical: a widely used default over-covers by 4.6
+points, and a second library’s randomization switch changes coverage by
+8.8 points.</p>
+<p>The practical recommendation is a reporting rule. Report raw and
+forced coverage, the empty rate, the conditional accuracy of the
+inserted label, and the set size. Report the cost ratio at which the
+fallback is optimal. Make the non-empty rule an explicit option; the
+default should be the exact rule that carries the guarantee. A pipeline
+that reports only coverage cannot be checked.</p>
+<p>The limitations are those of an audit, not a benchmark. The datasets
+are three, the models are linear heads on small images and a tabular
+benchmark, and the drift is synthetic on digits and a corruption family
+on CIFAR-10. The library sample is eight implementations, not a census.
+The audit does not prove a theorem about finite-time ACI; it measures
+the behaviour of the implementations we tested. The covertype boundary
+is a reminder that the magnitude is regime-dependent. The protocol is
+the contribution; the numbers are evidence for it.</p>
+<p>Three extensions would strengthen the work: a larger library census,
+a theoretical bound on the finite-time gap of ACI, and a deployment
+study that uses the cost rule with real costs. The first is engineering,
+the second is theory, the third is field work. The audit is a condition
+for all three: it makes the reported number visible enough to be
+studied.</p>
+<h2 id="acknowledgments">Acknowledgments</h2>
+<p>The author thanks the maintainers of the audited libraries for public
+code and documentation.</p>
+<h2 id="declaration-of-interest">Declaration of interest</h2>
+<p>The author reports no competing interests to declare.</p>
+<h2 id="funding">Funding</h2>
+<p>This research received no specific grant from any funding agency.</p>
+<h2 id="declaration-of-generative-ai-use">Declaration of generative AI
+use</h2>
+<p>The author used a generative AI assistant (DeepSeek) for code
+development, data analysis, and drafting/editing of the manuscript. The
+author verified all results, analyses, and references and takes full
+responsibility for the content.</p>
+<h2 id="credit-authorship-contribution-statement">CRediT authorship
+contribution statement</h2>
+<p>Shaoxuan Zhang: Conceptualization, Methodology, Software, Validation,
+Formal analysis, Investigation, Data curation, Writing - original draft,
+Writing - review &amp; editing, Visualization.</p>
+<h2 id="data-availability-statement">Data availability statement</h2>
+<p>The code, results and tables are available at
+https://github.com/ZhangShaoXuan-HIT/conformal-audit and archived at
+https://doi.org/10.5281/zenodo.24001054.</p>
+<h2 id="supplementary-material">Supplementary material</h2>
+<p>The supplementary file contains the full tables, the two-axis map,
+the complete experimental grid, the per-corruption results and the
+checklist. The main text reports the cells needed for the argument.</p>
+<h2 id="references">References</h2>
+<p>Aguru, M. K. (2026). What Split Conformal Prediction Guarantees, and
+What It Does Not: Exact Coverage Laws for Binary Classifiers, the
+Calibration-Set Size Needed for a Reliable Guarantee, and
+Class-Conditional Failure on UCI Adult. Zenodo (CERN European
+Organization for Nuclear Research).
+https://doi.org/10.5281/zenodo.23582987 Preprint.</p>
+<p>Al Bataineh, A. (2026). Certified Label-Free Drift Alarms From Empty
+Conformal Prediction Sets for Metal-Oxide Gas Sensor Arrays. IEEE
+Sensors Letters. https://doi.org/10.1109/lsens.2026.3748815</p>
+<p>Angelopoulos, A. N., &amp; Bates, S. (2023). Conformal Prediction: A
+Gentle Introduction. Foundations and Trends in Machine Learning 16(4),
+494-591. https://doi.org/10.1561/2200000101</p>
+<p>Angelopoulos, A. N., Bates, S., Candès, E. J., Jordan, M. I., &amp;
+Lei, L. (2025). Learn then Test: Calibrating Predictive Algorithms to
+Achieve Risk Control. Annals of Applied Statistics 19(2), 1641–1662.
+https://doi.org/10.1214/24-AOAS1998</p>
+<p>Angelopoulos, A. N., Bates, S., Fisch, A., Lei, L., &amp; Schuster,
+T. (2022). Conformal Risk Control. arXiv:2208.02814. Preprint.</p>
+<p>Angelopoulos, A. N., Bates, S., Malik, J., &amp; Jordan, M. I.
+(2021). Uncertainty Sets for Image Classifiers using Conformal
+Prediction. International Conference on Learning Representations (ICLR
+2021). arXiv:2009.14193.</p>
+<p>Barber, R. F., Candès, E. J., Ramdas, A., &amp; Tibshirani, R. J.
+(2021). The Limits of Distribution-Free Conditional Predictive
+Inference. Information and Inference 10(2), 455–482.
+https://doi.org/10.1093/imaiai/iaaa017</p>
+<p>Barber, R. F., Candès, E. J., Ramdas, A., &amp; Tibshirani, R. J.
+(2023). Conformal Prediction Beyond Exchangeability. Annals of
+Statistics 51(2), 816–845. https://doi.org/10.1214/23-AOS2276</p>
+<p>Bates, S., Angelopoulos, A. N., Lei, L., Malik, J., &amp; Jordan, M.
+I. (2021). Distribution-Free, Risk-Controlling Prediction Sets. Journal
+of the ACM 68(6), 1–34. https://doi.org/10.1145/3478535</p>
+<p>Blackard, J. A. (1998). Covertype. UCI Machine Learning Repository.
+https://doi.org/10.24432/C50K5N</p>
+<p>Boman, S. E. (2026). Benchmarking non-conformity score functions in
+conformal prediction. arXiv:2605.24983. Preprint.</p>
+<p>Campos, M. M., Farinhas, A., Zerva, C., Figueiredo, M. A. T., &amp;
+Martins, A. F. T. (2024). Conformal Prediction for Natural Language
+Processing: A Survey. Transactions of the Association for Computational
+Linguistics 12, 1497-1516. https://doi.org/10.1162/tacl_a_00715</p>
+<p>Cohen, K. M., Park, S., Simeone, O., &amp; Shamai, S. S. (2024).
+Cross-Validation Conformal Risk Control. IEEE International Symposium on
+Information Theory (ISIT 2024), 250–255.
+https://doi.org/10.1109/isit57864.2024.10619172</p>
+<p>Combes, J., Coeurjolly, J., &amp; Derville, A. (2026). Macro Mondrian
+Conformal Risk Control. https://doi.org/10.48550/arxiv.2610.35035
+Preprint.</p>
+<p>coverforest contributors (2026). coverforest: conformal prediction
+with random forests. version 0.0.3.
+https://pypi.org/project/coverforest/</p>
+<p>crepes contributors (2026). crepes: conformal regressors and
+predictive systems. version 0.9.1. https://pypi.org/project/crepes/</p>
+<p>Farinhas, A., Zerva, C., Ulmer, D., &amp; Martins, A. F. T. (2023).
+Non-Exchangeable Conformal Risk Control. arXiv:2310.01262. Preprint.</p>
+<p>Fontana, M., Zeni, G., &amp; Vantini, S. (2023). Conformal
+prediction: A unified review of theory and new challenges. Bernoulli
+29(1), 1-23. https://doi.org/10.3150/21-BEJ1447</p>
+<p>Gauthier, E., Bach, F., &amp; Jordan, M. I. (2025). Adaptive Coverage
+Policies in Conformal Prediction.
+https://doi.org/10.48550/arxiv.2510.04318 Preprint.</p>
+<p>Gibbs, I., &amp; Candès, E. J. (2021). Adaptive Conformal Inference
+Under Distribution Shift. Advances in Neural Information Processing
+Systems 34 (NeurIPS 2021). arXiv:2106.00170.</p>
+<p>Gibbs, I., Cherian, J. J., &amp; Candès, E. J. (2025). Conformal
+Prediction with Conditional Guarantees. Journal of the Royal Statistical
+Society: Series B 87(4), 1100–1126.
+https://doi.org/10.1093/jrsssb/qkaf008</p>
+<p>Hore, R., &amp; Barber, R. F. (2025). Conformal Prediction with Local
+Weights: Randomization Enables Robust Guarantees. Journal of the Royal
+Statistical Society: Series B 87(2), 549–578.
+https://doi.org/10.1093/jrsssb/qkae103</p>
+<p>Koul, A. (2017). conformal: a minimal conformal prediction
+implementation for classification. version 0.1.
+https://pypi.org/project/conformal/</p>
+<p>Lei, J., G’Sell, M., Rinaldo, A., Tibshirani, R. J., &amp; Wasserman,
+L. (2018). Distribution-Free Predictive Inference for Regression.
+Journal of the American Statistical Association 113(523), 1094–1111.
+https://doi.org/10.1080/01621459.2017.1307116</p>
+<p>Linusson, H. (2017). nonconformist: Python implementation of the
+conformal prediction framework. version 2.1.0.
+https://github.com/donlnz/nonconformist</p>
+<p>MAPIE contributors (2026). MAPIE: a scikit-learn-contrib package for
+conformal prediction. version 1.6.0. https://pypi.org/project/mapie/</p>
+<p>Mehrtens, H., Bucher, T., &amp; Brinker, T. J. (2025). Pitfalls of
+Conformal Predictions for Medical Image Classification.
+arXiv:2506.18162. Preprint.</p>
+<p>Oliveira, R. I., Orenstein, P., Ramos, T. R., &amp; Romano, J. V.
+(2022). Split Conformal Prediction and Non-Exchangeable Data.
+https://doi.org/10.48550/arxiv.2203.15885 Preprint.</p>
+<p>puncc contributors (2026). puncc: predictive uncertainty calibration
+and conformal prediction. version 0.9.3.
+https://pypi.org/project/puncc/</p>
+<p>Romano, Y., Patterson, E., &amp; Candes, E. J. (2019). Conformalized
+Quantile Regression. Advances in Neural Information Processing Systems
+32 (NeurIPS 2019). arXiv:1905.03222.</p>
+<p>Romano, Y., Sesia, M., &amp; Candès, E. J. (2020). Classification
+with Valid and Adaptive Coverage. Advances in Neural Information
+Processing Systems 33 (NeurIPS 2020). arXiv:2006.02544.</p>
+<p>Sadinle, M., Lei, J., &amp; Wasserman, L. (2019). Least Ambiguous
+Set-Valued Classifiers With Bounded Error Levels. Journal of the
+American Statistical Association 114(525), 223–234.
+https://doi.org/10.1080/01621459.2017.1395341</p>
+<p>Shafer, G., &amp; Vovk, V. (2008). A Tutorial on Conformal
+Prediction. Journal of Machine Learning Research 9, 371–421.
+https://doi.org/10.5555/1390681.1390693</p>
+<p>Susmann, H., Chambaz, A., &amp; Josse, J. (2023). AdaptiveConformal:
+an R package for adaptive conformal inference. arXiv:2312.00448.
+Preprint.</p>
+<p>Tibshirani, R. J., Barber, R. F., Candès, E. J., &amp; Ramdas, A.
+(2019). Conformal Prediction Under Covariate Shift. Advances in Neural
+Information Processing Systems 32 (NeurIPS 2019). arXiv:1904.06019.</p>
+<p>TorchCP contributors (2026). TorchCP: a Python library for conformal
+prediction. version 1.2.1. https://pypi.org/project/torchcp/</p>
+<p>Vovk, V. (2012). Conditional validity of inductive conformal
+predictors. ACML 2012, PMLR 25, 475-490.
+https://proceedings.mlr.press/v25/vovk12.html</p>
+<p>Vovk, V., Gammerman, A., &amp; Shafer, G. (2005). Algorithmic
+Learning in a Random World. Springer, New York.
+https://doi.org/10.1007/b106715</p>
+<p>Zhou, X., Chen, B., Gui, Y., Cheng, L., Deng, Z., &amp; Wang, X.
+(2025). Conformal Prediction: A Data Perspective. ACM Computing Surveys
+58(2), 1–37. https://doi.org/10.1145/3736575</p>
+<h2 id="tables">Tables</h2>
+<h3 id="table-1.-threshold-calibration">Table 1. Threshold
+calibration</h3>
+<table>
+<thead>
+<tr>
+<th>dataset</th>
+<th>training</th>
+<th>rule</th>
+<th>coverage</th>
+<th>empty</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>digits</td>
+<td>44</td>
+<td>raw 0.90</td>
+<td>0.294</td>
+<td>0.701</td>
+</tr>
+<tr>
+<td>digits</td>
+<td>44</td>
+<td>max-probability</td>
+<td>0.668</td>
+<td>0.086</td>
+</tr>
+<tr>
+<td>digits</td>
+<td>44</td>
+<td>true-class</td>
+<td>0.800</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>digits</td>
+<td>898</td>
+<td>raw 0.90</td>
+<td>0.855</td>
+<td>0.140</td>
+</tr>
+<tr>
+<td>digits</td>
+<td>898</td>
+<td>max-probability</td>
+<td>0.771</td>
+<td>0.008</td>
+</tr>
+<tr>
+<td>digits</td>
+<td>898</td>
+<td>true-class</td>
+<td>0.901</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>CIFAR-10</td>
+<td>30,000</td>
+<td>raw 0.90</td>
+<td>0.716</td>
+<td>0.244</td>
+</tr>
+<tr>
+<td>CIFAR-10</td>
+<td>30,000</td>
+<td>max-probability</td>
+<td>0.810</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>CIFAR-10</td>
+<td>30,000</td>
+<td>true-class</td>
+<td>0.899</td>
+<td>0.000</td>
+</tr>
+</tbody>
+</table>
+<p>The true-class rule and split conformal are identical pointwise. The
+raw threshold is a singleton or empty; its coverage is accuracy on
+non-abstentions.</p>
+<h3 id="table-2.-library-behaviour">Table 2. Library behaviour</h3>
+<table>
+<thead>
+<tr>
+<th>implementation</th>
+<th>setting</th>
+<th>coverage</th>
+<th>empty</th>
+<th>size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MAPIE</td>
+<td>APS default</td>
+<td>0.9457</td>
+<td>0.0000</td>
+<td>3.68</td>
+</tr>
+<tr>
+<td>MAPIE</td>
+<td>APS randomized</td>
+<td>0.8998</td>
+<td>0.0004</td>
+<td>3.23</td>
+</tr>
+<tr>
+<td>puncc</td>
+<td>APS randomization off</td>
+<td>0.977</td>
+<td>0.000</td>
+<td>4.06</td>
+</tr>
+<tr>
+<td>puncc</td>
+<td>APS randomization on</td>
+<td>0.889</td>
+<td>0.002</td>
+<td>2.98</td>
+</tr>
+<tr>
+<td>crepes</td>
+<td>LAC</td>
+<td>0.895</td>
+<td>0.000</td>
+<td>2.87</td>
+</tr>
+<tr>
+<td>nonconformist</td>
+<td>ICP margin</td>
+<td>0.890</td>
+<td>0.000</td>
+<td>3.50</td>
+</tr>
+<tr>
+<td>conformal</td>
+<td>per-label thresholds</td>
+<td>0.890</td>
+<td>0.000</td>
+<td>3.02</td>
+</tr>
+</tbody>
+</table>
+<p>MAPIE rows are five seeds; the other rows are one seed on the common
+synthetic task. The LAC implementations of MAPIE, puncc and crepes agree
+at 0.895 and a size of 2.87.</p>
+<h3 id="table-3.-aci-update">Table 3. ACI update</h3>
+<table>
+<thead>
+<tr>
+<th>dataset</th>
+<th>update</th>
+<th>coverage</th>
+<th>size</th>
+<th>near-trivial</th>
+<th>alpha final</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>digits</td>
+<td>static</td>
+<td>0.666</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>digits</td>
+<td>correct</td>
+<td>0.836</td>
+<td>3.44</td>
+<td>0.108</td>
+<td>0.0074</td>
+</tr>
+<tr>
+<td>digits</td>
+<td>incorrect</td>
+<td>0.869</td>
+<td>4.58</td>
+<td>0.244</td>
+<td>0.0011</td>
+</tr>
+<tr>
+<td>CIFAR-10</td>
+<td>static</td>
+<td>0.451</td>
+<td>1.30</td>
+<td>0.000</td>
+<td>—</td>
+</tr>
+<tr>
+<td>CIFAR-10</td>
+<td>correct</td>
+<td>0.828</td>
+<td>4.93</td>
+<td>0.145</td>
+<td>0.0106</td>
+</tr>
+<tr>
+<td>CIFAR-10</td>
+<td>incorrect</td>
+<td>0.936</td>
+<td>6.97</td>
+<td>0.380</td>
+<td>0.0019</td>
+</tr>
+</tbody>
+</table>
+<p>The incorrect update reports more coverage at a larger size and a
+larger near-trivial share. The correct update also falls short of
+0.90.</p>
+<h3 id="table-4.-cost-rule">Table 4. Cost rule</h3>
+<table>
+<thead>
+<tr>
+<th>dataset</th>
+<th>mean a_E</th>
+<th>threshold c_a / c_e</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>digits</td>
+<td>0.99</td>
+<td>0.01</td>
+</tr>
+<tr>
+<td>CIFAR-10</td>
+<td>0.96 to 0.99</td>
+<td>0.01 to 0.04</td>
+</tr>
+<tr>
+<td>covertype</td>
+<td>0.94</td>
+<td>0.06</td>
+</tr>
+</tbody>
+</table>
+<p>Forcing is better than abstaining when c_a / c_e exceeds 1 - a_E. The
+threshold is small in every dataset; the empty rate determines the
+exposure.</p>
+<h2 id="figures">Figures</h2>
+<figure>
+<img src="../figures/fig1_pipeline.png"
+alt="The three stages (solid) and the reporting step (dashed), with the three places where the reported number can move." />
+<figcaption aria-hidden="true">The three stages (solid) and the
+reporting step (dashed), with the three places where the reported number
+can move.</figcaption>
+</figure>
+<figure>
+<img src="../figures/fig2_equivalence.png"
+alt="Coverage and set size versus the threshold on digits." />
+<figcaption aria-hidden="true">Coverage and set size versus the
+threshold on digits.</figcaption>
+</figure>
+<figure>
+<img src="../figures/fig3_forcing.png"
+alt="Change in coverage versus the raw empty rate across the image cells." />
+<figcaption aria-hidden="true">Change in coverage versus the raw empty
+rate across the image cells.</figcaption>
+</figure>
+<figure>
+<img src="../figures/fig4_aci.png"
+alt="Coverage and level trajectories under drift on digits." />
+<figcaption aria-hidden="true">Coverage and level trajectories under
+drift on digits.</figcaption>
+</figure>
+<h2 id="figure-captions">Figure captions</h2>
+<p><strong>Figure 1.</strong> The three stages (solid) and the reporting
+step (dashed), with the three places where the reported number can
+move.</p>
+<p><strong>Figure 2.</strong> Coverage and set size versus the threshold
+on digits.</p>
+<p><strong>Figure 3.</strong> Change in coverage versus the raw empty
+rate across the image cells.</p>
+<p><strong>Figure 4.</strong> Coverage and level trajectories under
+drift on digits.</p></body></html>

@@ -283,3 +283,16 @@ the declaration of generative AI use and CRediT statement. It is editable and
 satisfies the journal's format-free Word submission and editable-revision
 requirements. The manuscript is still 42 pages; JAS limits Research/Review
 articles to 20 pages and Application Notes to 15, so it is not yet compliant.
+
+
+## Update: JAS Application Note (2026-11-06)
+
+The Application Note version is built at paper/jas_an/main_an.pdf (15 pages,
+3,448 words, 4 tables, 4 figures) with main_an.docx, supplement_an.pdf (9 pages)
+and cover_letter.md. It uses the four-section structure the journal requests:
+introduction with the data challenge, methodology/approach (the audit protocol),
+application to three datasets and eight implementations, and conclusion.
+
+The declaration of generative AI use and CRediT statement are included. The
+15-page limit is met. The full tables, map, grid and checklist are in the
+supplement. This version supersedes the 42-page main_jas.pdf for JAS submission.

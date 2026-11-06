@@ -126,6 +126,18 @@ generative AI use. The package uses Harvard/APA author-date citations,
 not accessible at build time; verify the journal's exact reference style, page
 limit and spacing before submission.
 
+## Journal of Applied Statistics Application Note
+
+```bash
+python code/build_jas_an.py
+python code/build_an_supplement.py
+```
+
+Outputs `paper/jas_an/main_an.pdf` (15 pages, 3,448 words, 4 tables, 4 figures),
+`main_an.docx`, `supplement_an.pdf` (9 pages) and `cover_letter.md`. The full
+tables, two-axis map, complete grid, per-corruption results and reporting
+checklist are in the supplement.
+
 ## Design rules
 
 1. `build_sets` never forces non-empty sets; forcing is a separate

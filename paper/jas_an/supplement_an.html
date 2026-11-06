@@ -1,0 +1,2463 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Supplementary
+material</title>
+<link rel="stylesheet" href="style.css"></head><body><h1
+id="supplementary-material">Supplementary material</h1>
+<h2 id="table-s1.-guarantee-by-data-assumption">Table S1. Guarantee by
+data assumption</h2>
+<p>Each cell gives a representative method, the assumption it needs, and
+the price it pays. “Open” means no method in the reviewed set covers
+that cell.</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>guarantee</th>
+<th>exchangeable</th>
+<th>covariate shift</th>
+<th>non-exchangeable / temporal</th>
+<th>known groups</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>marginal coverage</td>
+<td>Vovk et al. (2005), Lei et al. (2018), Angelopoulos &amp; Bates
+(2023). One calibration pass.</td>
+<td>Tibshirani et al. (2019). Likelihood ratio known or estimable.</td>
+<td>Barber et al. (2023), Oliveira et al. (2022). Gap bounded by the
+violation.</td>
+<td>Vovk (2012). Per-group quantiles; small n per group.</td>
+</tr>
+<tr>
+<td>group-conditional coverage</td>
+<td>Vovk (2012), Gibbs et al. (2025). Group-wise quantiles; smaller
+effective n.</td>
+<td>open</td>
+<td>open</td>
+<td>Vovk (2012), Gibbs et al. (2025). Group labels known at test.</td>
+</tr>
+<tr>
+<td>pointwise conditional coverage</td>
+<td>Barber et al. (2021), Hore &amp; Barber (2025). Larger sets.</td>
+<td>open</td>
+<td>open</td>
+<td>open</td>
+</tr>
+<tr>
+<td>risk control</td>
+<td>Bates et al. (2021), Angelopoulos et al. (2022), Angelopoulos et
+al. (2025). Monotone loss; grid and multiplicity.</td>
+<td>open in the reviewed set</td>
+<td>Farinhas et al. (2023). Bounded non-exchangeability.</td>
+<td>Combes et al. (2026).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="table-s2.-a-calibrated-threshold-is-split-conformal">Table S2. A
+calibrated threshold is split conformal</h3>
+<p>digits, alpha = 0.10, n_cal = 449, 5 seeds. Coverage is the mean over
+seeds. Raw keeps empty sets; forced fills them with the argmax. Size is
+mean cardinality. Pointwise set equality between the conformal threshold
+and split conformal: mismatches = 0.</p>
+<h3 id="strength-0.05-n_train-44">strength = 0.05 (n_train = 44)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th>method</th>
+<th>coverage raw</th>
+<th>coverage forced</th>
+<th>size raw</th>
+<th>size forced</th>
+<th>empty raw</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>softmax threshold, raw t = 1-alpha</td>
+<td>0.294</td>
+<td>0.833</td>
+<td>0.299</td>
+<td>1.000</td>
+<td>0.701</td>
+</tr>
+<tr>
+<td>threshold at max-prob quantile</td>
+<td>0.800</td>
+<td>0.837</td>
+<td>0.920</td>
+<td>1.006</td>
+<td>0.086</td>
+</tr>
+<tr>
+<td>threshold at true-class quantile</td>
+<td>0.918</td>
+<td>0.918</td>
+<td>1.389</td>
+<td>1.390</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>threshold at t = 1-q (conformal)</td>
+<td>0.919</td>
+<td>0.919</td>
+<td>1.396</td>
+<td>1.397</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>split conformal, naive score</td>
+<td>0.919</td>
+<td>0.919</td>
+<td>1.396</td>
+<td>1.397</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>split conformal, APS</td>
+<td>0.917</td>
+<td>0.952</td>
+<td>1.886</td>
+<td>1.922</td>
+<td>0.036</td>
+</tr>
+</tbody>
+</table>
+<h3 id="strength-0.25-n_train-224">strength = 0.25 (n_train = 224)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th>method</th>
+<th>coverage raw</th>
+<th>coverage forced</th>
+<th>size raw</th>
+<th>size forced</th>
+<th>empty raw</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>softmax threshold, raw t = 1-alpha</td>
+<td>0.713</td>
+<td>0.938</td>
+<td>0.719</td>
+<td>1.000</td>
+<td>0.281</td>
+</tr>
+<tr>
+<td>threshold at max-prob quantile</td>
+<td>0.886</td>
+<td>0.938</td>
+<td>0.912</td>
+<td>1.000</td>
+<td>0.088</td>
+</tr>
+<tr>
+<td>threshold at true-class quantile</td>
+<td>0.909</td>
+<td>0.939</td>
+<td>0.949</td>
+<td>1.002</td>
+<td>0.053</td>
+</tr>
+<tr>
+<td>threshold at t = 1-q (conformal)</td>
+<td>0.911</td>
+<td>0.939</td>
+<td>0.951</td>
+<td>1.002</td>
+<td>0.051</td>
+</tr>
+<tr>
+<td>split conformal, naive score</td>
+<td>0.911</td>
+<td>0.939</td>
+<td>0.951</td>
+<td>1.002</td>
+<td>0.051</td>
+</tr>
+<tr>
+<td>split conformal, APS</td>
+<td>0.904</td>
+<td>0.976</td>
+<td>1.178</td>
+<td>1.251</td>
+<td>0.073</td>
+</tr>
+</tbody>
+</table>
+<h3 id="strength-1.00-n_train-898">strength = 1.00 (n_train = 898)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th>method</th>
+<th>coverage raw</th>
+<th>coverage forced</th>
+<th>size raw</th>
+<th>size forced</th>
+<th>empty raw</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>softmax threshold, raw t = 1-alpha</td>
+<td>0.855</td>
+<td>0.964</td>
+<td>0.860</td>
+<td>1.000</td>
+<td>0.140</td>
+</tr>
+<tr>
+<td>threshold at max-prob quantile</td>
+<td>0.901</td>
+<td>0.964</td>
+<td>0.912</td>
+<td>1.000</td>
+<td>0.088</td>
+</tr>
+<tr>
+<td>threshold at true-class quantile</td>
+<td>0.908</td>
+<td>0.964</td>
+<td>0.920</td>
+<td>1.000</td>
+<td>0.080</td>
+</tr>
+<tr>
+<td>threshold at t = 1-q (conformal)</td>
+<td>0.910</td>
+<td>0.964</td>
+<td>0.922</td>
+<td>1.000</td>
+<td>0.078</td>
+</tr>
+<tr>
+<td>split conformal, naive score</td>
+<td>0.910</td>
+<td>0.964</td>
+<td>0.922</td>
+<td>1.000</td>
+<td>0.078</td>
+</tr>
+<tr>
+<td>split conformal, APS</td>
+<td>0.903</td>
+<td>0.982</td>
+<td>1.034</td>
+<td>1.113</td>
+<td>0.079</td>
+</tr>
+</tbody>
+</table>
+<h3 id="table-s3.-non-empty-post-processing-inflates-coverage">Table S3.
+Non-empty post-processing inflates coverage</h3>
+<p>digits, alpha = 0.10, 5 seeds. Delta = forced coverage - raw
+coverage. Raw empty is the share of sets that were empty before the
+argmax was forced in.</p>
+<h3 id="strength-0.05-n_train-44-1">strength = 0.05 (n_train = 44)</h3>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>score</th>
+<th>n_cal</th>
+<th>coverage raw</th>
+<th>coverage forced</th>
+<th>delta</th>
+<th>empty raw</th>
+<th>size raw</th>
+<th>size forced</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>naive</td>
+<td>100</td>
+<td>0.932</td>
+<td>0.932</td>
+<td>+0.000</td>
+<td>0.000</td>
+<td>1.565</td>
+<td>1.565</td>
+</tr>
+<tr>
+<td>naive</td>
+<td>225</td>
+<td>0.929</td>
+<td>0.929</td>
+<td>+0.000</td>
+<td>0.000</td>
+<td>1.491</td>
+<td>1.491</td>
+</tr>
+<tr>
+<td>naive</td>
+<td>449</td>
+<td>0.919</td>
+<td>0.919</td>
+<td>+0.000</td>
+<td>0.000</td>
+<td>1.396</td>
+<td>1.397</td>
+</tr>
+<tr>
+<td>APS randomized</td>
+<td>100</td>
+<td>0.914</td>
+<td>0.954</td>
+<td>+0.040</td>
+<td>0.040</td>
+<td>1.983</td>
+<td>2.024</td>
+</tr>
+<tr>
+<td>APS randomized</td>
+<td>225</td>
+<td>0.918</td>
+<td>0.952</td>
+<td>+0.033</td>
+<td>0.034</td>
+<td>1.864</td>
+<td>1.898</td>
+</tr>
+<tr>
+<td>APS randomized</td>
+<td>449</td>
+<td>0.920</td>
+<td>0.954</td>
+<td>+0.033</td>
+<td>0.034</td>
+<td>1.922</td>
+<td>1.956</td>
+</tr>
+<tr>
+<td>APS deterministic</td>
+<td>100</td>
+<td>0.893</td>
+<td>0.981</td>
+<td>+0.088</td>
+<td>0.090</td>
+<td>3.551</td>
+<td>3.641</td>
+</tr>
+<tr>
+<td>APS deterministic</td>
+<td>225</td>
+<td>0.899</td>
+<td>0.984</td>
+<td>+0.085</td>
+<td>0.086</td>
+<td>3.619</td>
+<td>3.705</td>
+</tr>
+<tr>
+<td>APS deterministic</td>
+<td>449</td>
+<td>0.898</td>
+<td>0.981</td>
+<td>+0.084</td>
+<td>0.084</td>
+<td>3.549</td>
+<td>3.634</td>
+</tr>
+<tr>
+<td>RAPS</td>
+<td>100</td>
+<td>0.922</td>
+<td>0.952</td>
+<td>+0.030</td>
+<td>0.031</td>
+<td>1.941</td>
+<td>1.972</td>
+</tr>
+<tr>
+<td>RAPS</td>
+<td>225</td>
+<td>0.917</td>
+<td>0.951</td>
+<td>+0.034</td>
+<td>0.034</td>
+<td>1.874</td>
+<td>1.908</td>
+</tr>
+<tr>
+<td>RAPS</td>
+<td>449</td>
+<td>0.911</td>
+<td>0.945</td>
+<td>+0.034</td>
+<td>0.034</td>
+<td>1.781</td>
+<td>1.816</td>
+</tr>
+</tbody>
+</table>
+<h3 id="strength-0.25-n_train-224-1">strength = 0.25 (n_train =
+224)</h3>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>score</th>
+<th>n_cal</th>
+<th>coverage raw</th>
+<th>coverage forced</th>
+<th>delta</th>
+<th>empty raw</th>
+<th>size raw</th>
+<th>size forced</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>naive</td>
+<td>100</td>
+<td>0.922</td>
+<td>0.947</td>
+<td>+0.025</td>
+<td>0.044</td>
+<td>0.981</td>
+<td>1.025</td>
+</tr>
+<tr>
+<td>naive</td>
+<td>225</td>
+<td>0.912</td>
+<td>0.941</td>
+<td>+0.029</td>
+<td>0.050</td>
+<td>0.956</td>
+<td>1.007</td>
+</tr>
+<tr>
+<td>naive</td>
+<td>449</td>
+<td>0.911</td>
+<td>0.939</td>
+<td>+0.028</td>
+<td>0.051</td>
+<td>0.951</td>
+<td>1.002</td>
+</tr>
+<tr>
+<td>APS randomized</td>
+<td>100</td>
+<td>0.911</td>
+<td>0.979</td>
+<td>+0.068</td>
+<td>0.068</td>
+<td>1.236</td>
+<td>1.305</td>
+</tr>
+<tr>
+<td>APS randomized</td>
+<td>225</td>
+<td>0.901</td>
+<td>0.975</td>
+<td>+0.074</td>
+<td>0.074</td>
+<td>1.193</td>
+<td>1.268</td>
+</tr>
+<tr>
+<td>APS randomized</td>
+<td>449</td>
+<td>0.919</td>
+<td>0.978</td>
+<td>+0.059</td>
+<td>0.060</td>
+<td>1.239</td>
+<td>1.299</td>
+</tr>
+<tr>
+<td>APS deterministic</td>
+<td>100</td>
+<td>0.892</td>
+<td>0.995</td>
+<td>+0.104</td>
+<td>0.105</td>
+<td>3.220</td>
+<td>3.325</td>
+</tr>
+<tr>
+<td>APS deterministic</td>
+<td>225</td>
+<td>0.907</td>
+<td>0.996</td>
+<td>+0.089</td>
+<td>0.090</td>
+<td>3.372</td>
+<td>3.463</td>
+</tr>
+<tr>
+<td>APS deterministic</td>
+<td>449</td>
+<td>0.898</td>
+<td>0.995</td>
+<td>+0.097</td>
+<td>0.099</td>
+<td>3.266</td>
+<td>3.364</td>
+</tr>
+<tr>
+<td>RAPS</td>
+<td>100</td>
+<td>0.910</td>
+<td>0.975</td>
+<td>+0.065</td>
+<td>0.065</td>
+<td>1.215</td>
+<td>1.280</td>
+</tr>
+<tr>
+<td>RAPS</td>
+<td>225</td>
+<td>0.894</td>
+<td>0.973</td>
+<td>+0.080</td>
+<td>0.080</td>
+<td>1.186</td>
+<td>1.266</td>
+</tr>
+<tr>
+<td>RAPS</td>
+<td>449</td>
+<td>0.896</td>
+<td>0.973</td>
+<td>+0.077</td>
+<td>0.077</td>
+<td>1.148</td>
+<td>1.226</td>
+</tr>
+</tbody>
+</table>
+<h3 id="strength-1.00-n_train-898-1">strength = 1.00 (n_train =
+898)</h3>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>score</th>
+<th>n_cal</th>
+<th>coverage raw</th>
+<th>coverage forced</th>
+<th>delta</th>
+<th>empty raw</th>
+<th>size raw</th>
+<th>size forced</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>naive</td>
+<td>100</td>
+<td>0.929</td>
+<td>0.964</td>
+<td>+0.035</td>
+<td>0.056</td>
+<td>0.944</td>
+<td>1.000</td>
+</tr>
+<tr>
+<td>naive</td>
+<td>225</td>
+<td>0.917</td>
+<td>0.964</td>
+<td>+0.047</td>
+<td>0.071</td>
+<td>0.929</td>
+<td>1.000</td>
+</tr>
+<tr>
+<td>naive</td>
+<td>449</td>
+<td>0.910</td>
+<td>0.964</td>
+<td>+0.054</td>
+<td>0.078</td>
+<td>0.922</td>
+<td>1.000</td>
+</tr>
+<tr>
+<td>APS randomized</td>
+<td>100</td>
+<td>0.903</td>
+<td>0.984</td>
+<td>+0.081</td>
+<td>0.081</td>
+<td>1.049</td>
+<td>1.130</td>
+</tr>
+<tr>
+<td>APS randomized</td>
+<td>225</td>
+<td>0.899</td>
+<td>0.981</td>
+<td>+0.082</td>
+<td>0.082</td>
+<td>1.044</td>
+<td>1.126</td>
+</tr>
+<tr>
+<td>APS randomized</td>
+<td>449</td>
+<td>0.913</td>
+<td>0.983</td>
+<td>+0.070</td>
+<td>0.070</td>
+<td>1.068</td>
+<td>1.137</td>
+</tr>
+<tr>
+<td>APS deterministic</td>
+<td>100</td>
+<td>0.894</td>
+<td>1.000</td>
+<td>+0.106</td>
+<td>0.106</td>
+<td>3.011</td>
+<td>3.117</td>
+</tr>
+<tr>
+<td>APS deterministic</td>
+<td>225</td>
+<td>0.908</td>
+<td>1.000</td>
+<td>+0.092</td>
+<td>0.092</td>
+<td>3.127</td>
+<td>3.218</td>
+</tr>
+<tr>
+<td>APS deterministic</td>
+<td>449</td>
+<td>0.911</td>
+<td>1.000</td>
+<td>+0.089</td>
+<td>0.089</td>
+<td>3.110</td>
+<td>3.199</td>
+</tr>
+<tr>
+<td>RAPS</td>
+<td>100</td>
+<td>0.900</td>
+<td>0.982</td>
+<td>+0.081</td>
+<td>0.082</td>
+<td>1.028</td>
+<td>1.110</td>
+</tr>
+<tr>
+<td>RAPS</td>
+<td>225</td>
+<td>0.887</td>
+<td>0.982</td>
+<td>+0.095</td>
+<td>0.096</td>
+<td>1.018</td>
+<td>1.113</td>
+</tr>
+<tr>
+<td>RAPS</td>
+<td>449</td>
+<td>0.884</td>
+<td>0.980</td>
+<td>+0.096</td>
+<td>0.096</td>
+<td>1.001</td>
+<td>1.098</td>
+</tr>
+</tbody>
+</table>
+<h3 id="table-s4.-the-alpha_t-update-is-not-aci">Table S4. The alpha_t
+update is not ACI</h3>
+<p>digits, alpha = 0.10, 5 seeds. Coverage and size are means over
+seeds. Min/max block are computed on the seed-averaged block curve. Clip
+is the share of steps at a clip bound.</p>
+<h3 id="schedule-linear">schedule = linear</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th>update</th>
+<th>gamma</th>
+<th>coverage</th>
+<th>seed SD</th>
+<th>size</th>
+<th>min block</th>
+<th>max block</th>
+<th>alpha final</th>
+<th>clip</th>
+<th>sets &gt;= 9</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>static</td>
+<td>—</td>
+<td>0.666</td>
+<td>0.100</td>
+<td>1.524</td>
+<td>0.388</td>
+<td>0.968</td>
+<td>0.1000</td>
+<td>0.000</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.005</td>
+<td>0.832</td>
+<td>0.023</td>
+<td>3.371</td>
+<td>0.776</td>
+<td>0.948</td>
+<td>0.0054</td>
+<td>0.045</td>
+<td>0.130</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.010</td>
+<td>0.840</td>
+<td>0.030</td>
+<td>3.598</td>
+<td>0.768</td>
+<td>0.932</td>
+<td>0.0064</td>
+<td>0.071</td>
+<td>0.139</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.020</td>
+<td>0.836</td>
+<td>0.038</td>
+<td>3.444</td>
+<td>0.732</td>
+<td>0.928</td>
+<td>0.0074</td>
+<td>0.091</td>
+<td>0.108</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.050</td>
+<td>0.818</td>
+<td>0.049</td>
+<td>3.469</td>
+<td>0.684</td>
+<td>0.916</td>
+<td>0.0090</td>
+<td>0.132</td>
+<td>0.105</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.100</td>
+<td>0.804</td>
+<td>0.046</td>
+<td>3.182</td>
+<td>0.668</td>
+<td>0.908</td>
+<td>0.0090</td>
+<td>0.156</td>
+<td>0.087</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.200</td>
+<td>0.775</td>
+<td>0.043</td>
+<td>3.103</td>
+<td>0.624</td>
+<td>0.904</td>
+<td>0.0170</td>
+<td>0.203</td>
+<td>0.098</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.005</td>
+<td>0.849</td>
+<td>0.025</td>
+<td>3.773</td>
+<td>0.784</td>
+<td>0.940</td>
+<td>0.0010</td>
+<td>0.052</td>
+<td>0.176</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.010</td>
+<td>0.865</td>
+<td>0.031</td>
+<td>4.273</td>
+<td>0.780</td>
+<td>0.924</td>
+<td>0.0010</td>
+<td>0.061</td>
+<td>0.216</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.020</td>
+<td>0.869</td>
+<td>0.036</td>
+<td>4.580</td>
+<td>0.752</td>
+<td>0.944</td>
+<td>0.0011</td>
+<td>0.065</td>
+<td>0.244</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.050</td>
+<td>0.870</td>
+<td>0.043</td>
+<td>5.169</td>
+<td>0.792</td>
+<td>0.956</td>
+<td>0.0012</td>
+<td>0.070</td>
+<td>0.297</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.100</td>
+<td>0.781</td>
+<td>0.205</td>
+<td>4.868</td>
+<td>0.668</td>
+<td>0.868</td>
+<td>0.0014</td>
+<td>0.076</td>
+<td>0.279</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.200</td>
+<td>0.769</td>
+<td>0.153</td>
+<td>4.788</td>
+<td>0.476</td>
+<td>0.900</td>
+<td>0.0019</td>
+<td>0.091</td>
+<td>0.260</td>
+</tr>
+</tbody>
+</table>
+<h3 id="schedule-step">schedule = step</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th>update</th>
+<th>gamma</th>
+<th>coverage</th>
+<th>seed SD</th>
+<th>size</th>
+<th>min block</th>
+<th>max block</th>
+<th>alpha final</th>
+<th>clip</th>
+<th>sets &gt;= 9</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>static</td>
+<td>—</td>
+<td>0.663</td>
+<td>0.085</td>
+<td>1.488</td>
+<td>0.432</td>
+<td>0.960</td>
+<td>0.1000</td>
+<td>0.000</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.005</td>
+<td>0.830</td>
+<td>0.024</td>
+<td>3.358</td>
+<td>0.576</td>
+<td>0.948</td>
+<td>0.0064</td>
+<td>0.051</td>
+<td>0.130</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.010</td>
+<td>0.835</td>
+<td>0.028</td>
+<td>3.492</td>
+<td>0.680</td>
+<td>0.940</td>
+<td>0.0102</td>
+<td>0.077</td>
+<td>0.132</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.020</td>
+<td>0.828</td>
+<td>0.039</td>
+<td>3.349</td>
+<td>0.732</td>
+<td>0.928</td>
+<td>0.0098</td>
+<td>0.102</td>
+<td>0.104</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.050</td>
+<td>0.808</td>
+<td>0.046</td>
+<td>3.176</td>
+<td>0.712</td>
+<td>0.916</td>
+<td>0.0120</td>
+<td>0.138</td>
+<td>0.088</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.100</td>
+<td>0.790</td>
+<td>0.047</td>
+<td>3.013</td>
+<td>0.684</td>
+<td>0.916</td>
+<td>0.0190</td>
+<td>0.166</td>
+<td>0.079</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.200</td>
+<td>0.767</td>
+<td>0.042</td>
+<td>3.010</td>
+<td>0.664</td>
+<td>0.900</td>
+<td>0.0170</td>
+<td>0.208</td>
+<td>0.084</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.005</td>
+<td>0.836</td>
+<td>0.028</td>
+<td>3.575</td>
+<td>0.564</td>
+<td>0.944</td>
+<td>0.0010</td>
+<td>0.060</td>
+<td>0.161</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.010</td>
+<td>0.845</td>
+<td>0.031</td>
+<td>3.826</td>
+<td>0.676</td>
+<td>0.924</td>
+<td>0.0011</td>
+<td>0.072</td>
+<td>0.178</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.020</td>
+<td>0.839</td>
+<td>0.040</td>
+<td>3.928</td>
+<td>0.712</td>
+<td>0.924</td>
+<td>0.0012</td>
+<td>0.076</td>
+<td>0.188</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.050</td>
+<td>0.809</td>
+<td>0.067</td>
+<td>4.078</td>
+<td>0.636</td>
+<td>0.892</td>
+<td>0.0016</td>
+<td>0.078</td>
+<td>0.202</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.100</td>
+<td>0.748</td>
+<td>0.183</td>
+<td>4.042</td>
+<td>0.620</td>
+<td>0.852</td>
+<td>0.0015</td>
+<td>0.086</td>
+<td>0.199</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.200</td>
+<td>0.733</td>
+<td>0.163</td>
+<td>4.262</td>
+<td>0.484</td>
+<td>0.840</td>
+<td>0.0024</td>
+<td>0.092</td>
+<td>0.214</td>
+</tr>
+</tbody>
+</table>
+<h3 id="schedule-abrupt">schedule = abrupt</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th>update</th>
+<th>gamma</th>
+<th>coverage</th>
+<th>seed SD</th>
+<th>size</th>
+<th>min block</th>
+<th>max block</th>
+<th>alpha final</th>
+<th>clip</th>
+<th>sets &gt;= 9</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>static</td>
+<td>—</td>
+<td>0.739</td>
+<td>0.042</td>
+<td>1.453</td>
+<td>0.360</td>
+<td>0.960</td>
+<td>0.1000</td>
+<td>0.000</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.005</td>
+<td>0.831</td>
+<td>0.021</td>
+<td>2.411</td>
+<td>0.508</td>
+<td>0.948</td>
+<td>0.0054</td>
+<td>0.040</td>
+<td>0.070</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.010</td>
+<td>0.840</td>
+<td>0.023</td>
+<td>2.574</td>
+<td>0.608</td>
+<td>0.940</td>
+<td>0.0064</td>
+<td>0.061</td>
+<td>0.073</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.020</td>
+<td>0.836</td>
+<td>0.029</td>
+<td>2.499</td>
+<td>0.640</td>
+<td>0.928</td>
+<td>0.0074</td>
+<td>0.080</td>
+<td>0.062</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.050</td>
+<td>0.824</td>
+<td>0.033</td>
+<td>2.425</td>
+<td>0.644</td>
+<td>0.916</td>
+<td>0.0090</td>
+<td>0.103</td>
+<td>0.052</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.100</td>
+<td>0.816</td>
+<td>0.030</td>
+<td>2.398</td>
+<td>0.620</td>
+<td>0.916</td>
+<td>0.0090</td>
+<td>0.124</td>
+<td>0.048</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.200</td>
+<td>0.796</td>
+<td>0.022</td>
+<td>2.528</td>
+<td>0.612</td>
+<td>0.900</td>
+<td>0.0170</td>
+<td>0.167</td>
+<td>0.061</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.005</td>
+<td>0.828</td>
+<td>0.024</td>
+<td>2.448</td>
+<td>0.492</td>
+<td>0.944</td>
+<td>0.0010</td>
+<td>0.042</td>
+<td>0.079</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.010</td>
+<td>0.832</td>
+<td>0.039</td>
+<td>2.598</td>
+<td>0.588</td>
+<td>0.924</td>
+<td>0.0010</td>
+<td>0.052</td>
+<td>0.085</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.020</td>
+<td>0.807</td>
+<td>0.065</td>
+<td>2.580</td>
+<td>0.564</td>
+<td>0.924</td>
+<td>0.0011</td>
+<td>0.054</td>
+<td>0.089</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.050</td>
+<td>0.767</td>
+<td>0.107</td>
+<td>2.904</td>
+<td>0.636</td>
+<td>0.892</td>
+<td>0.0012</td>
+<td>0.062</td>
+<td>0.115</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.100</td>
+<td>0.628</td>
+<td>0.320</td>
+<td>2.500</td>
+<td>0.492</td>
+<td>0.852</td>
+<td>0.3387</td>
+<td>0.048</td>
+<td>0.092</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.200</td>
+<td>0.576</td>
+<td>0.259</td>
+<td>2.649</td>
+<td>0.316</td>
+<td>0.776</td>
+<td>0.0019</td>
+<td>0.066</td>
+<td>0.122</td>
+</tr>
+</tbody>
+</table>
+<h1
+id="cifar-10-audit-a-a-calibrated-threshold-is-split-conformal">CIFAR-10,
+audit A: a calibrated threshold is split conformal</h1>
+<p>alpha = 0.10, n_cal = 2000, 5 seeds, 10k official test set. Coverage
+is the mean over seeds. Raw keeps empty sets; forced fills them with the
+argmax.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th>n_train</th>
+<th>method</th>
+<th>coverage raw</th>
+<th>coverage forced</th>
+<th>size raw</th>
+<th>empty raw</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100</td>
+<td>raw threshold 0.90</td>
+<td>0.290</td>
+<td>0.692</td>
+<td>0.310</td>
+<td>0.690</td>
+</tr>
+<tr>
+<td>100</td>
+<td>max-prob quantile</td>
+<td>0.668</td>
+<td>0.702</td>
+<td>0.921</td>
+<td>0.103</td>
+</tr>
+<tr>
+<td>100</td>
+<td>true-class quantile</td>
+<td>0.898</td>
+<td>0.898</td>
+<td>2.086</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>100</td>
+<td>t = 1-q</td>
+<td>0.898</td>
+<td>0.898</td>
+<td>2.090</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>100</td>
+<td>split conformal</td>
+<td>0.898</td>
+<td>0.898</td>
+<td>2.090</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>100</td>
+<td>APS</td>
+<td>0.896</td>
+<td>0.911</td>
+<td>2.471</td>
+<td>0.016</td>
+</tr>
+<tr>
+<td>100</td>
+<td><strong>accuracy</strong></td>
+<td><strong>0.692</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1000</td>
+<td>raw threshold 0.90</td>
+<td>0.647</td>
+<td>0.803</td>
+<td>0.705</td>
+<td>0.295</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>max-prob quantile</td>
+<td>0.762</td>
+<td>0.803</td>
+<td>0.899</td>
+<td>0.101</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>true-class quantile</td>
+<td>0.894</td>
+<td>0.894</td>
+<td>1.344</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>t = 1-q</td>
+<td>0.894</td>
+<td>0.894</td>
+<td>1.346</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>split conformal</td>
+<td>0.894</td>
+<td>0.894</td>
+<td>1.346</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>APS</td>
+<td>0.892</td>
+<td>0.911</td>
+<td>1.497</td>
+<td>0.021</td>
+</tr>
+<tr>
+<td>1000</td>
+<td><strong>accuracy</strong></td>
+<td><strong>0.803</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>5000</td>
+<td>raw threshold 0.90</td>
+<td>0.731</td>
+<td>0.818</td>
+<td>0.819</td>
+<td>0.181</td>
+</tr>
+<tr>
+<td>5000</td>
+<td>max-prob quantile</td>
+<td>0.771</td>
+<td>0.818</td>
+<td>0.892</td>
+<td>0.108</td>
+</tr>
+<tr>
+<td>5000</td>
+<td>true-class quantile</td>
+<td>0.899</td>
+<td>0.899</td>
+<td>1.286</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>5000</td>
+<td>t = 1-q</td>
+<td>0.899</td>
+<td>0.899</td>
+<td>1.287</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>5000</td>
+<td>split conformal</td>
+<td>0.899</td>
+<td>0.899</td>
+<td>1.287</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>5000</td>
+<td>APS</td>
+<td>0.897</td>
+<td>0.907</td>
+<td>1.351</td>
+<td>0.011</td>
+</tr>
+<tr>
+<td>5000</td>
+<td><strong>accuracy</strong></td>
+<td><strong>0.818</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>30000</td>
+<td>raw threshold 0.90</td>
+<td>0.716</td>
+<td>0.855</td>
+<td>0.756</td>
+<td>0.244</td>
+</tr>
+<tr>
+<td>30000</td>
+<td>max-prob quantile</td>
+<td>0.810</td>
+<td>0.855</td>
+<td>0.899</td>
+<td>0.101</td>
+</tr>
+<tr>
+<td>30000</td>
+<td>true-class quantile</td>
+<td>0.888</td>
+<td>0.888</td>
+<td>1.089</td>
+<td>0.001</td>
+</tr>
+<tr>
+<td>30000</td>
+<td>t = 1-q</td>
+<td>0.888</td>
+<td>0.888</td>
+<td>1.090</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>30000</td>
+<td>split conformal</td>
+<td>0.888</td>
+<td>0.888</td>
+<td>1.090</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>30000</td>
+<td>APS</td>
+<td>0.887</td>
+<td>0.927</td>
+<td>1.258</td>
+<td>0.041</td>
+</tr>
+<tr>
+<td>30000</td>
+<td><strong>accuracy</strong></td>
+<td><strong>0.855</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1
+id="cifar-10-audit-b-non-empty-post-processing-inflates-coverage">CIFAR-10,
+audit B: non-empty post-processing inflates coverage</h1>
+<p>alpha = 0.10, n_cal = 2000, 5 seeds, 10k official test set. Delta =
+forced coverage - raw coverage. Raw empty is the share of empty
+sets.</p>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>n_train</th>
+<th>score</th>
+<th>coverage raw</th>
+<th>coverage forced</th>
+<th>delta</th>
+<th>empty raw</th>
+<th>size raw</th>
+<th>size forced</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100</td>
+<td>naive</td>
+<td>0.898</td>
+<td>0.898</td>
+<td>+0.000</td>
+<td>0.000</td>
+<td>2.090</td>
+<td>2.090</td>
+</tr>
+<tr>
+<td>100</td>
+<td>APS randomized</td>
+<td>0.898</td>
+<td>0.913</td>
+<td>+0.015</td>
+<td>0.015</td>
+<td>2.482</td>
+<td>2.497</td>
+</tr>
+<tr>
+<td>100</td>
+<td>APS deterministic</td>
+<td>0.904</td>
+<td>0.972</td>
+<td>+0.068</td>
+<td>0.069</td>
+<td>4.437</td>
+<td>4.506</td>
+</tr>
+<tr>
+<td>100</td>
+<td>RAPS</td>
+<td>0.899</td>
+<td>0.911</td>
+<td>+0.012</td>
+<td>0.013</td>
+<td>2.403</td>
+<td>2.415</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>naive</td>
+<td>0.894</td>
+<td>0.894</td>
+<td>+0.000</td>
+<td>0.000</td>
+<td>1.346</td>
+<td>1.346</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>APS randomized</td>
+<td>0.896</td>
+<td>0.914</td>
+<td>+0.018</td>
+<td>0.019</td>
+<td>1.515</td>
+<td>1.534</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>APS deterministic</td>
+<td>0.902</td>
+<td>0.993</td>
+<td>+0.091</td>
+<td>0.091</td>
+<td>4.654</td>
+<td>4.745</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>RAPS</td>
+<td>0.897</td>
+<td>0.913</td>
+<td>+0.016</td>
+<td>0.016</td>
+<td>1.490</td>
+<td>1.506</td>
+</tr>
+<tr>
+<td>5000</td>
+<td>naive</td>
+<td>0.899</td>
+<td>0.899</td>
+<td>+0.000</td>
+<td>0.000</td>
+<td>1.287</td>
+<td>1.287</td>
+</tr>
+<tr>
+<td>5000</td>
+<td>APS randomized</td>
+<td>0.900</td>
+<td>0.909</td>
+<td>+0.009</td>
+<td>0.010</td>
+<td>1.362</td>
+<td>1.372</td>
+</tr>
+<tr>
+<td>5000</td>
+<td>APS deterministic</td>
+<td>0.994</td>
+<td>0.994</td>
+<td>+0.000</td>
+<td>0.000</td>
+<td>6.083</td>
+<td>6.083</td>
+</tr>
+<tr>
+<td>5000</td>
+<td>RAPS</td>
+<td>0.899</td>
+<td>0.907</td>
+<td>+0.008</td>
+<td>0.008</td>
+<td>1.338</td>
+<td>1.346</td>
+</tr>
+<tr>
+<td>30000</td>
+<td>naive</td>
+<td>0.888</td>
+<td>0.888</td>
+<td>+0.000</td>
+<td>0.000</td>
+<td>1.090</td>
+<td>1.091</td>
+</tr>
+<tr>
+<td>30000</td>
+<td>APS randomized</td>
+<td>0.893</td>
+<td>0.930</td>
+<td>+0.036</td>
+<td>0.037</td>
+<td>1.271</td>
+<td>1.309</td>
+</tr>
+<tr>
+<td>30000</td>
+<td>APS deterministic</td>
+<td>0.899</td>
+<td>0.994</td>
+<td>+0.095</td>
+<td>0.095</td>
+<td>3.967</td>
+<td>4.061</td>
+</tr>
+<tr>
+<td>30000</td>
+<td>RAPS</td>
+<td>0.894</td>
+<td>0.929</td>
+<td>+0.035</td>
+<td>0.036</td>
+<td>1.261</td>
+<td>1.297</td>
+</tr>
+</tbody>
+</table>
+<h3 id="table-s7.-cifar-10-c-style-drift">Table S7. CIFAR-10-C style
+drift</h3>
+<p>Five corruption types (gaussian_noise, defocus_blur, contrast,
+brightness, jpeg_compression), three severities (1, 3, 5), 1,000 images
+per block, 3,000 points per stream, 3 seeds, alpha = 0.10, gamma = 0.02.
+Calibration is clean.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr>
+<th>update</th>
+<th>coverage</th>
+<th>mean size</th>
+<th>block sev 1</th>
+<th>block sev 3</th>
+<th>block sev 5</th>
+<th>alpha final</th>
+<th>clip</th>
+<th>sets &gt;= 9</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>static</td>
+<td>0.451</td>
+<td>1.30</td>
+<td>0.588</td>
+<td>0.457</td>
+<td>0.308</td>
+<td>—</td>
+<td>—</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0.828</td>
+<td>4.93</td>
+<td>0.853</td>
+<td>0.829</td>
+<td>0.802</td>
+<td>0.0106</td>
+<td>0.13</td>
+<td>0.145</td>
+</tr>
+<tr>
+<td>buggy</td>
+<td>0.936</td>
+<td>6.97</td>
+<td>0.940</td>
+<td>0.939</td>
+<td>0.928</td>
+<td>0.0019</td>
+<td>0.05</td>
+<td>0.380</td>
+</tr>
+</tbody>
+</table>
+<h3 id="per-corruption">Per corruption</h3>
+<p>Coverage and mean set size, averaged over three seeds.</p>
+<table>
+<thead>
+<tr>
+<th>corruption</th>
+<th>static</th>
+<th>fixed</th>
+<th>buggy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gaussian_noise</td>
+<td>0.22 / 1.34</td>
+<td>0.66 / 5.45</td>
+<td>0.81 / 7.02</td>
+</tr>
+<tr>
+<td>defocus_blur</td>
+<td>0.24 / 1.37</td>
+<td>0.85 / 7.52</td>
+<td>0.98 / 9.42</td>
+</tr>
+<tr>
+<td>contrast</td>
+<td>0.52 / 1.33</td>
+<td>0.87 / 4.94</td>
+<td>0.98 / 7.42</td>
+</tr>
+<tr>
+<td>brightness</td>
+<td>0.80 / 1.15</td>
+<td>0.90 / 1.88</td>
+<td>0.94 / 3.70</td>
+</tr>
+<tr>
+<td>jpeg_compression</td>
+<td>0.47 / 1.32</td>
+<td>0.86 / 4.87</td>
+<td>0.97 / 7.28</td>
+</tr>
+</tbody>
+</table>
+<p>The incorrect update reports 10.8 points more coverage than the
+correct one, at a 41 percent larger mean set size, and raises the share
+of near-trivial sets from 14.5 to 38.0 percent. The correct update also
+falls short of 0.90, at 0.828.</p>
+<h3 id="table-s8.-library-behavior-audit">Table S8. Library behavior
+audit</h3>
+<p>Versions checked on 2026-11-06. Line numbers refer to the named files
+in the package versions listed; the source snapshots were downloaded
+locally for the audit. Runtime: MAPIE, puncc, crepes, nonconformist, and
+conformal. Source inspection: TorchCP, coverforest, and
+AdaptiveConformal.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr>
+<th>library</th>
+<th>version</th>
+<th>task</th>
+<th>empty sets possible</th>
+<th>default policy</th>
+<th>evidence</th>
+<th>ACI update</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MAPIE</td>
+<td>1.6.0</td>
+<td>classification</td>
+<td>LAC yes; APS policy-dependent</td>
+<td>APS default include_last_label=True: no empty sets, coverage 0.9457
+vs 0.90</td>
+<td>classification.py:238-283; aps.py:355-358; lac.py:205-207;
+results/mapie_empty.json</td>
+<td>fixed alpha_0 (time_series_regression.py:329)</td>
+</tr>
+<tr>
+<td>TorchCP</td>
+<td>1.2.1</td>
+<td>classification</td>
+<td>yes</td>
+<td>no forcing; boolean mask (scores &lt;= q_hat)</td>
+<td>classification/predictor/base.py:111</td>
+<td>fixed alpha (regression/predictor/aci.py:197)</td>
+</tr>
+<tr>
+<td>puncc</td>
+<td>0.9.3</td>
+<td>classification</td>
+<td>yes</td>
+<td>no forcing; index lists, empty when no class passes</td>
+<td>api/prediction_sets.py:70-78, 112-119</td>
+<td>not implemented</td>
+</tr>
+<tr>
+<td>crepes</td>
+<td>0.9.1</td>
+<td>classification</td>
+<td>yes</td>
+<td>no forcing; boolean mask (p_values &gt;= 1-confidence)</td>
+<td>base.py:340</td>
+<td>not implemented</td>
+</tr>
+<tr>
+<td>nonconformist</td>
+<td>2.1.0</td>
+<td>classification</td>
+<td>yes</td>
+<td>no forcing; boolean matrix of p-values &gt; significance;
+smoothing=True</td>
+<td>icp.py:199-250</td>
+<td>not implemented</td>
+</tr>
+<tr>
+<td>conformal</td>
+<td>0.1</td>
+<td>classification</td>
+<td>yes (empty list possible)</td>
+<td>no forcing; per-label thresholds at 100 - epsilon percentile</td>
+<td><strong>init</strong>.py:76-93, 95-108</td>
+<td>not implemented</td>
+</tr>
+<tr>
+<td>coverforest</td>
+<td>0.0.3</td>
+<td>classification</td>
+<td>yes by default</td>
+<td>allow_empty_sets=True default; False avoids empty sets; docs warn to
+use it sparingly</td>
+<td>_forest.py:1457, 2006-2008</td>
+<td>not applicable</td>
+</tr>
+<tr>
+<td>AdaptiveConformal</td>
+<td>GitHub main</td>
+<td>regression intervals</td>
+<td>not applicable</td>
+<td>not applicable</td>
+<td>R/aci_algorithm.R:78-81</td>
+<td>fixed alpha (correct)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mapie-1.6.0-five-seeds-alpha-0.10">MAPIE 1.6.0, five seeds,
+alpha = 0.10</h3>
+<p>Synthetic five-class data, logistic regression, 2,000 test points per
+seed. The correct randomised APS is the last row. The default is the
+second row.</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>score</th>
+<th>include_last_label</th>
+<th>coverage (mean +/- SD)</th>
+<th>empty rate</th>
+<th>size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LAC</td>
+<td>True</td>
+<td>0.9016 +/- 0.0080</td>
+<td>0.0000</td>
+<td>3.151</td>
+</tr>
+<tr>
+<td>APS, default</td>
+<td>True</td>
+<td>0.9457 +/- 0.0107</td>
+<td>0.0000</td>
+<td>3.676</td>
+</tr>
+<tr>
+<td>APS</td>
+<td>False</td>
+<td>0.8284 +/- 0.0150</td>
+<td>0.0000</td>
+<td>2.684</td>
+</tr>
+<tr>
+<td>APS, randomized</td>
+<td>randomized</td>
+<td>0.8998 +/- 0.0105</td>
+<td>0.0004</td>
+<td>3.232</td>
+</tr>
+</tbody>
+</table>
+<p>The default APS setting over-covers by 4.6 points with zero empty
+sets. The randomised setting, which is the exact conformal rule, lands
+on the target. The difference is the non-empty post-processing, not the
+score.</p>
+<h3 id="runtime-cross-check">Runtime cross-check</h3>
+<p>Same synthetic five-class task for all libraries: 8,000 samples,
+logistic regression, 2,000 test points, alpha = 0.10, test accuracy
+0.487. One seed for every library in this table; the MAPIE numbers in
+the table above use five seeds. The puncc randomized row has no fixed
+seed; its empty rate was 0.0 to 0.2 percent across runs.</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>library</th>
+<th>setting</th>
+<th>coverage</th>
+<th>empty rate</th>
+<th>mean size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MAPIE</td>
+<td>LAC</td>
+<td>0.895</td>
+<td>0.000</td>
+<td>2.87</td>
+</tr>
+<tr>
+<td>MAPIE</td>
+<td>APS, include_last_label=True (default)</td>
+<td>0.949</td>
+<td>0.000</td>
+<td>3.46</td>
+</tr>
+<tr>
+<td>MAPIE</td>
+<td>APS, include_last_label=False</td>
+<td>0.809</td>
+<td>0.000</td>
+<td>2.48</td>
+</tr>
+<tr>
+<td>MAPIE</td>
+<td>APS, randomized</td>
+<td>0.892</td>
+<td>0.001</td>
+<td>3.02</td>
+</tr>
+<tr>
+<td>puncc</td>
+<td>LAC</td>
+<td>0.895</td>
+<td>0.000</td>
+<td>2.87</td>
+</tr>
+<tr>
+<td>puncc</td>
+<td>APS, rand=True</td>
+<td>0.889</td>
+<td>0.000</td>
+<td>2.99</td>
+</tr>
+<tr>
+<td>puncc</td>
+<td>APS, rand=False</td>
+<td>0.977</td>
+<td>0.000</td>
+<td>4.06</td>
+</tr>
+<tr>
+<td>crepes</td>
+<td>LAC (hinge), p &gt;= alpha</td>
+<td>0.895</td>
+<td>0.000</td>
+<td>2.87</td>
+</tr>
+<tr>
+<td>nonconformist</td>
+<td>ICP margin, smoothing=True</td>
+<td>0.890</td>
+<td>0.000</td>
+<td>3.50</td>
+</tr>
+<tr>
+<td>conformal</td>
+<td>per-label thresholds, epsilon=10</td>
+<td>0.890</td>
+<td>0.000</td>
+<td>3.02</td>
+</tr>
+</tbody>
+</table>
+<p>coverforest 0.0.3 could not be run on scikit-learn 1.9: its forest
+code calls _get_n_samples_bootstrap without the sample_weight argument
+that the installed scikit-learn requires. TorchCP 1.2.1 was not run: its
+optional graph dependencies (torch_geometric) are not installed. Both
+were read at the source level.</p>
+<h3 id="table-s9.-coverage-against-four-surveys">Table S9. Coverage
+against four surveys</h3>
+<p>Authors’ assessment of topical coverage, not of quality. A circle
+means the topic is not a focus of that survey, not that the survey is
+deficient. Symbols: full circle = comprehensive, half circle = partial,
+open circle = not a focus.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th>dimension</th>
+<th>this paper</th>
+<th>Angelopoulos &amp; Bates 2021</th>
+<th>Fontana et al. 2023</th>
+<th>Campos et al. 2024</th>
+<th>Zhou et al. 2025</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>foundations</td>
+<td>half</td>
+<td>full</td>
+<td>full</td>
+<td>half</td>
+<td>full</td>
+</tr>
+<tr>
+<td>scores</td>
+<td>full</td>
+<td>full</td>
+<td>half</td>
+<td>full</td>
+<td>full</td>
+</tr>
+<tr>
+<td>conditional coverage</td>
+<td>full</td>
+<td>half</td>
+<td>full</td>
+<td>half</td>
+<td>half</td>
+</tr>
+<tr>
+<td>risk control</td>
+<td>full</td>
+<td>half</td>
+<td>half</td>
+<td>half</td>
+<td>half</td>
+</tr>
+<tr>
+<td>non-exchangeable</td>
+<td>full</td>
+<td>open</td>
+<td>half</td>
+<td>half</td>
+<td>half</td>
+</tr>
+<tr>
+<td>language models</td>
+<td>half</td>
+<td>open</td>
+<td>open</td>
+<td>full</td>
+<td>half</td>
+</tr>
+<tr>
+<td>implementation audit</td>
+<td>full</td>
+<td>open</td>
+<td>open</td>
+<td>open</td>
+<td>open</td>
+</tr>
+<tr>
+<td>two-dataset experiments</td>
+<td>full</td>
+<td>open</td>
+<td>open</td>
+<td>open</td>
+<td>open</td>
+</tr>
+</tbody>
+</table>
+<p>The last two rows are the reason this paper exists. The first six
+rows are the reason it has to cite the other four.</p>
+<h3 id="table-s10.-experimental-grid">Table S10. Experimental grid</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr>
+<th>dataset</th>
+<th>train pool</th>
+<th>strengths</th>
+<th>calibration</th>
+<th>test</th>
+<th>model</th>
+<th>scores</th>
+<th>alpha</th>
+<th>seeds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>digits</td>
+<td>898</td>
+<td>44 / 224 / 898</td>
+<td>449 for A and C; 100 / 225 / 449 for B</td>
+<td>450</td>
+<td>standardiser + logistic regression</td>
+<td>naive, APS randomized, APS deterministic, RAPS</td>
+<td>0.10 for A and C; 0.05 / 0.10 / 0.20 for B</td>
+<td>5</td>
+</tr>
+<tr>
+<td>CIFAR-10</td>
+<td>30,000</td>
+<td>100 / 1,000 / 5,000 / 30,000</td>
+<td>2,000 for A; 500 / 2,000 / 10,000 for B; 2,000 for C</td>
+<td>10,000</td>
+<td>ResNet-18 features + logistic regression</td>
+<td>naive, APS randomized, APS deterministic, RAPS</td>
+<td>0.10 for A and C; 0.05 / 0.10 / 0.20 for B</td>
+<td>5 for A and B; 3 for C</td>
+</tr>
+<tr>
+<td>covertype</td>
+<td>120,000-row subset</td>
+<td>6,000 / 60,000</td>
+<td>20,000</td>
+<td>40,000</td>
+<td>standardiser + logistic regression</td>
+<td>naive, APS randomized, APS deterministic</td>
+<td>0.05 / 0.10 / 0.20</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<p>The calibration column gives the sizes used in each audit. The
+strength column gives the number of training points used to fit the
+model; the calibration and test sets are disjoint from it.</p>
+<h3 id="table-s11.-covertype-audit-b">Table S11. Covertype audit B</h3>
+<p>120,000-row stratified subset, 54 features, 7 classes, logistic
+regression, 20,000 calibration points, 40,000 test points, alpha = 0.10,
+5 seeds.</p>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>train</th>
+<th>score</th>
+<th>raw coverage</th>
+<th>raw empty</th>
+<th>raw size</th>
+<th>forced coverage</th>
+<th>forced size</th>
+<th>delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6000</td>
+<td>naive</td>
+<td>0.900</td>
+<td>0.000</td>
+<td>1.53</td>
+<td>0.900</td>
+<td>1.53</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>6000</td>
+<td>APS randomized</td>
+<td>0.901</td>
+<td>0.003</td>
+<td>1.67</td>
+<td>0.904</td>
+<td>1.68</td>
+<td>0.003</td>
+</tr>
+<tr>
+<td>6000</td>
+<td>APS deterministic</td>
+<td>0.900</td>
+<td>0.004</td>
+<td>1.92</td>
+<td>0.903</td>
+<td>1.92</td>
+<td>0.004</td>
+</tr>
+<tr>
+<td>60000</td>
+<td>naive</td>
+<td>0.901</td>
+<td>0.000</td>
+<td>1.51</td>
+<td>0.901</td>
+<td>1.51</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>60000</td>
+<td>APS randomized</td>
+<td>0.900</td>
+<td>0.003</td>
+<td>1.65</td>
+<td>0.903</td>
+<td>1.66</td>
+<td>0.003</td>
+</tr>
+<tr>
+<td>60000</td>
+<td>APS deterministic</td>
+<td>0.899</td>
+<td>0.001</td>
+<td>1.89</td>
+<td>0.900</td>
+<td>1.89</td>
+<td>0.001</td>
+</tr>
+</tbody>
+</table>
+<p>The two training sizes give test accuracies of 0.717 and 0.721.</p>
+<p>delta is forced coverage minus raw coverage. The identity delta =
+empty rate x conditional accuracy holds. The empty rate is 0.0 to 0.4
+percent, so the change is 0.0 to 0.4 points. The trap is a regime
+effect, not a universal constant.</p>
+<h3 id="table-s12.-cost-sensitive-reading-of-the-fallback">Table S12.
+Cost-sensitive reading of the fallback</h3>
+<p>At alpha = 0.10, over cells with a non-zero raw empty rate. a_E is
+the conditional accuracy of the inserted label on empty sets, estimated
+as delta / empty rate. The threshold is the cost ratio c_a / c_e above
+which forcing is better than abstaining.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th>dataset</th>
+<th>score</th>
+<th>cells</th>
+<th>mean empty rate</th>
+<th>mean a_E</th>
+<th>threshold c_a/c_e</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>digits</td>
+<td>aps_rand</td>
+<td>45</td>
+<td>0.060</td>
+<td>0.99</td>
+<td>0.01</td>
+</tr>
+<tr>
+<td>digits</td>
+<td>aps_det</td>
+<td>45</td>
+<td>0.093</td>
+<td>0.99</td>
+<td>0.01</td>
+</tr>
+<tr>
+<td>cifar10</td>
+<td>aps_rand</td>
+<td>60</td>
+<td>0.020</td>
+<td>0.96</td>
+<td>0.04</td>
+</tr>
+<tr>
+<td>cifar10</td>
+<td>aps_det</td>
+<td>45</td>
+<td>0.084</td>
+<td>0.99</td>
+<td>0.01</td>
+</tr>
+<tr>
+<td>covertype</td>
+<td>aps_rand</td>
+<td>10</td>
+<td>0.003</td>
+<td>0.94</td>
+<td>0.06</td>
+</tr>
+<tr>
+<td>covertype</td>
+<td>aps_det</td>
+<td>10</td>
+<td>0.003</td>
+<td>0.94</td>
+<td>0.06</td>
+</tr>
+</tbody>
+</table>
+<p>The threshold is small in every dataset (0.01 to 0.06); the empty
+rate is not. The expected loss difference at a given cost ratio is
+proportional to the empty rate, so the same rule matters much more on
+digits than on covertype.</p>
+<h2 id="reporting-checklist">Reporting checklist</h2>
+<ol type="1">
+<li>Report the nominal level and the realized coverage, raw and
+forced.</li>
+<li>Report the empty rate.</li>
+<li>Report the calibration size and the finite-sample correction.</li>
+<li>Report the score and the set-size distribution.</li>
+<li>Report the update rule and its target.</li>
+<li>Report the library version and its non-empty policy.</li>
+</ol></body></html>
