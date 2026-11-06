@@ -68,7 +68,7 @@ for n, name in tables:
     parts.append(txt + "\n")
 
 figs = [
-    ("Figure 1", "The three-stage pipeline and the three places where the reported number can move.", "fig1_pipeline.png"),
+    ("Figure 1", "The three stages (solid) and the reporting step (dashed), with the three places where the reported number can move.", "fig1_pipeline.png"),
     ("Figure 2", "Coverage and set size versus the threshold on digits.", "fig2_equivalence.png"),
     ("Figure 3", "Change in coverage versus the raw empty rate across the image cells.", "fig3_forcing.png"),
     ("Figure 4", "Coverage and level trajectories under drift on digits.", "fig4_aci.png"),

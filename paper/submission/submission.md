@@ -184,8 +184,8 @@ not evidence of a better method. Both are draws from a procedure whose average i
 
 ### 2.2 Split conformal
 
-Figure 1 shows the three stages and the three places where the reported number can
-move. The construction is the split conformal predictor of Vovk et al. [38] and Shafer and Vovk [33]. Fit f on a training set. Pass a disjoint calibration set
+Figure 1 shows the three stages (solid) and the reporting step (dashed), with the
+three places where the reported number can move. The construction is the split conformal predictor of Vovk et al. [38] and Shafer and Vovk [33]. Fit f on a training set. Pass a disjoint calibration set
 of size n through f and compute a nonconformity score s_i = s(X_i, Y_i) for each
 calibration pair, where a larger score means the pair is less consistent with the model.
 Sort the scores and take the k-th smallest, with k = ceil((n + 1)(1 − α)). For a new input
@@ -1511,7 +1511,7 @@ so the same rule matters much more on digits than on covertype.
 
 ### Figure 1
 
-![The three-stage pipeline and the three places where the reported number can move.](../figures/fig1_pipeline.png)
+![The three stages (solid) and the reporting step (dashed), with the three places where the reported number can move.](../figures/fig1_pipeline.png)
 
 
 ### Figure 2

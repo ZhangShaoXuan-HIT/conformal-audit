@@ -14,7 +14,7 @@ th { background: #efefef; }
 thead { display: table-header-group; }
 tr { page-break-inside: avoid; }
 figure { margin: 10pt 0 14pt; page-break-inside: avoid; text-align: center; }
-figure img { max-width: 100%; height: auto; }
+figure img { width: 100% !important; max-width: 100% !important; height: auto; }
 figcaption { font-size: 9pt; text-align: left; margin-top: 3pt; }
 code { font-family: Consolas, monospace; font-size: 9pt; }
 h2#tables, h2#figures, h2#references { page-break-before: always; }

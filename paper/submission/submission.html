@@ -189,15 +189,16 @@ target of 0.90 is not evidence of a bug, and a single estimate of 0.946
 is not evidence of a better method. Both are draws from a procedure
 whose average is fixed.</p>
 <h3 id="split-conformal">2.2 Split conformal</h3>
-<p>Figure 1 shows the three stages and the three places where the
-reported number can move. The construction is the split conformal
-predictor of Vovk et al. [38] and Shafer and Vovk [33]. Fit f on a
-training set. Pass a disjoint calibration set of size n through f and
-compute a nonconformity score s_i = s(X_i, Y_i) for each calibration
-pair, where a larger score means the pair is less consistent with the
-model. Sort the scores and take the k-th smallest, with k = ceil((n +
-1)(1 − α)). For a new input x, the prediction set is the collection of
-labels y whose score does not exceed q.</p>
+<p>Figure 1 shows the three stages (solid) and the reporting step
+(dashed), with the three places where the reported number can move. The
+construction is the split conformal predictor of Vovk et al. [38] and
+Shafer and Vovk [33]. Fit f on a training set. Pass a disjoint
+calibration set of size n through f and compute a nonconformity score
+s_i = s(X_i, Y_i) for each calibration pair, where a larger score means
+the pair is less consistent with the model. Sort the scores and take the
+k-th smallest, with k = ceil((n + 1)(1 − α)). For a new input x, the
+prediction set is the collection of labels y whose score does not exceed
+q.</p>
 <p>The index k is the part that is most often implemented incorrectly.
 The naive choice ceil(n(1 − α)) gives a threshold that is too small, and
 the resulting coverage is below the nominal level by a term of order
@@ -3573,9 +3574,10 @@ digits than on covertype.</p>
 <h3 id="figure-1">Figure 1</h3>
 <figure>
 <img src="../figures/fig1_pipeline.png"
-alt="The three-stage pipeline and the three places where the reported number can move." />
-<figcaption aria-hidden="true">The three-stage pipeline and the three
-places where the reported number can move.</figcaption>
+alt="The three stages (solid) and the reporting step (dashed), with the three places where the reported number can move." />
+<figcaption aria-hidden="true">The three stages (solid) and the
+reporting step (dashed), with the three places where the reported number
+can move.</figcaption>
 </figure>
 <h3 id="figure-2">Figure 2</h3>
 <figure>
