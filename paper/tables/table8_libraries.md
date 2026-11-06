@@ -27,3 +27,26 @@ The correct randomised APS is the last row. The default is the second row.
 The default APS setting over-covers by 4.6 points with zero empty sets. The randomised
 setting, which is the exact conformal rule, lands on the target. The difference is the
 non-empty post-processing, not the score.
+
+
+## Runtime cross-check
+
+Same synthetic five-class task for all libraries: 8,000 samples, logistic
+regression, 2,000 test points, alpha = 0.10, test accuracy 0.487. One seed for
+puncc and crepes; the MAPIE rows in the table above use five seeds.
+
+| library | setting | coverage | empty rate | mean size |
+|---|---|---|---|---|
+| MAPIE | LAC | 0.895 | 0.000 | 2.87 |
+| MAPIE | APS, include_last_label=True (default) | 0.949 | 0.000 | 3.46 |
+| MAPIE | APS, include_last_label=False | 0.809 | 0.000 | 2.48 |
+| MAPIE | APS, randomized | 0.892 | 0.001 | 3.02 |
+| puncc | LAC | 0.895 | 0.000 | 2.87 |
+| puncc | APS, rand=True | 0.889 | 0.002 | 2.98 |
+| puncc | APS, rand=False | 0.977 | 0.000 | 4.06 |
+| crepes | LAC (hinge), p >= alpha | 0.895 | 0.000 | 2.87 |
+
+coverforest 0.0.3 could not be run on scikit-learn 1.9: its forest code calls
+_get_n_samples_bootstrap without the sample_weight argument that the installed
+scikit-learn requires. TorchCP 1.2.1 was not run: its optional graph dependencies
+(torch_geometric) are not installed. Both were read at the source level.

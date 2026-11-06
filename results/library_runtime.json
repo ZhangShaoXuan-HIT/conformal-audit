@@ -1,0 +1,108 @@
+{
+ "alpha": 0.1,
+ "accuracy": 0.487,
+ "dataset": "make_classification 5 classes, 8000 samples",
+ "versions": {
+  "mapie": "1.6.0",
+  "torchcp": null,
+  "puncc": null,
+  "crepes": "0.9.1",
+  "coverforest": null
+ },
+ "rows": [
+  {
+   "library": "MAPIE",
+   "setting": "lac include_last_label=True",
+   "n_test": 2000,
+   "error": null,
+   "coverage": 0.8955,
+   "empty_rate": 0.0,
+   "mean_size": 2.8655,
+   "forced_coverage": 0.8955,
+   "forced_size": 2.8655
+  },
+  {
+   "library": "MAPIE",
+   "setting": "aps include_last_label=True",
+   "n_test": 2000,
+   "error": null,
+   "coverage": 0.9485,
+   "empty_rate": 0.0,
+   "mean_size": 3.4565,
+   "forced_coverage": 0.9485,
+   "forced_size": 3.4565
+  },
+  {
+   "library": "MAPIE",
+   "setting": "aps include_last_label=False",
+   "n_test": 2000,
+   "error": null,
+   "coverage": 0.8095,
+   "empty_rate": 0.0,
+   "mean_size": 2.4755,
+   "forced_coverage": 0.8095,
+   "forced_size": 2.4755
+  },
+  {
+   "library": "MAPIE",
+   "setting": "aps include_last_label=randomized",
+   "n_test": 2000,
+   "error": null,
+   "coverage": 0.892,
+   "empty_rate": 0.001,
+   "mean_size": 3.021,
+   "forced_coverage": 0.893,
+   "forced_size": 3.022
+  },
+  {
+   "library": "puncc",
+   "setting": "LAC",
+   "n_test": 2000,
+   "error": null,
+   "coverage": 0.8955,
+   "empty_rate": 0.0,
+   "mean_size": 2.8655,
+   "forced_coverage": 0.8955,
+   "forced_size": 2.8655
+  },
+  {
+   "library": "puncc",
+   "setting": "APS rand=True",
+   "n_test": 2000,
+   "error": null,
+   "coverage": 0.889,
+   "empty_rate": 0.0015,
+   "mean_size": 2.9785,
+   "forced_coverage": 0.8905,
+   "forced_size": 2.98
+  },
+  {
+   "library": "puncc",
+   "setting": "APS rand=False",
+   "n_test": 2000,
+   "error": null,
+   "coverage": 0.9765,
+   "empty_rate": 0.0,
+   "mean_size": 4.0615,
+   "forced_coverage": 0.9765,
+   "forced_size": 4.0615
+  },
+  {
+   "library": "crepes",
+   "setting": "LAC (hinge) p>=alpha, no smoothing",
+   "n_test": 2000,
+   "error": null,
+   "coverage": 0.8955,
+   "empty_rate": 0.0,
+   "mean_size": 2.8655,
+   "forced_coverage": 0.8955,
+   "forced_size": 2.8655
+  },
+  {
+   "library": "coverforest",
+   "setting": "all",
+   "n_test": 2000,
+   "error": "TypeError: _get_n_samples_bootstrap() missing 1 required positional argument: 'sample_weight'"
+  }
+ ]
+}

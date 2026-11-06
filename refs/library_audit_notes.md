@@ -70,3 +70,24 @@ MAPIE 的源码文档在 aps.py 第 355 到 358 行明确写了：True 或 False
 - 没有覆盖 R 的运行时行为；AdaptiveConformal 只读了 GitHub main。
 - MAPIE 实验用的是合成五分类数据，真实数据上的幅度可能不同。
 - 没有覆盖 MAPIE 的旧接口（MapieClassifier v0），只看了 v1 的 SplitConformalClassifier。
+
+
+## 运行时补充（2026-11-06）
+
+同一份五分类合成数据，逻辑回归，2,000 个测试点，α=0.10，准确率 0.487。
+
+| 库 | 设置 | 覆盖率 | 空集率 | 集合大小 |
+|---|---|---|---|---|
+| MAPIE | LAC | 0.895 | 0.000 | 2.87 |
+| MAPIE | APS 默认 | 0.949 | 0.000 | 3.46 |
+| MAPIE | APS False | 0.809 | 0.000 | 2.48 |
+| MAPIE | APS randomized | 0.892 | 0.001 | 3.02 |
+| puncc | LAC | 0.895 | 0.000 | 2.87 |
+| puncc | APS rand=True | 0.889 | 0.002 | 2.98 |
+| puncc | APS rand=False | 0.977 | 0.000 | 4.06 |
+| crepes | LAC | 0.895 | 0.000 | 2.87 |
+
+- puncc 的 rand=False 与 MAPIE 的 include_last_label=True 是同一类政策：用非空规则换覆盖率。puncc 的差是 8.8 个点，MAPIE 的差是 5.7 个点（这次单种子运行）。
+- 三个库的 LAC 结果完全一致（0.895，2.87），说明审计脚本本身是可比的。
+- coverforest 0.0.3 与 sklearn 1.9 不兼容（_get_n_samples_bootstrap 缺 sample_weight 参数），未能运行；保留源码结论。
+- TorchCP 1.2.1 的顶层 import 依赖 torch_geometric，未安装；保留源码结论。

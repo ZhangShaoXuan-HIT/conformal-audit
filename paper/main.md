@@ -617,7 +617,8 @@ The audit so far uses our own set constructor. A reader may ask whether the
 behaviour is an artifact of that choice. We inspected six implementations:
 MAPIE 1.6.0, TorchCP 1.2.1, puncc 0.9.3, crepes 0.9.1, coverforest 0.0.3,
 and the AdaptiveConformal R package. All six were read at the source level.
-MAPIE was also run, with five seeds on a synthetic five-class problem.
+MAPIE, puncc, and crepes were also run on a common synthetic five-class problem;
+MAPIE was run with five seeds, and the other two with one.
 
 The first finding is that the empty-set policy is a design choice, not a
 universal. MAPIE's APS implementation defaults to include_last_label=True,
@@ -639,6 +640,13 @@ the default reaches 0.9457 +/- 0.0107 with zero empty sets and a mean size of
 False setting reaches 0.8284 +/- 0.0150, below the target. The two
 non-randomized settings therefore err in opposite directions. The default
 over-covers by 4.6 points; the exact rule lands on the target.
+
+Two more libraries reproduce the pattern. On the same one-seed task, puncc's APS
+with randomization off reaches 0.977 with no empty sets. With randomization on it
+reaches 0.889 with 0.2 percent empty sets. The switch is explicit in the API, and
+the documentation says that turning randomization off avoids empty sets. The LAC
+implementations of MAPIE, puncc, and crepes agree to three decimals (0.895, mean
+size 2.87), which is a consistency check on the audit itself.
 
 The MAPIE documentation acknowledges that True and False "may result in a
 coverage higher than 1 - alpha", because neither creates empty sets. It does
@@ -674,7 +682,10 @@ coverage report is not interpretable without the set-construction rule that
 produced it. The rule is part of the method, and it belongs in the methods
 section.
 
-The audit has limits. Five of the six implementations were read but not run.
+The audit has limits. Three of the six implementations were run. TorchCP,
+coverforest, and AdaptiveConformal were read at the source level. coverforest
+could not be installed against scikit-learn 1.9, and TorchCP's optional graph
+dependencies are not available on this machine.
 The versions are those available on 2026-11-06, and line numbers will move.
 The MAPIE experiment uses synthetic data, so the 4.6-point gap should be read
 as an illustration of the mechanism rather than an estimate for a particular
