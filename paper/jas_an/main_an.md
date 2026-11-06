@@ -48,6 +48,8 @@ Figure 1 shows the pipeline and the three probes, which work with existing score
 
 ![Figure 1. The three stages (solid) and the reporting step (dashed), with the three places where the reported number can move.](../figures/fig1_pipeline.png)
 
+The dashed reporting step is where the three probes act; each probe holds the other two stages fixed.
+
 
 
 ### 2.2 Data and experimental grid
@@ -74,7 +76,7 @@ On digits with 44 training points, the raw 0.90 threshold returns an empty set f
 
 On CIFAR-10 with 30,000 training images, the raw threshold returns an empty set for 24.4 percent of the test points even though the model is 85.5 percent accurate; coverage is 0.716, and forcing the argmax raises it to 0.855. The maximum-probability rule reaches 0.810 at a target of 0.90, and the true-class rule agrees with split conformal pointwise over 10,000 test points, five seeds and four strengths.
 
-Table 1 collects the threshold results, and the pattern is consistent across datasets: a fixed probability threshold yields a set with no coverage guarantee, and the fraction it reports measures accuracy among the points on which the model does not abstain. A quantile of the maximum probability leaves the problem in place; only a quantile of the true-class probability reproduces the conformal set.
+Table 1 sets the four rules side by side at two training sizes. The gap between the raw and true-class columns is widest when the model is weak and narrows as training grows, while the maximum-probability column never closes it.
 
 ### Table 1. Threshold calibration
 
@@ -92,7 +94,13 @@ Table 1 collects the threshold results, and the pattern is consistent across dat
 
 The true-class rule and split conformal are identical pointwise. The raw threshold is a singleton or empty; its coverage is accuracy on non-abstentions.
 
+The table isolates the source of the gap. A raw threshold at 0.90 is a fixed probability, and its coverage column is accuracy among the points it did not abstain on; the true-class column is the only one that matches split conformal at every training size.
+
+Figure 2 recasts the same cells as a coverage-size plot. The raw threshold sits at the bottom left, the maximum-probability rule moves up but stays below the target, and the true-class rule lies on the diagonal.
+
 ![Figure 2. Coverage and set size versus the threshold on digits.](../figures/fig2_equivalence.png)
+
+The vertical distance from the target is the coverage cost of the wrong quantile; the horizontal distance is the set-size cost.
 
 
 
@@ -106,7 +114,7 @@ The accounting identity explains the pattern: the gain equals the empty rate mul
 
 The library audit reproduces the mechanism in released code. MAPIE's APS default inserts the last label that crosses the quantile and therefore never returns an empty set; over five seeds it reaches 0.9457 with zero empty sets, against 0.8998 for the randomized rule, a 4.6-point gap. puncc's APS reaches 0.977 with randomization off and 0.889 with it on. The LAC implementations of MAPIE, puncc and crepes agree to three decimals at 0.895 and a mean size of 2.87, which serves as a consistency check, and nonconformist and conformal also return no empty sets on the common task.
 
-Table 2 summarises the library results: the empty-set policy changes reported coverage by several points when the empty rate is high and by almost nothing when it is low, so the empty rate itself is the quantity a deployment should report alongside coverage.
+Table 2 turns from the grid to the libraries. Each row records what one implementation does with an empty set: MAPIE's default and puncc with randomization off never return one, while the LAC rows do.
 
 ### Table 2. Library behaviour
 
@@ -122,7 +130,13 @@ Table 2 summarises the library results: the empty-set policy changes reported co
 
 MAPIE rows are five seeds; the other rows are one seed on the common synthetic task. The LAC implementations of MAPIE, puncc and crepes agree at 0.895 and a size of 2.87.
 
+The table separates the libraries by policy. MAPIE and puncc sit at the top of the coverage column because they insert a label; crepes, nonconformist and conformal sit near 0.89 because they return the raw set.
+
+Figure 3 shows the same mechanism across the full image grid. The gain from forcing is a line through the origin with slope equal to the conditional accuracy of the argmax; points below the line are cells where the argmax is less accurate on empty sets.
+
 ![Figure 3. Change in coverage versus the raw empty rate across the image cells.](../figures/fig3_forcing.png)
+
+The cluster near the origin is the low-empty-rate regime, where the policy barely matters; the spread at higher rates is where it changes the reported number.
 
 
 
@@ -134,7 +148,7 @@ On digits, the static procedure covers 0.666 of the stream. The correct update a
 
 On CIFAR-10 with five corruption types and three severities, the static procedure covers 0.451; the correct update covers 0.828 with a mean size of 4.93, and the incorrect update covers 0.936 with a mean size of 6.97. The gain is 10.8 points, the size cost is 41 percent, and the near-trivial share rises from 14.5 to 38.0 percent. Block coverage under the correct rule is 0.853, 0.829 and 0.802 at the three severities, and under the incorrect rule it is 0.940, 0.939 and 0.928. The correct rule falls short of 0.90, while the incorrect rule exceeds it by inflating the sets.
 
-Table 3 collects the update results: the variant's higher coverage is bought with larger sets, and at the lower clip it reflects a level that has lost the fixed target. Three of the eight implementations (MAPIE, TorchCP and AdaptiveConformal) use the correct fixed-target update; the others do not implement ACI. The correct rule also misses 0.90 on these streams; the shortfall follows from finite-time behaviour and limited calibration support. The result is negative for ACI on these streams, and it identifies the mechanism behind the shortfall.
+Table 3 sets the three updates side by side. The incorrect variant buys 3.3 points on digits and 10.8 on CIFAR-10, and pays for them with 33 and 41 percent more set size.
 
 ### Table 3. ACI update
 
@@ -149,6 +163,8 @@ Table 3 collects the update results: the variant's higher coverage is bought wit
 
 The incorrect update reports more coverage at a larger size and a larger near-trivial share. The correct update also falls short of 0.90.
 
+The table makes the trade-off explicit. The extra coverage in the incorrect row comes with a larger set and a larger near-trivial share, and the final level sits at the lower clip; the correct row misses the target, but its level stays away from the clip. Three of the eight implementations (MAPIE, TorchCP and AdaptiveConformal) use the correct fixed-target update; the others do not implement ACI. The correct rule also misses 0.90 on these streams; the shortfall follows from finite-time behaviour and limited calibration support.
+
 
 
 
@@ -157,7 +173,7 @@ The incorrect update reports more coverage at a larger size and a larger near-tr
 
 The audit also yields the quantity a deployment needs: on digits the mean a_E is 0.99, so the cost threshold c_a / c_e is 0.01; on CIFAR-10 it lies between 0.96 and 0.99, giving a threshold of 0.01 to 0.04; on covertype it is 0.94, giving 0.06. Forcing is preferable to abstaining unless abstaining costs less than one to six percent of an error. The defaults are therefore rational for most deployments, although the decision is usually made silently, and the reported coverage no longer estimates the nominal level once the fallback is active.
 
-Table 4 gives the threshold; a per-point version that uses the model's maximum probability as a proxy for a_E coincides with uniform forcing at or above c_a / c_e = 0.05 on all three datasets, so the proxy adds nothing to the population rule.
+Table 4 reduces the cost calculation to a single ratio. The mean a_E is 0.99 on digits, 0.96 to 0.99 on CIFAR-10 and 0.94 on covertype, so the threshold c_a / c_e lies between 0.01 and 0.06.
 
 ### Table 4. Cost rule
 
@@ -169,13 +185,19 @@ Table 4 gives the threshold; a per-point version that uses the model's maximum p
 
 Forcing is better than abstaining when c_a / c_e exceeds 1 - a_E. The threshold is small in every dataset; the empty rate determines the exposure.
 
+The table condenses the decision into one ratio. The per-point proxy, which uses the maximum probability for a_E, coincides with uniform forcing at or above 0.05 on all three datasets, so it adds nothing to the population rule.
+
+Figure 4 returns to the update results and shows the trajectories behind Table 3. The correct rule recovers after each block; the incorrect rule drifts upward and never returns.
+
 ![Figure 4. Coverage and level trajectories under drift on digits.](../figures/fig4_aci.png)
+
+The divergence persists across blocks and reflects the fixed point of the variant.
 
 
 
 ### 3.5 Simulation and the boundary
 
-Figures 2 to 4 display the threshold, forcing and update results. The 1,260 image cells form the simulation component: the data are held fixed while score, target level, calibration size and model strength vary. The effect does not track model strength in a simple way, since a stronger model can have a higher empty rate when the score is more likely to cross the threshold on every label. Across the grid, the ranking of scores follows the ranking of empty rates, and the forced evaluation can reverse the ranking of two methods that differ only in their post-processing.
+The 1,260 image cells form the simulation component: the data are held fixed while score, target level, calibration size and model strength vary. The effect does not track model strength in a simple way, since a stronger model can have a higher empty rate when the score is more likely to cross the threshold on every label. Across the grid, the ranking of scores follows the ranking of empty rates, and the forced evaluation can reverse the ranking of two methods that differ only in their post-processing.
 
 The covertype replication marks the boundary: at alpha = 0.10 the empty rate is 0.0 to 0.4 percent and the forcing gain is 0.0 to 0.4 points, so the identity still holds but has almost nothing to multiply. This is the behaviour the protocol predicts: a large gain on images and a near-zero gain on a well-calibrated tabular model are consistent with each other, and together they locate the exposure.
 

@@ -13,6 +13,6 @@ th { background: #efefef; }
 thead { display: table-header-group; }
 tr { page-break-inside: avoid; }
 figure { margin: 8pt 0 10pt; page-break-inside: avoid; text-align: center; }
-figure img { width: 100% !important; max-width: 100% !important; height: auto; }
+figure img { width: 92% !important; max-width: 92% !important; height: auto; }
 figcaption { font-size: 10pt; text-align: left; margin-top: 2pt; }
 h2#references, h2#tables, h2#figures, h2#figure-captions { page-break-before: always; }
