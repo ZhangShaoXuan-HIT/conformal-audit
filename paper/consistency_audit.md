@@ -320,8 +320,14 @@ paragraph into digits and CIFAR parts, removed two duplicate table follow-ups,
 and added a transition into 3.5.
 
 
-The reference list was reduced to the 24 works cited in the text. Every entry
+The reference list was reduced to the 25 works cited in the text. Every entry
 has an in-text citation and every in-text citation has an entry. Group-author
 periods were fixed. The two-axis map was removed from the supplement because
 the Application Note does not discuss it; Tables S1-S11 now run from the full
 threshold table to the cost table.
+
+
+The citation style was switched from author-date to the numbered style used by
+the JAS article supplied by the author: bracketed numbers in the text, sorted
+numerically, and an alphabetically ordered numbered reference list. The ACI
+source (Gibbs and Candes) was added; there are now 25 references, all cited.

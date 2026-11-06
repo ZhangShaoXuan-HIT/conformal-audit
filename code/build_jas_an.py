@@ -72,20 +72,56 @@ def ref(key):
     return " ".join(bits).replace("--", "–")
 
 
-def repl(m):
-    keys = [x.strip().lstrip("@") for x in m.group(1).split(";")]
-    keys = [k for k in keys if k in bib]
-    if not keys:
-        return m.group(0)
-    if len(keys) == 1:
-        v = bib[keys[0]]
-        names = parse_names(v["authors"])
-        first = names[0][0] if names else ""
-        before = m.string[max(0, m.start() - 70):m.start()]
-        if first and first.lower() in before.lower():
-            return "(" + str(v["year"]) + ")"
-        return "(" + intext(keys[0]) + ")"
-    return "(" + "; ".join(intext(k) for k in keys) + ")"
+def fmt_authors_num(names):
+    parts = []
+    for surname, initials in names:
+        if initials:
+            parts.append("".join(i + "." for i in initials) + " " + surname)
+        else:
+            parts.append(surname)
+    if len(parts) == 1:
+        return parts[0]
+    if len(parts) == 2:
+        return parts[0] + " and " + parts[1]
+    return ", ".join(parts[:-1]) + ", and " + parts[-1]
+
+
+def ref_num(key, n):
+    v = bib[key]
+    year = str(v["year"])
+    authors = fmt_authors_num(parse_names(v["authors"]))
+    title = v["title"].rstrip(".")
+    venue = (v.get("venue") or "").rstrip(".")
+    bits = ["[%d] %s, %s." % (n, authors, title)]
+    arxiv_added = False
+    if venue and venue.lower().startswith("arxiv"):
+        if v.get("arxiv"):
+            bits.append("arXiv:%s (%s)." % (v["arxiv"], year))
+            arxiv_added = True
+        else:
+            bits.append("%s (%s)." % (venue, year))
+    elif venue:
+        m = re.match(r"^(.*?)\s+(\d+)(?:\((\d+)\))?,\s*([0-9]+(?:\s*[-–]\s*[0-9]+)?)$", venue)
+        if m:
+            j, vol, issue, pages = m.groups()
+            pages = re.sub(r"\s*[-–]\s*", "–", pages)
+            bits.append("%s %s%s (%s), pp. %s." % (j, vol, "(%s)" % issue if issue else "", year, pages))
+        elif re.search(r"\((?:19|20)\d{2}\)", venue) or year in venue:
+            bits.append(venue + ".")
+        else:
+            bits.append("%s (%s)." % (venue, year))
+    elif v.get("arxiv"):
+        bits.append("arXiv:%s (%s)." % (v["arxiv"], year))
+        arxiv_added = True
+    else:
+        bits.append("(%s)." % year)
+    if v.get("doi"):
+        bits.append("https://doi.org/" + v["doi"])
+    elif v.get("arxiv") and not arxiv_added:
+        bits.append("arXiv:%s." % v["arxiv"])
+    elif v.get("url"):
+        bits.append(v["url"])
+    return " ".join(bits).replace("--", "–")
 
 
 text_keys = []
@@ -95,9 +131,22 @@ for m in re.finditer(r"\[@([^\]]+)\]", md):
         if k in bib:
             text_keys.append(k)
 text_keys = sorted(set(text_keys))
+ordered_keys = sorted(text_keys, key=lambda k: ref(k).lower())
+num = {k: i + 1 for i, k in enumerate(ordered_keys)}
+
+
+def repl(m):
+    keys = [x.strip().lstrip("@") for x in m.group(1).split(";")]
+    nums = sorted(num[k] for k in keys if k in num)
+    if not nums:
+        return m.group(0)
+    return "[" + ", ".join(str(n) for n in nums) + "]"
+
+
 md = re.sub(r"\[@([^\]]+)\]", repl, md)
-refs = sorted([ref(k) for k in text_keys], key=lambda s: s.lower())
+refs = [ref_num(k, num[k]) for k in ordered_keys]
 print("references", len(refs))
+
 md = md.replace("<!-- REFERENCES -->", "\n\n".join(refs))
 
 figs = [

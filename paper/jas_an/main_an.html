@@ -46,15 +46,15 @@ threshold rule on the test sample; the coverage guarantee belongs to a
 different construction.</p>
 <p>The conformal alternative replaces the fixed threshold with a
 quantile of calibration scores, and the resulting set satisfies a
-finite-sample guarantee under exchangeability (Vovk et al., 2005;
-Angelopoulos &amp; Bates, 2023). That guarantee concerns the procedure,
-while the number printed by a particular pipeline is a separate object,
-and three implementation choices can move it without touching the
-guarantee. One is how the threshold is calibrated. Another is what the
-code does when a set is empty. A third is how an adaptive method updates
-its target. A deployment that compares methods, or that decides whether
-to abstain, therefore faces a practical question: whether the printed
-figure reflects the guarantee or merely the implementation.</p>
+finite-sample guarantee under exchangeability [3, 24]. That guarantee
+concerns the procedure, while the number printed by a particular
+pipeline is a separate object, and three implementation choices can move
+it without touching the guarantee. One is how the threshold is
+calibrated. Another is what the code does when a set is empty. A third
+is how an adaptive method updates its target. A deployment that compares
+methods, or that decides whether to abstain, therefore faces a practical
+question: whether the printed figure reflects the guarantee or merely
+the implementation.</p>
 <h3 id="relevant-data">1.2 Relevant data</h3>
 <p>We study the challenge on three public datasets chosen for different
 failure surfaces. Digits is small enough for hand checks, CIFAR-10
@@ -83,13 +83,11 @@ implementations, and the cost rule. The map records which libraries
 force a non-empty set by default, which expose randomization, and which
 return the raw set; the cost rule converts the fallback into a
 comparison between the loss of abstaining and the loss of a wrong
-answer. The audit sits alongside four surveys and tutorials
-(Angelopoulos &amp; Bates, 2023; Fontana et al., 2023; Campos et al.,
-2024; Zhou et al., 2025) and the closest 2025-2026 work (Aguru, 2026;
-Mehrtens et al., 2025; Gauthier et al., 2025; Al Bataineh, 2026; Boman,
-2026). The threshold identity has appeared before; the contribution here
-is the measurement of what follows when a pipeline uses the wrong
-threshold, the wrong post-processing, or the wrong update.</p>
+answer. The audit sits alongside four surveys and tutorials [3, 7, 10,
+25] and the closest 2025-2026 work [1, 2, 6, 11, 17]. The threshold
+identity has appeared before; the contribution here is the measurement
+of what follows when a pipeline uses the wrong threshold, the wrong
+post-processing, or the wrong update.</p>
 <h2 id="methodologyapproach">2. Methodology/Approach</h2>
 <h3 id="the-audit-protocol">2.1 The audit protocol</h3>
 <p>A conformal pipeline fits a model f, calibrates a quantile q on
@@ -98,14 +96,13 @@ a plausible shortcut, and the protocol turns each shortcut into a
 probe.</p>
 <p>The threshold probe compares four rules: a raw 0.90 threshold, a
 quantile of the maximum probability, a quantile of the true-class
-probability, and split conformal with the naive score (Shafer &amp;
-Vovk, 2008; Lei et al., 2018). The raw rule returns a singleton or an
-empty set; the maximum-probability rule takes a quantile of a quantity
-unrelated to the calibration score. For the naive score s(x,y) = 1 -
-p_y, the true-class threshold t satisfies p_y &gt;= 1 - q, which is
-exactly the conformal set. We check the identity pointwise as well as in
-aggregate coverage, since a coverage match can hide set-level
-disagreement.</p>
+probability, and split conformal with the naive score [14, 21]. The raw
+rule returns a singleton or an empty set; the maximum-probability rule
+takes a quantile of a quantity unrelated to the calibration score. For
+the naive score s(x,y) = 1 - p_y, the true-class threshold t satisfies
+p_y &gt;= 1 - q, which is exactly the conformal set. We check the
+identity pointwise as well as in aggregate coverage, since a coverage
+match can hide set-level disagreement.</p>
 <p>The empty-set probe keeps the raw set and a forced set in which the
 argmax is inserted only when the raw set is empty. If e is the empty
 rate and a_E is the fraction of empty-set points on which the argmax is
@@ -115,8 +112,8 @@ a cost rule: with c_a the loss of abstaining and c_e the loss of a wrong
 answer, forcing is preferable when c_e (1 - a_E) &lt; c_a, or c_a / c_e
 &gt; 1 - a_E. The audit estimates a_E as delta / e.</p>
 <p>The update probe compares the published recursion alpha_{t+1} =
-alpha_t + gamma (alpha - err_t) with a common variant that replaces the
-fixed target by the current level, alpha_{t+1} = alpha_t + gamma
+alpha_t + gamma (alpha - err_t) [12] with a common variant that replaces
+the fixed target by the current level, alpha_{t+1} = alpha_t + gamma
 (alpha_t - err_t). The fixed target supplies the restoring force; the
 variant removes it and adds a positive feedback term. We run the static
 procedure, the correct recursion and the variant on controlled streams,
@@ -148,20 +145,19 @@ pretrained ResNet-18 supplies 512-dimensional features, a
 logistic-regression head is fitted on 100, 1,000, 5,000 or 30,000
 images, and the calibration set is drawn from the remaining 20,000 at
 sizes 500, 2,000 and 10,000. Covertype is a 581,012-row, 54-feature,
-seven-class tabular dataset (Blackard, 1998); we use a 120,000-row
-stratified subset, a logistic regression, training sizes of 6,000 and
-60,000, a calibration set of 20,000 and a test set of 40,000.</p>
-<p>Four scores enter the grid: the naive score 1 - p_y (Sadinle et al.,
-2019), randomized APS (Romano et al., 2020), deterministic APS and RAPS
-(Angelopoulos et al., 2021). The grid crosses score, target level (0.05,
-0.10, 0.20), calibration size and model strength. Audit A fixes alpha =
-0.10 and compares the four threshold rules; Audit B runs the full
-score-by-level-by-calibration-by-strength grid, 540 digits cells and 720
-CIFAR-10 cells, each evaluated raw and forced; Audit C uses controlled
-drift streams, with 450 digits points in nine blocks and Gaussian noise
-rising from 0 to 0.60, and 3,000 CIFAR-10 images in three severity
-blocks across five corruption types. Five seeds are used for Audits A
-and B, and three for the CIFAR-10 drift stream.</p>
+seven-class tabular dataset [5]; we use a 120,000-row stratified subset,
+a logistic regression, training sizes of 6,000 and 60,000, a calibration
+set of 20,000 and a test set of 40,000.</p>
+<p>Four scores enter the grid: the naive score 1 - p_y [20], randomized
+APS [19], deterministic APS and RAPS [4]. The grid crosses score, target
+level (0.05, 0.10, 0.20), calibration size and model strength. Audit A
+fixes alpha = 0.10 and compares the four threshold rules; Audit B runs
+the full score-by-level-by-calibration-by-strength grid, 540 digits
+cells and 720 CIFAR-10 cells, each evaluated raw and forced; Audit C
+uses controlled drift streams, with 450 digits points in nine blocks and
+Gaussian noise rising from 0 to 0.60, and 3,000 CIFAR-10 images in three
+severity blocks across five corruption types. Five seeds are used for
+Audits A and B, and three for the CIFAR-10 drift stream.</p>
 <p>The grid also serves as the simulation study, varying the factors a
 deployment can control and includes regimes where the effect should be
 large and regimes where it should vanish. The tabular replication acts
@@ -170,15 +166,12 @@ once.</p>
 <h3 id="implementations">2.3 Implementations</h3>
 <p>We inspect eight implementations: MAPIE 1.6.0, TorchCP 1.2.1, puncc
 0.9.3, crepes 0.9.1, coverforest 0.0.3, nonconformist 2.1.0, conformal
-0.1 and the AdaptiveConformal R package (MAPIE contributors, 2026;
-TorchCP contributors, 2026; puncc contributors, 2026; crepes
-contributors, 2026; coverforest contributors, 2026; Linusson, 2017;
-Koul, 2017; Susmann et al., 2023). All eight were read at source level.
-Five were run on a common synthetic five-class task, with five seeds for
-MAPIE and one for the others; TorchCP, coverforest and AdaptiveConformal
-were read only. The sample deliberately includes two older, smaller
-packages and covers eight public implementations; a complete census
-remains future work.</p>
+0.1 and the AdaptiveConformal R package [8, 9, 13, 15, 16, 18, 22, 23].
+All eight were read at source level. Five were run on a common synthetic
+five-class task, with five seeds for MAPIE and one for the others;
+TorchCP, coverforest and AdaptiveConformal were read only. The sample
+deliberately includes two older, smaller packages and covers eight
+public implementations; a complete census remains future work.</p>
 <h3 id="metrics-and-the-cost-rule">2.4 Metrics and the cost rule</h3>
 <p>For each cell we record coverage, mean set size, the raw empty rate,
 the share of near-trivial sets, class coverage, expected calibration
@@ -657,77 +650,82 @@ https://doi.org/10.5281/zenodo.24001054.</p>
 experimental grid, the per-corruption results and the reporting
 checklist. The main text reports the cells needed for the argument.</p>
 <h2 id="references">References</h2>
-<p>Aguru, M. K. (2026). What Split Conformal Prediction Guarantees, and
-What It Does Not: Exact Coverage Laws for Binary Classifiers, the
+<p>[1] M.K. Aguru, What Split Conformal Prediction Guarantees, and What
+It Does Not: Exact Coverage Laws for Binary Classifiers, the
 Calibration-Set Size Needed for a Reliable Guarantee, and
 Class-Conditional Failure on UCI Adult. Zenodo (CERN European
-Organization for Nuclear Research).
-https://doi.org/10.5281/zenodo.23582987 Preprint.</p>
-<p>Al Bataineh, A. (2026). Certified Label-Free Drift Alarms From Empty
+Organization for Nuclear Research) (2026).
+https://doi.org/10.5281/zenodo.23582987</p>
+<p>[2] A. Al Bataineh, Certified Label-Free Drift Alarms From Empty
 Conformal Prediction Sets for Metal-Oxide Gas Sensor Arrays. IEEE
-Sensors Letters. https://doi.org/10.1109/lsens.2026.3748815</p>
-<p>Angelopoulos, A. N., &amp; Bates, S. (2023). Conformal Prediction: A
-Gentle Introduction. Foundations and Trends in Machine Learning 16(4),
-494-591. https://doi.org/10.1561/2200000101</p>
-<p>Angelopoulos, A. N., Bates, S., Malik, J., &amp; Jordan, M. I.
-(2021). Uncertainty Sets for Image Classifiers using Conformal
-Prediction. International Conference on Learning Representations (ICLR
-2021). arXiv:2009.14193.</p>
-<p>Blackard, J. A. (1998). Covertype. UCI Machine Learning Repository.
+Sensors Letters (2026). https://doi.org/10.1109/lsens.2026.3748815</p>
+<p>[3] A.N. Angelopoulos and S. Bates, Conformal Prediction: A Gentle
+Introduction. Foundations and Trends in Machine Learning 16(4) (2023),
+pp. 494–591. https://doi.org/10.1561/2200000101</p>
+<p>[4] A.N. Angelopoulos, S. Bates, J. Malik, and M.I. Jordan,
+Uncertainty Sets for Image Classifiers using Conformal Prediction.
+International Conference on Learning Representations (ICLR 2021).
+arXiv:2009.14193.</p>
+<p>[5] J.A. Blackard, Covertype. UCI Machine Learning Repository (1998).
 https://doi.org/10.24432/C50K5N</p>
-<p>Boman, S. E. (2026). Benchmarking non-conformity score functions in
-conformal prediction. arXiv:2605.24983. Preprint.</p>
-<p>Campos, M. M., Farinhas, A., Zerva, C., Figueiredo, M. A. T., &amp;
-Martins, A. F. T. (2024). Conformal Prediction for Natural Language
-Processing: A Survey. Transactions of the Association for Computational
-Linguistics 12, 1497-1516. https://doi.org/10.1162/tacl_a_00715</p>
-<p>coverforest contributors. (2026). coverforest: conformal prediction
-with random forests. version 0.0.3.
+<p>[6] S.E. Boman, Benchmarking non-conformity score functions in
+conformal prediction. arXiv:2605.24983 (2026).
+http://arxiv.org/abs/2605.24983v2</p>
+<p>[7] M.M. Campos, A. Farinhas, C. Zerva, M.A.T. Figueiredo, and A.F.T.
+Martins, Conformal Prediction for Natural Language Processing: A Survey.
+Transactions of the Association for Computational Linguistics 12 (2024),
+pp. 1497–1516. https://doi.org/10.1162/tacl_a_00715</p>
+<p>[8] coverforest contributors, coverforest: conformal prediction with
+random forests. version 0.0.3 (2026).
 https://pypi.org/project/coverforest/</p>
-<p>crepes contributors. (2026). crepes: conformal regressors and
-predictive systems. version 0.9.1. https://pypi.org/project/crepes/</p>
-<p>Fontana, M., Zeni, G., &amp; Vantini, S. (2023). Conformal
-prediction: A unified review of theory and new challenges. Bernoulli
-29(1), 1-23. https://doi.org/10.3150/21-BEJ1447</p>
-<p>Gauthier, E., Bach, F., &amp; Jordan, M. I. (2025). Adaptive Coverage
-Policies in Conformal Prediction.
-https://doi.org/10.48550/arxiv.2510.04318 Preprint.</p>
-<p>Koul, A. (2017). conformal: a minimal conformal prediction
-implementation for classification. version 0.1.
+<p>[9] crepes contributors, crepes: conformal regressors and predictive
+systems. version 0.9.1 (2026). https://pypi.org/project/crepes/</p>
+<p>[10] M. Fontana, G. Zeni, and S. Vantini, Conformal prediction: A
+unified review of theory and new challenges. Bernoulli 29(1) (2023),
+pp. 1–23. https://doi.org/10.3150/21-BEJ1447</p>
+<p>[11] E. Gauthier, F. Bach, and M.I. Jordan, Adaptive Coverage
+Policies in Conformal Prediction. arXiv preprint (2025).
+https://doi.org/10.48550/arxiv.2510.04318</p>
+<p>[12] I. Gibbs and E.J. Candès, Adaptive Conformal Inference Under
+Distribution Shift. Advances in Neural Information Processing Systems 34
+(NeurIPS 2021). arXiv:2106.00170.</p>
+<p>[13] A. Koul, conformal: a minimal conformal prediction
+implementation for classification. version 0.1 (2017).
 https://pypi.org/project/conformal/</p>
-<p>Lei, J., G’Sell, M., Rinaldo, A., Tibshirani, R. J., &amp; Wasserman,
-L. (2018). Distribution-Free Predictive Inference for Regression.
-Journal of the American Statistical Association 113(523), 1094–1111.
-https://doi.org/10.1080/01621459.2017.1307116</p>
-<p>Linusson, H. (2017). nonconformist: Python implementation of the
-conformal prediction framework. version 2.1.0.
+<p>[14] J. Lei, M. G’Sell, A. Rinaldo, R.J. Tibshirani, and L.
+Wasserman, Distribution-Free Predictive Inference for Regression.
+Journal of the American Statistical Association 113(523), 1094–1111
+(2018). https://doi.org/10.1080/01621459.2017.1307116</p>
+<p>[15] H. Linusson, nonconformist: Python implementation of the
+conformal prediction framework. version 2.1.0 (2017).
 https://github.com/donlnz/nonconformist</p>
-<p>MAPIE contributors. (2026). MAPIE: a scikit-learn-contrib package for
-conformal prediction. version 1.6.0. https://pypi.org/project/mapie/</p>
-<p>Mehrtens, H., Bucher, T., &amp; Brinker, T. J. (2025). Pitfalls of
-Conformal Predictions for Medical Image Classification.
-arXiv:2506.18162. Preprint.</p>
-<p>puncc contributors. (2026). puncc: predictive uncertainty calibration
-and conformal prediction. version 0.9.3.
+<p>[16] MAPIE contributors, MAPIE: a scikit-learn-contrib package for
+conformal prediction. version 1.6.0 (2026).
+https://pypi.org/project/mapie/</p>
+<p>[17] H. Mehrtens, T. Bucher, and T.J. Brinker, Pitfalls of Conformal
+Predictions for Medical Image Classification. arXiv:2506.18162 (2025).
+https://arxiv.org/abs/2506.18162</p>
+<p>[18] puncc contributors, puncc: predictive uncertainty calibration
+and conformal prediction. version 0.9.3 (2026).
 https://pypi.org/project/puncc/</p>
-<p>Romano, Y., Sesia, M., &amp; Candès, E. J. (2020). Classification
-with Valid and Adaptive Coverage. Advances in Neural Information
-Processing Systems 33 (NeurIPS 2020). arXiv:2006.02544.</p>
-<p>Sadinle, M., Lei, J., &amp; Wasserman, L. (2019). Least Ambiguous
-Set-Valued Classifiers With Bounded Error Levels. Journal of the
-American Statistical Association 114(525), 223–234.
+<p>[19] Y. Romano, M. Sesia, and E.J. Candès, Classification with Valid
+and Adaptive Coverage. Advances in Neural Information Processing Systems
+33 (NeurIPS 2020). arXiv:2006.02544.</p>
+<p>[20] M. Sadinle, J. Lei, and L. Wasserman, Least Ambiguous Set-Valued
+Classifiers With Bounded Error Levels. Journal of the American
+Statistical Association 114(525), 223–234 (2019).
 https://doi.org/10.1080/01621459.2017.1395341</p>
-<p>Shafer, G., &amp; Vovk, V. (2008). A Tutorial on Conformal
-Prediction. Journal of Machine Learning Research 9, 371–421.
+<p>[21] G. Shafer and V. Vovk, A Tutorial on Conformal Prediction.
+Journal of Machine Learning Research 9, 371–421 (2008).
 https://doi.org/10.5555/1390681.1390693</p>
-<p>Susmann, H., Chambaz, A., &amp; Josse, J. (2023). AdaptiveConformal:
-an R package for adaptive conformal inference. arXiv:2312.00448.
-Preprint.</p>
-<p>TorchCP contributors. (2026). TorchCP: a Python library for conformal
-prediction. version 1.2.1. https://pypi.org/project/torchcp/</p>
-<p>Vovk, V., Gammerman, A., &amp; Shafer, G. (2005). Algorithmic
-Learning in a Random World. Springer, New York.
+<p>[22] H. Susmann, A. Chambaz, and J. Josse, AdaptiveConformal: an R
+package for adaptive conformal inference. arXiv:2312.00448 (2023).
+https://github.com/herbps10/AdaptiveConformal</p>
+<p>[23] TorchCP contributors, TorchCP: a Python library for conformal
+prediction. version 1.2.1 (2026). https://pypi.org/project/torchcp/</p>
+<p>[24] V. Vovk, A. Gammerman, and G. Shafer, Algorithmic Learning in a
+Random World. Springer, New York (2005).
 https://doi.org/10.1007/b106715</p>
-<p>Zhou, X., Chen, B., Gui, Y., Cheng, L., Deng, Z., &amp; Wang, X.
-(2025). Conformal Prediction: A Data Perspective. ACM Computing Surveys
-58(2), 1–37. https://doi.org/10.1145/3736575</p></body></html>
+<p>[25] X. Zhou, B. Chen, Y. Gui, L. Cheng, Z. Deng, and X. Wang,
+Conformal Prediction: A Data Perspective. ACM Computing Surveys 58(2),
+1–37 (2025). https://doi.org/10.1145/3736575</p></body></html>
