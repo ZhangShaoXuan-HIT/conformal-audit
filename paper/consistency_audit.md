@@ -118,3 +118,20 @@ size of 4.93. The incorrect update covers 0.936 with a mean set size of 6.97. Th
 near-trivial share rises from 14.5 to 38.0 percent. The qualitative conclusion is
 unchanged, and the external validity is stronger because the drift is a standard
 corruption family rather than a one-dimensional Gaussian ramp.
+
+
+## Update: third dataset (2026-11-06)
+
+Covertype (581,012 rows, 54 features, 7 classes) was added as a tabular benchmark.
+A 120,000-row stratified subset, logistic regression, two training sizes (6,000 and
+60,000), 20,000 calibration points, 40,000 test points, 5 seeds, 3 alphas, 3
+scores, raw and forced. The results are Table 11.
+
+The result is a boundary, not a replication. The empty rate is 0.1 to 0.4 percent
+and the forcing change is 0.1 to 0.3 points, at both training sizes. The identity
+holds; the magnitude is governed by the empty rate. The paper now says this
+explicitly in 5.3 and 5.6, and the abstract limits the 9.7-point figure to the
+image benchmarks. The reference list is 37 entries after adding the Covertype
+dataset citation.
+
+The paper is 11,300 words, 37 references, 11 tables and 5 figures.

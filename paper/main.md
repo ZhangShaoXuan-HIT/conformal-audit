@@ -7,8 +7,8 @@ between the guarantee and the reported number: the calibration of the threshold,
 the treatment of empty sets, and the update rule of adaptive conformal inference.
 Across two image datasets, a tabular benchmark, and a range of model strengths, a fixed probability
 threshold is not a coverage method, a threshold calibrated on the true-class
-probability is exactly split conformal, forcing the argmax into empty sets raises
-the reported coverage by up to 9.7 points at α = 0.10, and the common α_t update is not
+probability is exactly split conformal, on the image benchmarks, forcing the argmax into
+empty sets raises the reported coverage by up to 9.7 points at α = 0.10, and the common α_t update is not
 ACI and reports higher coverage by inflating sets. The audit of six libraries
 shows that the empty-set policy varies, that one widely used default over-covers
 by 4.6 points, and that three ACI implementations use the correct fixed-target
