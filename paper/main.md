@@ -171,7 +171,8 @@ not evidence of a better method. Both are draws from a procedure whose average i
 
 ### 2.2 Split conformal
 
-The construction has three stages. Fit f on a training set. Pass a disjoint calibration set
+Figure 1 shows the three stages and the three places where the reported number can
+move. The construction has three stages. Fit f on a training set. Pass a disjoint calibration set
 of size n through f and compute a nonconformity score s_i = s(X_i, Y_i) for each
 calibration pair, where a larger score means the pair is less consistent with the model.
 Sort the scores and take the k-th smallest, with k = ceil((n + 1)(1 − α)). For a new input
@@ -984,18 +985,18 @@ supplementary material.
 |---|---|---|
 | T1 | two-axis map: guarantee x assumption | paper/tables/table1_map.md |
 | T2 | calibrated threshold equals split conformal | paper/tables/table2_equivalence.md |
-| T3 | post-processing inflation grid | results/postprocess_digits.json |
-| T4 | ACI update comparison | results/aci_digits.json |
-| F1 | pipeline and the three trap locations | paper/figures/fig1_pipeline |
-| F2 | coverage and size versus threshold | paper/figures/fig2_equivalence |
-| F3 | delta coverage versus raw empty rate | paper/figures/fig3_forcing |
-| F4 | coverage and alpha trajectories under drift | paper/figures/fig4_aci |
+| T3 | post-processing inflation grid | paper/tables/table3_postprocess.md |
+| T4 | ACI update comparison | paper/tables/table4_aci.md |
 | T5 | CIFAR audit A | paper/tables/table5_cifar_equivalence.md |
 | T6 | CIFAR audit B | paper/tables/table6_cifar_postprocess.md |
 | T7 | CIFAR audit C | paper/tables/table7_cifar_aci.md |
 | T8 | library behavior audit | paper/tables/table8_libraries.md |
 | T9 | coverage against four surveys | paper/tables/table9_coverage.md |
 | T10 | experimental grid | paper/tables/table10_grid.md |
+| F1 | pipeline and the three trap locations | paper/figures/fig1_pipeline |
+| F2 | coverage and size versus threshold | paper/figures/fig2_equivalence |
+| F3 | delta coverage versus raw empty rate | paper/figures/fig3_forcing |
+| F4 | coverage and alpha trajectories under drift | paper/figures/fig4_aci |
 | F5 | trap visibility versus empty rate | paper/figures/fig5_regime |
 
 ## Claims ledger
