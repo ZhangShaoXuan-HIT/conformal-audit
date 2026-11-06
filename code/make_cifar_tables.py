@@ -67,7 +67,6 @@ def equivalence_table():
                 mean([r["empty_rate"] for r in raw]),
             ))
         out.append("| %d | **accuracy** | **%.3f** | | | |" % (n_train, acc))
-        out.append("")
     path = os.path.join(TAB, "table5_cifar_equivalence.md")
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(out) + "\n")
@@ -101,7 +100,6 @@ def postprocess_table():
                 mean([r["size"] for r in raw]),
                 mean([r["size"] for r in frc]),
             ))
-        out.append("")
     path = os.path.join(TAB, "table6_cifar_postprocess.md")
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(out) + "\n")

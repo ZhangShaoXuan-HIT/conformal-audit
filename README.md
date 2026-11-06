@@ -99,6 +99,18 @@ python code/cifar_features.py
 | Figure 1, pipeline | `code/make_fig1.py` |
 | Figures 2-5 | `code/make_figures.py` |
 
+## Submission PDF
+
+```bash
+python code/build_submission.py
+```
+
+This writes `paper/submission/submission.pdf`: the working notes after the final
+`---` are stripped, `[@key]` citations are converted to numbers, author
+placeholders are inserted, and Tables 1-12 and Figures 1-5 are appended. It uses
+`pypandoc-binary` (Pandoc 3.9) and Microsoft Edge headless; the current script
+hard-codes the Windows Edge path, so another OS needs a different browser path.
+
 ## Design rules
 
 1. `build_sets` never forces non-empty sets; forcing is a separate

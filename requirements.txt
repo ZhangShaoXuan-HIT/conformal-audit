@@ -14,3 +14,4 @@ nonconformist==2.1.0
 conformal==0.1
 scikit-image==0.26.0
 opencv-python==5.0.0.93
+pypandoc-binary==1.17

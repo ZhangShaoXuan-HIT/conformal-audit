@@ -228,3 +228,18 @@ The paper is 11,845 words, 12 tables and 5 figures.
 The repository is archived at https://doi.org/10.5281/zenodo.24001054 (v1.0.0,
 2026-11-06); the concept DOI is https://doi.org/10.5281/zenodo.24001053. README
 and the Data and code statement now cite the DOI. The paper is 11,845 words.
+
+
+## Update: submission PDF (2026-11-06)
+
+code/build_submission.py builds a 30-page A4 PDF at
+paper/submission/submission.pdf. It strips the working notes after the final
+---, converts [@key] citations to numbered references, inserts author
+placeholders, and appends Tables 1-12 and Figures 1-5. It uses pypandoc-binary
+(Pandoc 3.9) and Microsoft Edge headless.
+
+The first build exposed a table bug: the CIFAR table generators inserted a blank
+line between training-size groups, so Pandoc rendered the later rows as body
+text. The generators were fixed (Tables 5 and 6 now one continuous table per
+table), and the PDF was rebuilt. Author name, affiliation and email are still
+placeholders.
