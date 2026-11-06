@@ -1057,7 +1057,7 @@ not distinguish them.
 
 ### 7.5 The prevalence and the utility of non-empty rules
 
-Section 4.4 audits six implementations. The policy map is a start, not a census.
+Section 4.4 audits eight implementations. The policy map is a start, not a census.
 A systematic audit of the defaults across the ecosystem, including the libraries
 we did not run, would establish whether the MAPIE default is an outlier or a
 pattern. The utility question is separate. The audit measures the cost of a
