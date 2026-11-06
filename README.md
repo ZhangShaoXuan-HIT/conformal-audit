@@ -3,6 +3,8 @@
 Code and results for **What Does Conformal Prediction Add? A Controlled Audit of
 Calibrated Set-Valued Classification**.
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24001054.svg)](https://doi.org/10.5281/zenodo.24001054)
+
 The paper audits three implementation choices that sit between the conformal
 guarantee and the coverage a pipeline reports: the calibration of the threshold,
 the treatment of empty sets, and the update rule of adaptive conformal inference.
@@ -127,7 +129,9 @@ python code/cifar_features.py
 ## Citation
 
 The paper is in preparation. The code and results are at
-https://github.com/ZhangShaoXuan-HIT/conformal-audit. The reference list is
+https://github.com/ZhangShaoXuan-HIT/conformal-audit and archived at
+https://doi.org/10.5281/zenodo.24001054 (v1.0.0; concept DOI
+https://doi.org/10.5281/zenodo.24001053). The reference list is
 `paper/references.md`; author and venue information will be added at submission.
 
 ## License

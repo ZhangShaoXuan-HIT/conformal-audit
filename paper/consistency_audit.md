@@ -139,7 +139,7 @@ At that point the paper was 11,300 words, 37 references, 11 tables and 5 figures
 
 ## Re-audit after CIFAR-C and covertype (2026-11-06)
 
-Checks: 11,841 words; Tables 1-12 all referenced and present; Figures 1-5 all
+Checks: 11,845 words; Tables 1-12 all referenced and present; Figures 1-5 all
 referenced and present; 28 citation keys in prose, all in the bibliography; 37
 entries in the reference list (28 prose plus 3 map-only keys plus 8 software).
 Stale CIFAR numbers (0.272, 0.677, 0.801, 12.4, 25 percent, 12.9) are gone.
@@ -177,7 +177,7 @@ Figure 5 now includes covertype as the near-origin points. The legend was fixed
 to avoid clipping. The abstract, 5.3 and 5.5 reframe the covertype result as a
 confirmation of the empty-rate diagnostic, not as a null result.
 
-The paper is 11,841 words, 12 tables and 5 figures.
+The paper is 11,845 words, 12 tables and 5 figures.
 
 
 ## Update: eight-library sample (2026-11-06)
@@ -185,7 +185,7 @@ The paper is 11,841 words, 12 tables and 5 figures.
 Added nonconformist 2.1.0 and conformal 0.1 to the library audit. Runtime:
 MAPIE, puncc, crepes, nonconformist, conformal (5). Source: TorchCP,
 coverforest, AdaptiveConformal (3). Table 8 has 8 source rows and 10 runtime
-rows. The reference list is 39 entries. The paper is 11,841 words.
+rows. The reference list is 39 entries. The paper is 11,845 words.
 
 The sample includes two older packages on purpose; it is a sample of public
 implementations, not a census. The puncc randomized row has no fixed seed; its
@@ -204,7 +204,7 @@ the proxy forces them all. The per-point rule does not improve on the population
 rule. The result is negative and is reported as such in 6.1 and 6.2; no figure was
 added.
 
-The paper is 11,841 words, 12 tables and 5 figures.
+The paper is 11,845 words, 12 tables and 5 figures.
 
 
 ## Update: README and artifact (2026-11-06)
@@ -220,4 +220,11 @@ The paper is 11,841 words, 12 tables and 5 figures.
   library_runtime.json.
 - The partial CIFAR-10-C.tar and the temporary coverforest test were removed.
 
-The paper is 11,841 words, 12 tables and 5 figures.
+The paper is 11,845 words, 12 tables and 5 figures.
+
+
+## Update: Zenodo DOI (2026-11-06)
+
+The repository is archived at https://doi.org/10.5281/zenodo.24001054 (v1.0.0,
+2026-11-06); the concept DOI is https://doi.org/10.5281/zenodo.24001053. README
+and the Data and code statement now cite the DOI. The paper is 11,845 words.

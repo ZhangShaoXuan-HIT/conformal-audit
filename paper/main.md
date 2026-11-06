@@ -1088,7 +1088,8 @@ CIFAR-10 and covertype are public. README.md documents the environment, the data
 and the commands that regenerate Tables 2-7, 11 and 12 and Figures 1-5. Table 8's
 source-policy columns are a curated reading of the code; its runtime rows come
 from results/library_runtime.json. The repository is available at
-https://github.com/ZhangShaoXuan-HIT/conformal-audit.
+https://github.com/ZhangShaoXuan-HIT/conformal-audit and archived at
+https://doi.org/10.5281/zenodo.24001054.
 
 ---
 
