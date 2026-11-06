@@ -139,9 +139,9 @@ At that point the paper was 11,300 words, 37 references, 11 tables and 5 figures
 
 ## Re-audit after CIFAR-C and covertype (2026-11-06)
 
-Checks: 11,688 words; Tables 1-12 all referenced and present; Figures 1-5 all
+Checks: 11,718 words; Tables 1-12 all referenced and present; Figures 1-5 all
 referenced and present; 28 citation keys in prose, all in the bibliography; 37
-entries in the reference list (28 prose plus 3 map-only keys plus 6 software).
+entries in the reference list (28 prose plus 3 map-only keys plus 8 software).
 Stale CIFAR numbers (0.272, 0.677, 0.801, 12.4, 25 percent, 12.9) are gone.
 
 Fixes made in this pass:
@@ -177,4 +177,17 @@ Figure 5 now includes covertype as the near-origin points. The legend was fixed
 to avoid clipping. The abstract, 5.3 and 5.5 reframe the covertype result as a
 confirmation of the empty-rate diagnostic, not as a null result.
 
-The paper is 11,688 words, 12 tables and 5 figures.
+The paper is 11,718 words, 12 tables and 5 figures.
+
+
+## Update: eight-library sample (2026-11-06)
+
+Added nonconformist 2.1.0 and conformal 0.1 to the library audit. Runtime:
+MAPIE, puncc, crepes, nonconformist, conformal (5). Source: TorchCP,
+coverforest, AdaptiveConformal (3). Table 8 has 8 source rows and 10 runtime
+rows. The reference list is 39 entries. The paper is 11,718 words.
+
+The sample includes two older packages on purpose; it is a sample of public
+implementations, not a census. The puncc randomized row has no fixed seed; its
+empty rate was 0.0 to 0.2 percent across runs, and the text says "below 0.2
+percent" rather than a fixed value.

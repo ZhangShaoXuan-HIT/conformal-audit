@@ -91,3 +91,11 @@ MAPIE 的源码文档在 aps.py 第 355 到 358 行明确写了：True 或 False
 - 三个库的 LAC 结果完全一致（0.895，2.87），说明审计脚本本身是可比的。
 - coverforest 0.0.3 与 sklearn 1.9 不兼容（_get_n_samples_bootstrap 缺 sample_weight 参数），未能运行；保留源码结论。
 - TorchCP 1.2.1 的顶层 import 依赖 torch_geometric，未安装；保留源码结论。
+
+
+## 八库补充（2026-11-06）
+
+- nonconformist 2.1.0：ICP + margin，0.890 / 0.000 / 3.50；no forcing；smoothing=True。
+- conformal 0.1：per-label thresholds at 100-epsilon percentile，0.890 / 0.000 / 3.02；no forcing；minimal API。
+- 八库中五个跑过（MAPIE、puncc、crepes、nonconformist、conformal），三个只读源码（TorchCP、coverforest、AdaptiveConformal）。
+- puncc APS rand=True 没有固定种子，空集率在 0.0–0.2% 之间波动；正文写 "below 0.2 percent"。

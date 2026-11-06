@@ -71,10 +71,10 @@
    "n_test": 2000,
    "error": null,
    "coverage": 0.889,
-   "empty_rate": 0.0015,
-   "mean_size": 2.9785,
-   "forced_coverage": 0.8905,
-   "forced_size": 2.98
+   "empty_rate": 0.0,
+   "mean_size": 2.9945,
+   "forced_coverage": 0.889,
+   "forced_size": 2.9945
   },
   {
    "library": "puncc",
@@ -97,6 +97,28 @@
    "mean_size": 2.8655,
    "forced_coverage": 0.8955,
    "forced_size": 2.8655
+  },
+  {
+   "library": "nonconformist",
+   "setting": "ICP margin, smoothing=True",
+   "n_test": 2000,
+   "error": null,
+   "coverage": 0.89,
+   "empty_rate": 0.0,
+   "mean_size": 3.504,
+   "forced_coverage": 0.89,
+   "forced_size": 3.504
+  },
+  {
+   "library": "conformal",
+   "setting": "per-label thresholds, epsilon=10",
+   "n_test": 2000,
+   "error": null,
+   "coverage": 0.8905,
+   "empty_rate": 0.0,
+   "mean_size": 3.0185,
+   "forced_coverage": 0.8905,
+   "forced_size": 3.0185
   },
   {
    "library": "coverforest",

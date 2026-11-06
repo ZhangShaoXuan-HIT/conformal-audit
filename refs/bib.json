@@ -832,5 +832,27 @@
   "status": "dataset",
   "doi": "10.24432/C50K5N",
   "url": "https://doi.org/10.24432/C50K5N"
+ },
+ "nonconformist2017": {
+  "authors": "Linusson H",
+  "title": "nonconformist: Python implementation of the conformal prediction framework",
+  "venue": "version 2.1.0",
+  "year": 2017,
+  "status": "software",
+  "doi": null,
+  "arxiv": null,
+  "url": "https://github.com/donlnz/nonconformist",
+  "source": "software"
+ },
+ "conformal2017": {
+  "authors": "Koul A",
+  "title": "conformal: a minimal conformal prediction implementation for classification",
+  "venue": "version 0.1",
+  "year": 2017,
+  "status": "software",
+  "doi": null,
+  "arxiv": null,
+  "url": "https://pypi.org/project/conformal/",
+  "source": "software"
  }
 }

@@ -24,6 +24,7 @@ X_train, X_tmp, y_train, y_tmp = train_test_split(X, y, test_size=0.5, stratify=
 X_cal, X_test, y_cal, y_test = train_test_split(X_tmp, y_tmp, test_size=0.5, stratify=y_tmp, random_state=0)
 clf = LogisticRegression(max_iter=2000).fit(X_train, y_train)
 P_test = clf.predict_proba(X_test)
+P_cal = clf.predict_proba(X_cal)
 argmax = P_test.argmax(axis=1)
 n, K = len(y_test), P_test.shape[1]
 print("accuracy", round(float((argmax == y_test).mean()), 4), "n_test", n, flush=True)
@@ -128,6 +129,30 @@ try:
     add("crepes", "LAC (hinge) p>=alpha, no smoothing", measure(sets))
 except Exception as e:
     add("crepes", "all", None, "%s: %s" % (type(e).__name__, e))
+
+# nonconformist
+try:
+    from nonconformist.base import ClassifierAdapter
+    from nonconformist.icp import IcpClassifier
+    from nonconformist.nc import ClassifierNc, MarginErrFunc
+    model = ClassifierAdapter(LogisticRegression(max_iter=2000))
+    nc = ClassifierNc(model, MarginErrFunc())
+    icp = IcpClassifier(nc)
+    icp.fit(X_train, y_train)
+    icp.calibrate(X_cal, y_cal)
+    sets = icp.predict(X_test, significance=0.10)
+    add("nonconformist", "ICP margin, smoothing=True", measure(sets))
+except Exception as e:
+    add("nonconformist", "all", None, "%s: %s" % (type(e).__name__, e))
+
+# conformal 0.1
+try:
+    from conformal import ConformalPrediction
+    cp = ConformalPrediction(P_cal, np.eye(K)[y_cal], epsilon=10)
+    sets = cp.predict(P_test)
+    add("conformal", "per-label thresholds, epsilon=10", measure(sets))
+except Exception as e:
+    add("conformal", "all", None, "%s: %s" % (type(e).__name__, e))
 
 # coverforest
 try:

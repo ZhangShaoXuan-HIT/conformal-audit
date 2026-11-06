@@ -11,7 +11,7 @@ probability is exactly split conformal, and forcing the argmax into empty sets
 raises the reported coverage by up to 9.7 points at α = 0.10 on the image
 benchmarks. On a tabular benchmark the same mechanism is near zero, as the
 empty-rate diagnostic predicts. The common α_t update is not ACI and reports higher coverage by
-inflating sets. The audit of six libraries
+inflating sets. The audit of eight libraries
 shows that the empty-set policy varies, that one widely used default over-covers
 by 4.6 points, and that three ACI implementations use the correct fixed-target
 update. We organise the field by guarantee and assumption rather than by
@@ -92,7 +92,7 @@ classes, used to test whether the post-processing effect survives a different
 modality. We vary the score, the target level, the calibration size, and the model
 strength, and we evaluate every cell twice, once with the empty sets kept and once
 with the argmax forced. The image grid has 1,260 cells; the tabular replication
-adds 180 rows. We also audit six libraries, all at the source level and three at
+adds 180 rows. We also audit eight libraries, all at the source level and five at
 runtime, and we compare their empty-set policies and their update rules.
 
 The audit is organised by a two-axis map. The rows are the guarantee a method
@@ -611,11 +611,12 @@ and Section 6 turns it into a checklist.
 ### 4.4 Do real libraries do this?
 
 The audit so far uses our own set constructor. A reader may ask whether the
-behaviour is an artifact of that choice. We inspected six implementations:
+behaviour is an artifact of that choice. We inspected eight implementations:
 MAPIE 1.6.0, TorchCP 1.2.1, puncc 0.9.3, crepes 0.9.1, coverforest 0.0.3,
-and the AdaptiveConformal R package. All six were read at the source level.
-MAPIE, puncc, and crepes were also run on a common synthetic five-class problem;
-MAPIE was run with five seeds, and the other two with one.
+nonconformist 2.1.0, conformal 0.1, and the AdaptiveConformal R package. All
+eight were read at the source level. MAPIE, puncc, crepes, nonconformist, and
+conformal were also run on a common synthetic five-class problem; MAPIE was run
+with five seeds, and the others with one.
 
 The first finding is that the empty-set policy is a design choice, not a
 universal. MAPIE's APS implementation defaults to include_last_label=True,
@@ -624,8 +625,9 @@ empty set. TorchCP returns the boolean mask scores <= q_hat. puncc returns
 index lists. crepes returns p_values >= 1 - confidence. All three can return
 empty sets. coverforest exposes the choice directly, with allow_empty_sets=True
 as the default and documentation that recommends using False sparingly.
-Table 8 summarises the six implementations. It is a policy map, not a defect
-list.
+Table 8 summarises the eight implementations. It is a policy map, not a defect
+list. The sample includes two older, smaller packages as well as the maintained
+ones. It is a sample of public implementations, not a census.
 
 The second finding is that MAPIE's default is a non-empty rule of a different
 kind from the argmax fallback studied in Section 4.2. It does not insert the
@@ -638,9 +640,9 @@ False setting reaches 0.8284 +/- 0.0150, below the target. The two
 non-randomized settings therefore err in opposite directions. The default
 over-covers by 4.6 points; the exact rule lands on the target.
 
-Two more libraries reproduce the pattern. On the same one-seed task, puncc's APS
+One more library reproduces the pattern. On the same one-seed task, puncc's APS
 with randomization off reaches 0.977 with no empty sets. With randomization on it
-reaches 0.889 with 0.2 percent empty sets. The switch is explicit in the API, and
+reaches 0.889 with an empty rate below 0.2 percent. The switch is explicit in the API, and
 the documentation says that turning randomization off avoids empty sets. The LAC
 implementations of MAPIE, puncc, and crepes agree to three decimals (0.895, mean
 size 2.87), which is a consistency check on the audit itself.
@@ -679,7 +681,7 @@ coverage report is not interpretable without the set-construction rule that
 produced it. The rule is part of the method, and it belongs in the methods
 section.
 
-The audit has limits. Three of the six implementations were run. TorchCP,
+The audit has limits. Five of the eight implementations were run. TorchCP,
 coverforest, and AdaptiveConformal were read at the source level. coverforest
 could not be run against scikit-learn 1.9, and TorchCP's optional graph
 dependencies are not available on this machine.

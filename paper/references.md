@@ -22,18 +22,20 @@
 20. Gibbs I, Candès E J. Adaptive Conformal Inference Under Distribution Shift. Advances in Neural Information Processing Systems 34 (NeurIPS 2021), 2021. arXiv:2106.00170. <!-- Gibbs2021ACI -->
 21. Gibbs I, Cherian J J, Candès E J. Conformal Prediction with Conditional Guarantees. Journal of the Royal Statistical Society: Series B 87(4), 1100–1126, 2025. DOI 10.1093/jrsssb/qkaf008. <!-- Gibbs2025 -->
 22. Hore R, Barber R F. Conformal Prediction with Local Weights: Randomization Enables Robust Guarantees. Journal of the Royal Statistical Society: Series B 87(2), 549–578, 2025. DOI 10.1093/jrsssb/qkae103. <!-- Hore2024 -->
-23. Lei J, G'Sell M, Rinaldo A, Tibshirani R J, Wasserman L. Distribution-Free Predictive Inference for Regression. Journal of the American Statistical Association 113(523), 1094–1111, 2018. DOI 10.1080/01621459.2017.1307116. <!-- Lei2018 -->
-24. MAPIE contributors. MAPIE: a scikit-learn-contrib package for conformal prediction. version 1.6.0, 2026. https://pypi.org/project/mapie/. <!-- mapie2026 -->
-25. Mehrtens H, Bucher T, Brinker TJ. Pitfalls of Conformal Predictions for Medical Image Classification. arXiv, 2025. arXiv:2506.18162. Preprint. <!-- Mehrtens2025 -->
-26. Oliveira RI, Orenstein P, Ramos TR, Romano JV. Split Conformal Prediction and Non-Exchangeable Data. arXiv preprint, 2022. DOI 10.48550/arxiv.2203.15885. Preprint. <!-- Oliveira2022 -->
-27. puncc contributors. puncc: predictive uncertainty calibration and conformal prediction. version 0.9.3, 2026. https://pypi.org/project/puncc/. <!-- puncc2026 -->
-28. Romano Y, Patterson E, Candes E J. Conformalized Quantile Regression. Advances in Neural Information Processing Systems 32 (NeurIPS 2019), 2019. arXiv:1905.03222. <!-- Romano2019CQR -->
-29. Romano Y, Sesia M, Candès E J. Classification with Valid and Adaptive Coverage. Advances in Neural Information Processing Systems 33 (NeurIPS 2020), 2020. arXiv:2006.02544. <!-- Romano2020 -->
-30. Sadinle M, Lei J, Wasserman L. Least Ambiguous Set-Valued Classifiers With Bounded Error Levels. Journal of the American Statistical Association 114(525), 223–234, 2019. DOI 10.1080/01621459.2017.1395341. <!-- Sadinle2019 -->
-31. Shafer G, Vovk V. A Tutorial on Conformal Prediction. Journal of Machine Learning Research 9, 371–421, 2008. DOI 10.5555/1390681.1390693. <!-- Shafer2008 -->
-32. Susmann H, Chambaz A, Josse J. AdaptiveConformal: an R package for adaptive conformal inference. arXiv preprint, 2023. arXiv:2312.00448. Preprint. <!-- adaptiveconformal2023 -->
-33. Tibshirani R J, Barber R F, Candès E J, Ramdas A. Conformal Prediction Under Covariate Shift. Advances in Neural Information Processing Systems 32 (NeurIPS 2019), 2019. arXiv:1904.06019. <!-- Tibshirani2019 -->
-34. TorchCP contributors. TorchCP: a Python library for conformal prediction. version 1.2.1, 2026. https://pypi.org/project/torchcp/. <!-- torchcp2026 -->
-35. Vovk V. Conditional validity of inductive conformal predictors. ACML 2012, PMLR 25, 475-490, 2012. https://proceedings.mlr.press/v25/vovk12.html. <!-- Vovk2012 -->
-36. Vovk V, Gammerman A, Shafer G. Algorithmic Learning in a Random World. Springer, New York, 2005. DOI 10.1007/b106715. <!-- Vovk2005 -->
-37. Zhou X, Chen B, Gui Y, Cheng L, Deng Z, Wang X, et al. Conformal Prediction: A Data Perspective. ACM Computing Surveys 58(2), 1–37, 2025. DOI 10.1145/3736575. <!-- Zhou2025 -->
+23. Koul A. conformal: a minimal conformal prediction implementation for classification. version 0.1, 2017. https://pypi.org/project/conformal/. <!-- conformal2017 -->
+24. Lei J, G'Sell M, Rinaldo A, Tibshirani R J, Wasserman L. Distribution-Free Predictive Inference for Regression. Journal of the American Statistical Association 113(523), 1094–1111, 2018. DOI 10.1080/01621459.2017.1307116. <!-- Lei2018 -->
+25. Linusson H. nonconformist: Python implementation of the conformal prediction framework. version 2.1.0, 2017. https://github.com/donlnz/nonconformist. <!-- nonconformist2017 -->
+26. MAPIE contributors. MAPIE: a scikit-learn-contrib package for conformal prediction. version 1.6.0, 2026. https://pypi.org/project/mapie/. <!-- mapie2026 -->
+27. Mehrtens H, Bucher T, Brinker TJ. Pitfalls of Conformal Predictions for Medical Image Classification. arXiv, 2025. arXiv:2506.18162. Preprint. <!-- Mehrtens2025 -->
+28. Oliveira RI, Orenstein P, Ramos TR, Romano JV. Split Conformal Prediction and Non-Exchangeable Data. arXiv preprint, 2022. DOI 10.48550/arxiv.2203.15885. Preprint. <!-- Oliveira2022 -->
+29. puncc contributors. puncc: predictive uncertainty calibration and conformal prediction. version 0.9.3, 2026. https://pypi.org/project/puncc/. <!-- puncc2026 -->
+30. Romano Y, Patterson E, Candes E J. Conformalized Quantile Regression. Advances in Neural Information Processing Systems 32 (NeurIPS 2019), 2019. arXiv:1905.03222. <!-- Romano2019CQR -->
+31. Romano Y, Sesia M, Candès E J. Classification with Valid and Adaptive Coverage. Advances in Neural Information Processing Systems 33 (NeurIPS 2020), 2020. arXiv:2006.02544. <!-- Romano2020 -->
+32. Sadinle M, Lei J, Wasserman L. Least Ambiguous Set-Valued Classifiers With Bounded Error Levels. Journal of the American Statistical Association 114(525), 223–234, 2019. DOI 10.1080/01621459.2017.1395341. <!-- Sadinle2019 -->
+33. Shafer G, Vovk V. A Tutorial on Conformal Prediction. Journal of Machine Learning Research 9, 371–421, 2008. DOI 10.5555/1390681.1390693. <!-- Shafer2008 -->
+34. Susmann H, Chambaz A, Josse J. AdaptiveConformal: an R package for adaptive conformal inference. arXiv preprint, 2023. arXiv:2312.00448. Preprint. <!-- adaptiveconformal2023 -->
+35. Tibshirani R J, Barber R F, Candès E J, Ramdas A. Conformal Prediction Under Covariate Shift. Advances in Neural Information Processing Systems 32 (NeurIPS 2019), 2019. arXiv:1904.06019. <!-- Tibshirani2019 -->
+36. TorchCP contributors. TorchCP: a Python library for conformal prediction. version 1.2.1, 2026. https://pypi.org/project/torchcp/. <!-- torchcp2026 -->
+37. Vovk V. Conditional validity of inductive conformal predictors. ACML 2012, PMLR 25, 475-490, 2012. https://proceedings.mlr.press/v25/vovk12.html. <!-- Vovk2012 -->
+38. Vovk V, Gammerman A, Shafer G. Algorithmic Learning in a Random World. Springer, New York, 2005. DOI 10.1007/b106715. <!-- Vovk2005 -->
+39. Zhou X, Chen B, Gui Y, Cheng L, Deng Z, Wang X, et al. Conformal Prediction: A Data Perspective. ACM Computing Surveys 58(2), 1–37, 2025. DOI 10.1145/3736575. <!-- Zhou2025 -->

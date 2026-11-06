@@ -1,8 +1,8 @@
 # Table 8. Library behavior audit
 
 Versions checked on 2026-11-06. Line numbers refer to the sources in _libs/src.
-Runtime: MAPIE, puncc, and crepes. Source inspection: TorchCP, coverforest, and
-AdaptiveConformal.
+Runtime: MAPIE, puncc, crepes, nonconformist, and conformal. Source inspection:
+TorchCP, coverforest, and AdaptiveConformal.
 
 | library | version | task | empty sets possible | default policy | evidence | ACI update |
 |---|---|---|---|---|---|---|
@@ -10,6 +10,8 @@ AdaptiveConformal.
 | TorchCP | 1.2.1 | classification | yes | no forcing; boolean mask (scores <= q_hat) | classification/predictor/base.py:111 | fixed alpha (regression/predictor/aci.py:197) |
 | puncc | 0.9.3 | classification | yes | no forcing; index lists, empty when no class passes | api/prediction_sets.py:70-78, 112-119 | not implemented |
 | crepes | 0.9.1 | classification | yes | no forcing; boolean mask (p_values >= 1-confidence) | base.py:340 | not implemented |
+| nonconformist | 2.1.0 | classification | yes | no forcing; boolean matrix of p-values > significance; smoothing=True | icp.py:199-250 | not implemented |
+| conformal | 0.1 | classification | yes (empty list possible) | no forcing; per-label thresholds at 100 - epsilon percentile | __init__.py:76-93, 95-108 | not implemented |
 | coverforest | 0.0.3 | classification | yes by default | allow_empty_sets=True default; False avoids empty sets; docs warn to use it sparingly | _forest.py:1457, 2006-2008 | not applicable |
 | AdaptiveConformal | GitHub main | regression intervals | not applicable | not applicable | R/aci_algorithm.R:78-81 | fixed alpha (correct) |
 
@@ -34,7 +36,8 @@ non-empty post-processing, not the score.
 
 Same synthetic five-class task for all libraries: 8,000 samples, logistic
 regression, 2,000 test points, alpha = 0.10, test accuracy 0.487. One seed for every library in this table; the MAPIE numbers in the table above
-use five seeds.
+use five seeds. The puncc randomized row has no fixed seed; its empty rate was
+0.0 to 0.2 percent across runs.
 
 | library | setting | coverage | empty rate | mean size |
 |---|---|---|---|---|
@@ -43,9 +46,11 @@ use five seeds.
 | MAPIE | APS, include_last_label=False | 0.809 | 0.000 | 2.48 |
 | MAPIE | APS, randomized | 0.892 | 0.001 | 3.02 |
 | puncc | LAC | 0.895 | 0.000 | 2.87 |
-| puncc | APS, rand=True | 0.889 | 0.002 | 2.98 |
+| puncc | APS, rand=True | 0.889 | 0.000 | 2.99 |
 | puncc | APS, rand=False | 0.977 | 0.000 | 4.06 |
 | crepes | LAC (hinge), p >= alpha | 0.895 | 0.000 | 2.87 |
+| nonconformist | ICP margin, smoothing=True | 0.890 | 0.000 | 3.50 |
+| conformal | per-label thresholds, epsilon=10 | 0.890 | 0.000 | 3.02 |
 
 coverforest 0.0.3 could not be run on scikit-learn 1.9: its forest code calls
 _get_n_samples_bootstrap without the sample_weight argument that the installed
