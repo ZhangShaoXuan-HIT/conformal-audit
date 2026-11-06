@@ -748,18 +748,120 @@ public, and the experiments can be rerun on a laptop. The reproducibility is not
 claim about the importance of the results. It is a condition for the reader to
 check them.
 
-## 6. A checklist for practitioners (600 words)
+## 6. A checklist for practitioners
 
-1. Report the empty rate before any post-processing.
-2. Calibrate the threshold on the true-class probability, not the max probability.
-3. State the update rule and the target it is supposed to track.
-4. Match marginal coverage before comparing conditional coverage.
-5. Report the set-size distribution, not only its mean.
+The audit suggests a short checklist. None of the items is new. What is new is
+how often they are omitted, and how much the reported number moves when they are.
 
-## 7. Open problems (500 words)
+1. Report the empty rate before any post-processing. The empty rate is the
+mechanism behind the post-processing result. A forced coverage number without the
+raw empty rate cannot be compared to an unforced one. Section 4.2 gives the
+identity, and the empty rate is its first factor.
 
-Three problems, all stated as measurable gaps. No "does not exist" claims from
-the absence of a reference in this bibliography.
+2. Calibrate the threshold on the true-class probability, not on the maximum
+probability. The coverage statement is about the true label. The max-probability
+rule is exact only when the argmax is always correct, which is a property of the
+model, not of the procedure. Section 4.1 shows the gap on CIFAR-10, where the
+max-probability rule reaches 0.810 at a target of 0.90.
+
+3. State the update rule and the target it tracks. For adaptive conformal
+inference, write the recursion and say whether the target is fixed. Section 4.3
+shows that the two rules have different fixed points, and that the difference is
+invisible in a coverage report.
+
+4. Report the level trajectory, the clip fraction, and the set-size distribution.
+Coverage alone cannot distinguish adaptation from inflation. The incorrect rule in
+Section 4.3 reports higher coverage with larger sets, and the trajectory makes the
+difference visible. A single number can present a divergent run as a success.
+
+5. Match the post-processing rule before comparing methods. A forced method and
+an unforced method are two procedures, not two scores. The comparison should hold
+the post-processing fixed, and the empty rate should be reported for both.
+
+6. Report the calibration size and the group definition. The finite-sample
+coverage is k/(n + 1) with continuous scores, and the calibration-conditional
+coverage is a random variable. A group-conditional claim is only as good as the
+group definition, and class-conditional coverage is not pointwise coverage.
+
+A paper that reports these six quantities can be checked. A paper that reports
+only coverage cannot. The checklist is not a substitute for the theory. It is a
+condition for the theory to be visible in the reported number.
+
+## 7. Open problems
+
+The map in Table 1 has empty cells. They are the open problems, and they are
+stated here as measurable gaps rather than as declarations of impossibility. In
+each case, the question is what would count as progress, not whether the problem
+is hard.
+
+### 7.1 Pointwise conditional coverage without exchangeability
+
+The impossibility result of Barber et al. [@Barber2021] is a statement about
+exchangeable data. Under covariate shift or non-exchangeability, the target is
+harder, and the map has no entry. Local weighting [@Hore2024] obtains a
+conditional guarantee up to a smoothness constant, and the bound under
+non-exchangeability [@Beyond] is stated in terms of an unobservable distance. A
+procedure that gives a pointwise guarantee under a quantifiable departure from
+exchangeability, or a lower bound that shows the cost of the departure, would be
+progress. A procedure that assumes the departure away is not progress.
+
+### 7.2 Group-conditional coverage under shift
+
+The group-conditional column is empty under covariate shift and under
+non-exchangeability. The known-group case is solved by Mondrian calibration
+[@Vovk2012], and the weaker group-level guarantee is developed by Gibbs et al.
+[@Gibbs2025]. The open case is the one in which the group label is missing at
+test time, or the group distribution shifts with the covariates. A group-weighted
+version of the covariate-shift correction [@Tibshirani2019] would be a natural
+candidate, but the weight estimation error and the group sample size interact, and
+the interaction is not understood. A bound on the group coverage under a known
+shift, or a procedure that is robust to a misspecified group model, would be
+progress.
+
+### 7.3 Risk control under covariate shift
+
+The risk-control row is empty under covariate shift in the reviewed set. The
+exchangeable construction [@Bates2021] and its grid and cross-validated variants
+[@LTT; @XVCrc] assume that the calibration and test distributions coincide. The natural extension is to weight the risk estimate by the likelihood ratio, but the weight estimation error enters the risk bound in a way that is not yet characterized, and the finite-sample correction for the weighted empirical risk is not settled. A risk bound that accounts for
+the weight estimation error, or a procedure that remains valid under a
+misspecified ratio, would be progress.
+
+### 7.4 The finite-time behavior of adaptive inference
+
+The correct update in Section 4.3 fails to reach the target on the streams we
+tested, for two reasons that are not separated by the current theory. The
+calibration support bounds how far the quantile can move, and the step size bounds
+how fast it can move. A bound on the realized coverage as a function of the stream
+length, the step size, and the calibration support would make the two mechanisms
+separable. A step-size schedule that closes the gap, or a diagnostic that
+distinguishes a support-limited failure from a step-limited one, would be
+progress. The current practice of reporting a single average coverage number does
+not distinguish them.
+
+### 7.5 The prevalence and the utility of non-empty rules
+
+Section 4.4 audits six implementations. The policy map is a start, not a census.
+A systematic audit of the defaults across the ecosystem, including the libraries
+we did not run, would establish whether the MAPIE default is an outlier or a
+pattern. The utility question is separate. The audit measures the cost of a
+non-empty rule in coverage and set size, but it does not model the decision that
+the rule supports. A deployment that prefers a guess to an abstention may be
+better off with the fallback, and a deployment that acts on the set may be worse
+off. A utility model that maps the empty rate and the conditional accuracy to a
+decision, and an audit of the default policies against that model, would turn the
+checklist into a design rule.
+
+The empty cells are not a criticism of the field. They are the places where the
+next paper can be useful. The audit's contribution is to make them visible, not to
+fill them.
+
+## Data and code availability
+
+The experiments are implemented in a single Python repository with fixed seeds.
+Every reported number is written to a JSON file, and the tables and figures are
+generated from that file. The digits benchmark is distributed with scikit-learn;
+CIFAR-10 is public. The repository and the exact commands are provided in the
+supplementary material.
 
 ---
 
