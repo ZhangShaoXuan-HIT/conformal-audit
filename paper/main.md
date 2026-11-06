@@ -7,9 +7,10 @@ between the guarantee and the reported number: the calibration of the threshold,
 the treatment of empty sets, and the update rule of adaptive conformal inference.
 Across two image datasets, a tabular benchmark, and a range of model strengths, a fixed probability
 threshold is not a coverage method, a threshold calibrated on the true-class
-probability is exactly split conformal, on the image benchmarks, forcing the argmax into
-empty sets raises the reported coverage by up to 9.7 points at α = 0.10, and the common α_t update is not
-ACI and reports higher coverage by inflating sets. The audit of six libraries
+probability is exactly split conformal, and forcing the argmax into empty sets
+raises the reported coverage by up to 9.7 points at α = 0.10 on the image
+benchmarks. The common α_t update is not ACI and reports higher coverage by
+inflating sets. The audit of six libraries
 shows that the empty-set policy varies, that one widely used default over-covers
 by 4.6 points, and that three ACI implementations use the correct fixed-target
 update. We organise the field by guarantee and assumption rather than by
@@ -83,12 +84,15 @@ meaningless.
 
 ### 1.3 What this paper does
 
-We audit the three choices on two image datasets and a tabular benchmark. The digits benchmark is small enough
-to check by hand. CIFAR-10 is large enough that the coverage estimates are tight.
-We vary the score, the target level, the calibration size, and the model strength,
-and we evaluate every cell twice, once with the empty sets kept and once with the
-argmax forced. The grid has 1,260 cells. We also audit six libraries, all at the source level and one at runtime, and we compare their empty-set policies and their
-update rules.
+We audit the three choices on two image datasets and a tabular benchmark. The
+digits benchmark is small enough to check by hand. CIFAR-10 is large enough that
+the coverage estimates are tight. Covertype is a tabular benchmark with seven
+classes, used to test whether the post-processing effect survives a different
+modality. We vary the score, the target level, the calibration size, and the model
+strength, and we evaluate every cell twice, once with the empty sets kept and once
+with the argmax forced. The image grid has 1,260 cells; the tabular replication
+adds 180 rows. We also audit six libraries, all at the source level and three at
+runtime, and we compare their empty-set policies and their update rules.
 
 The audit is organised by a two-axis map. The rows are the guarantee a method
 pursues: marginal coverage, group-conditional coverage, pointwise conditional
@@ -413,8 +417,7 @@ practitioner tries. The third is the correct calibration. The fourth is split
 conformal.
 
 Table 2 reports the digits results at n_cal = 449, and Table 5 reports CIFAR-10 at
-n_cal = 2000, across four training-set sizes. Three facts are stable across the
-two datasets.
+n_cal = 2000, across four training-set sizes. Three facts are stable across the two image datasets.
 
 First, the raw threshold is degenerate. At α = 0.10 and a training set of 44
 digits, the raw threshold returns an empty set for 70.1 percent of the test
@@ -482,7 +485,7 @@ and let a_E be the fraction of those points on which the argmax is correct.
 Forcing the argmax adds one covered point for each point in E on which the argmax
 is correct, and no coverage for the others. The change in coverage is therefore
 |E|/N times a_E, which is the empty rate times the conditional accuracy of the
-argmax on the empty sets. The identity is not an approximation. It is the
+argmax on the empty sets. Write it as Δ = e a_E, with e = |E|/N. The identity is not an approximation. It is the
 definition of the two quantities.
 
 The experiment varies the score, the target level, the calibration size, and the
@@ -575,7 +578,7 @@ On digits, the static procedure covers 0.666 of the stream. The correct update a
 0.869 with a mean set size of 4.58. The coverage gain is 3.3 points. The set-size
 cost is 33 percent. The share of near-trivial sets, those containing at least nine
 of the ten labels, rises from 10.8 to 24.4 percent. The final level is 0.0074 for
-the correct rule and 0.0011 for the incorrect one, which is the lower clip. On CIFAR-10 with five corruption types and three severities, the static procedure covers 0.451. The correct update covers 0.828 with a mean size of 4.93. The incorrect update covers 0.936 with a mean size of 6.97. The coverage gain is 10.8 points, the set-size cost is 41 percent, and the near-trivial share rises from 14.5 to 38.0 percent. In both datasets the incorrect
+the correct rule and 0.0011 for the incorrect one, which is the lower clip. On CIFAR-10 with five corruption types and three severities, the static procedure covers 0.451. The correct update covers 0.828 with a mean size of 4.93. The incorrect update covers 0.936 with a mean size of 6.97. The coverage gain is 10.8 points, the set-size cost is 41 percent, and the near-trivial share rises from 14.5 to 38.0 percent. In both image streams the incorrect
 rule wins the coverage comparison and loses the information comparison.
 
 The correct rule also fails to reach 0.90 on these streams. On digits it reaches
@@ -720,7 +723,7 @@ logistic regression, training sizes of 6,000 and 60,000, a calibration set of
 
 The benchmarks are chosen for contrast, not for scale. Digits is small enough
 that every number can be checked by hand, and CIFAR-10 is large enough that the
-coverage estimates are tight. Neither is a deployment benchmark, and Section 5.6
+coverage estimates are tight. None is a deployment benchmark, and Section 5.6
 is explicit about the limits.
 
 Four scores are compared. The naive score is 1 − p_y. The randomized APS score
@@ -797,8 +800,8 @@ coverage of 0.994 and a mean set size of 6.08. The fallback has nothing to do. T
 cell is not a failure of the audit. It is a reminder that over-coverage can come
 from the score as well as from the post-processing.
 
-Table 11 repeats the audit on covertype. At alpha = 0.10 the empty rate is 0.1 to
-0.4 percent, and the forcing change is 0.1 to 0.3 points. The identity holds; the
+Table 11 repeats the audit on covertype. At alpha = 0.10 the empty rate is 0.0 to
+0.4 percent, and the forcing change is 0.0 to 0.4 points. The identity holds; the
 magnitude is governed by the empty rate. The trap is a regime effect, not a
 universal constant: on a well-calibrated tabular model with seven classes, the
 same post-processing is nearly invisible. This is the correct reading of the
@@ -856,7 +859,7 @@ though the magnitudes vary with the empty rate. They also show that on digits an
 CIFAR-10 the magnitudes are large enough to change a comparison. The raw threshold can turn 70
 percent of a test set into abstentions and then report the model's accuracy. At α = 0.10, the
 post-processing can add 9.7 points of coverage on digits and 9.5 points on
-CIFAR-10, with no change to the score. On covertype it adds 0.1 to 0.3 points, because the empty rate is 0.1 to 0.4 percent. The wrong update can add 10.8 points of coverage on CIFAR-10 while inflating the set size by 41 percent. On digits and CIFAR-10 these are not small effects, and they are not artifacts of
+CIFAR-10, with no change to the score. On covertype it adds 0.0 to 0.4 points, because the empty rate is 0.0 to 0.4 percent. The wrong update can add 10.8 points of coverage on CIFAR-10 while inflating the set size by 41 percent. On digits and CIFAR-10 these are not small effects, and they are not artifacts of
 a single seed. On covertype they are small, and the empty rate explains why.
 
 The experiments do not show that the traps are common across all libraries.

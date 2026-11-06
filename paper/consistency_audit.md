@@ -127,11 +127,35 @@ A 120,000-row stratified subset, logistic regression, two training sizes (6,000 
 60,000), 20,000 calibration points, 40,000 test points, 5 seeds, 3 alphas, 3
 scores, raw and forced. The results are Table 11.
 
-The result is a boundary, not a replication. The empty rate is 0.1 to 0.4 percent
-and the forcing change is 0.1 to 0.3 points, at both training sizes. The identity
+The result is a boundary, not a replication. The empty rate is 0.0 to 0.4 percent
+and the forcing change is 0.0 to 0.4 points, at both training sizes. The identity
 holds; the magnitude is governed by the empty rate. The paper now says this
 explicitly in 5.3 and 5.6, and the abstract limits the 9.7-point figure to the
 image benchmarks. The reference list is 37 entries after adding the Covertype
 dataset citation.
 
 The paper is 11,300 words, 37 references, 11 tables and 5 figures.
+
+
+## Re-audit after CIFAR-C and covertype (2026-11-06)
+
+Checks: 11,311 words; Tables 1-11 all referenced and present; Figures 1-5 all
+referenced and present; 28 citation keys in prose, all in the bibliography; 37
+entries in the reference list (28 prose plus 3 map-only keys plus 6 software).
+Stale CIFAR numbers (0.272, 0.677, 0.801, 12.4, 25 percent, 12.9) are gone.
+
+Fixes made in this pass:
+
+| issue | fix |
+|---|---|
+| abstract had "on the image benchmarks" inserted mid-sentence, twice | moved the qualifier to the end of the 9.7-point clause |
+| 1.3 said six libraries with "one at runtime" | changed to three at runtime, matching 4.4 |
+| 1.3 described only the image grid | added the covertype sentence and the 180 tabular rows |
+| 5.1 said "Neither is a deployment benchmark" | changed to "None", matching three datasets |
+| 5.1 said facts were stable across "the two datasets" | changed to "the two image datasets" (audit A) |
+| covertype bounds said 0.1-0.4 percent and 0.1-0.3 points | corrected to 0.0-0.4, since naive has zero empty sets and the largest delta is 0.39 points |
+| 4.2 stated the identity in words only | added the notation delta = e a_E, which 6.1 cites |
+
+Remaining, not content errors: the Data and Code URL is a placeholder; the working
+notes after the final --- are not part of the paper; the [@key] citations still need
+conversion to the target journal's style.

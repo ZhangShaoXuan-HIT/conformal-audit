@@ -14,5 +14,5 @@ training sizes give test accuracies of 0.717 and 0.721.
 | 60,000 | APS deterministic | 0.899 | 0.001 | 1.89 | 0.900 | 1.89 | 0.001 |
 
 delta is forced coverage minus raw coverage. The identity delta = empty rate x
-conditional accuracy holds. The empty rate is 0.1 to 0.4 percent, so the change is
-0.1 to 0.3 points. The trap is a regime effect, not a universal constant.
+conditional accuracy holds. The empty rate is 0.0 to 0.4 percent, so the change is
+0.0 to 0.4 points. The trap is a regime effect, not a universal constant.
