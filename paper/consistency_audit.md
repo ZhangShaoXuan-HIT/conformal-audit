@@ -288,7 +288,7 @@ articles to 20 pages and Application Notes to 15, so it is not yet compliant.
 ## Update: JAS Application Note (2026-11-06)
 
 The Application Note version is built at paper/jas_an/main_an.pdf (13 pages,
-about 3740 words of prose, four tables and four figures embedded at first reference,
+about 3740 words of prose, four three-line tables and four figures embedded at first reference,
 abstract 172) with main_an.docx, supplement_an.pdf (9 pages)
 and cover_letter.md. It uses the four-section structure the journal requests:
 introduction with the data challenge, methodology/approach (the audit protocol),
@@ -309,3 +309,10 @@ Tables and figures are embedded at the point of first reference: Table 1 after
 Section 3.1, Table 2 after 3.2, Table 3 after 3.3, Table 4 after 3.4; Figure 1
 after 2.1, Figures 2-4 with the corresponding results. The end-of-document
 table/figure sections and the separate caption list were removed.
+
+
+The main tables were converted to three-line format (top rule, header rule,
+bottom rule; no vertical rules) in both the PDF and the DOCX. The read-through
+added a probe-to-section roadmap at the end of 2.1, split the dense 3.2
+paragraph into digits and CIFAR parts, removed two duplicate table follow-ups,
+and added a transition into 3.5.

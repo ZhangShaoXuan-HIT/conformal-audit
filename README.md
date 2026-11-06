@@ -133,7 +133,7 @@ python code/build_jas_an.py
 python code/build_an_supplement.py
 ```
 
-Outputs `paper/jas_an/main_an.pdf` (13 pages, about 3740 words of prose, 4 tables and 4 figures embedded at first reference),
+Outputs `paper/jas_an/main_an.pdf` (13 pages, about 3740 words of prose, 4 three-line tables and 4 figures embedded at first reference),
 `main_an.docx`, `supplement_an.pdf` (9 pages) and `cover_letter.md`. The full
 tables, two-axis map, complete grid, per-corruption results and reporting
 checklist are in the supplement. The prose was revised to remove AI-style

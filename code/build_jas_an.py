@@ -6,6 +6,9 @@ import subprocess
 from pathlib import Path
 
 import pypandoc
+from docx import Document
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 
 ROOT = Path(__file__).resolve().parent.parent
 PAPER = ROOT / "paper"
@@ -107,12 +110,13 @@ body { font-family: "Times New Roman", "Liberation Serif", serif; font-size: 11.
 h1 { font-size: 17pt; text-align: center; margin: 0 0 6pt; line-height: 1.2; }
 h2 { font-size: 13pt; text-align: left; font-weight: bold; margin: 16pt 0 6pt; page-break-after: avoid; }
 h3 { font-size: 12pt; margin: 12pt 0 4pt; page-break-after: avoid; }
+.keep { page-break-inside: avoid; }
 p { margin: 0 0 7pt; }
 .author { text-align: center; font-size: 11pt; margin: 0 0 14pt; }
 .author p { margin: 0; }
-table { width: 100%; border-collapse: collapse; font-size: 8pt; line-height: 1.2; table-layout: fixed; margin: 6pt 0 10pt; }
-th, td { border: 0.4pt solid #777; padding: 2pt 2.5pt; vertical-align: top; overflow-wrap: anywhere; word-break: break-word; }
-th { background: #efefef; }
+table { width: 100%; border-collapse: collapse; font-size: 8pt; line-height: 1.2; table-layout: fixed; margin: 6pt 0 10pt; border-top: 1.2pt solid #000; border-bottom: 1.2pt solid #000; }
+th, td { border: none; padding: 2pt 3pt; vertical-align: top; overflow-wrap: anywhere; word-break: break-word; }
+th { background: none; border-bottom: 0.7pt solid #000; font-weight: bold; }
 thead { display: table-header-group; }
 tr { page-break-inside: avoid; }
 figure { margin: 8pt 0 10pt; page-break-inside: avoid; text-align: center; }
@@ -141,6 +145,43 @@ docx_md = re.sub(r"!\[([^\]]*)\]\(\.\./figures/([^)]+)\)",
 (AN / "main_an_docx.md").write_text(docx_md, encoding="utf-8")
 pypandoc.convert_file(str(AN / "main_an_docx.md"), "docx", outputfile=str(AN / "main_an.docx"),
                       extra_args=["--resource-path=" + str(AN)])
+
+doc = Document(str(AN / "main_an.docx"))
+for table in doc.tables:
+    tblPr = table._tbl.tblPr
+    for old in tblPr.findall(qn("w:tblBorders")):
+        tblPr.remove(old)
+    borders = OxmlElement("w:tblBorders")
+    for edge, sz, val in [("top", 12, "single"), ("bottom", 12, "single"),
+                          ("left", 0, "none"), ("right", 0, "none"),
+                          ("insideH", 0, "none"), ("insideV", 0, "none")]:
+        el = OxmlElement("w:" + edge)
+        el.set(qn("w:val"), val)
+        el.set(qn("w:sz"), str(sz))
+        el.set(qn("w:space"), "0")
+        el.set(qn("w:color"), "000000")
+        borders.append(el)
+    tblPr.append(borders)
+    for ri, row in enumerate(table.rows):
+        for cell in row.cells:
+            tcPr = cell._tc.get_or_add_tcPr()
+            for shd in tcPr.findall(qn("w:shd")):
+                tcPr.remove(shd)
+            if ri == 0:
+                for old in tcPr.findall(qn("w:tcBorders")):
+                    tcPr.remove(old)
+                tcB = OxmlElement("w:tcBorders")
+                bottom = OxmlElement("w:bottom")
+                bottom.set(qn("w:val"), "single")
+                bottom.set(qn("w:sz"), "6")
+                bottom.set(qn("w:space"), "0")
+                bottom.set(qn("w:color"), "000000")
+                tcB.append(bottom)
+                tcPr.append(tcB)
+                for p in cell.paragraphs:
+                    for r in p.runs:
+                        r.bold = True
+doc.save(str(AN / "main_an.docx"))
 print("wrote", AN / "main_an.pdf", (AN / "main_an.pdf").stat().st_size)
 print("wrote", AN / "main_an.docx", (AN / "main_an.docx").stat().st_size)
 print("body words", len(re.sub(r"[#*|]", " ", md.split("## References")[0]).split()))

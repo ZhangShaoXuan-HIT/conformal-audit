@@ -48,7 +48,7 @@ Figure 1 shows the pipeline and the three probes, which work with existing score
 
 ![Figure 1. The three stages (solid) and the reporting step (dashed), with the three places where the reported number can move.](../figures/fig1_pipeline.png)
 
-The dashed reporting step is where the three probes act; each probe holds the other two stages fixed.
+The dashed reporting step is where the three probes act; each probe holds the other two stages fixed. The probes are applied in Sections 3.1 to 3.3, and Section 3.4 turns the empty-set identity into the cost rule.
 
 
 
@@ -72,9 +72,9 @@ For each cell we record coverage, mean set size, the raw empty rate, the share o
 
 ### 3.1 Threshold calibration
 
-On digits with 44 training points, the raw 0.90 threshold returns an empty set for 70.1 percent of the test points and covers 0.294; forcing the argmax lifts coverage to 0.833, which equals the model's accuracy. The maximum-probability rule reaches 0.668, while the true-class rule reaches 0.800 with no empty sets. At 898 training points the raw threshold covers 0.855 with 14.0 percent empty, the maximum-probability rule reaches 0.771, and the true-class rule reaches 0.901. With a calibration set of 449, the true-class rule and split conformal coincide at 0.919, and the pointwise comparison shows zero mismatches over 450 test points, five seeds and three strengths.
+On digits with 44 training points, the raw 0.90 threshold returns an empty set for 70.1 percent of the test points and covers 0.294; forcing the argmax lifts coverage to 0.833, which equals the model's accuracy. The maximum-probability rule reaches 0.668, while the true-class rule reaches 0.800 with no empty sets. At 898 training points the raw threshold covers 0.855 with 14.0 percent empty, the maximum-probability rule reaches 0.771, and the true-class rule reaches 0.901. With a calibration set of 449, the true-class rule and split conformal coincide at 0.919, and the pointwise comparison shows zero mismatches across the digits grid.
 
-On CIFAR-10 with 30,000 training images, the raw threshold returns an empty set for 24.4 percent of the test points even though the model is 85.5 percent accurate; coverage is 0.716, and forcing the argmax raises it to 0.855. The maximum-probability rule reaches 0.810 at a target of 0.90, and the true-class rule agrees with split conformal pointwise over 10,000 test points, five seeds and four strengths.
+On CIFAR-10 with 30,000 training images, the raw threshold returns an empty set for 24.4 percent of the test points even though the model is 85.5 percent accurate; coverage is 0.716, and forcing the argmax raises it to 0.855. The maximum-probability rule reaches 0.810 at a target of 0.90, and the true-class rule agrees with split conformal pointwise across the CIFAR grid.
 
 Table 1 sets the four rules side by side at two training sizes. The gap between the raw and true-class columns is widest when the model is weak and narrows as training grows, while the maximum-probability column never closes it.
 
@@ -94,7 +94,7 @@ Table 1 sets the four rules side by side at two training sizes. The gap between 
 
 The true-class rule and split conformal are identical pointwise. The raw threshold is a singleton or empty; its coverage is accuracy on non-abstentions.
 
-The table isolates the source of the gap. A raw threshold at 0.90 is a fixed probability, and its coverage column is accuracy among the points it did not abstain on; the true-class column is the only one that matches split conformal at every training size.
+The table isolates the source of the gap: the raw column falls furthest below the target when the model is weak, and the maximum-probability column closes only part of the distance.
 
 Figure 2 recasts the same cells as a coverage-size plot. The raw threshold sits at the bottom left, the maximum-probability rule moves up but stays below the target, and the true-class rule lies on the diagonal.
 
@@ -108,7 +108,9 @@ The vertical distance from the target is the coverage cost of the wrong quantile
 
 ### 3.2 Empty-set post-processing
 
-Across the 540 digits cells, forcing raises coverage by 0.077 on average and by as much as 0.318. The mean gain is 0.041 for the naive score, 0.080 for randomized APS, 0.108 for deterministic APS and 0.078 for RAPS, a ranking that follows the empty rates: the naive score rarely leaves a set empty, while deterministic APS does so often. On CIFAR-10 the naive score produces no empty sets at any strength; randomized APS produces 1.0 to 3.7 percent empty sets and shifts coverage by 0.9 to 3.6 points, and deterministic APS produces 6.9 to 9.5 percent empty sets and shifts coverage by 6.8 to 9.5 points. The 5,000-image APS cell is the exception, since it is already conservative at 0.994 coverage and a mean size of 6.08, leaving the fallback with nothing to do.
+Across the 540 digits cells, forcing raises coverage by 0.077 on average and by as much as 0.318. The mean gain is 0.041 for the naive score, 0.080 for randomized APS, 0.108 for deterministic APS and 0.078 for RAPS, a ranking that follows the empty rates: the naive score rarely leaves a set empty, while deterministic APS does so often.
+
+On CIFAR-10 the naive score produces no empty sets at any strength; randomized APS produces 1.0 to 3.7 percent empty sets and shifts coverage by 0.9 to 3.6 points, and deterministic APS produces 6.9 to 9.5 percent empty sets and shifts coverage by 6.8 to 9.5 points. The 5,000-image APS cell is the exception, since it is already conservative at 0.994 coverage and a mean size of 6.08, leaving the fallback with nothing to do.
 
 The accounting identity explains the pattern: the gain equals the empty rate multiplied by the conditional accuracy of the argmax on empty sets. That accuracy is high, between 0.94 and 0.99, because the model is usually correct even when the set is empty, so the empty rate governs the size of the effect. On covertype the mean empty rate is 0.3 percent and the gain is 0.0 to 0.4 points, which makes the same post-processing nearly invisible.
 
@@ -163,7 +165,7 @@ Table 3 sets the three updates side by side. The incorrect variant buys 3.3 poin
 
 The incorrect update reports more coverage at a larger size and a larger near-trivial share. The correct update also falls short of 0.90.
 
-The table makes the trade-off explicit. The extra coverage in the incorrect row comes with a larger set and a larger near-trivial share, and the final level sits at the lower clip; the correct row misses the target, but its level stays away from the clip. Three of the eight implementations (MAPIE, TorchCP and AdaptiveConformal) use the correct fixed-target update; the others do not implement ACI. The correct rule also misses 0.90 on these streams; the shortfall follows from finite-time behaviour and limited calibration support.
+The table adds the levels. In the incorrect row the final level sits at the lower clip; in the correct row it stays away from the clip, even though that row misses the target. Three of the eight implementations (MAPIE, TorchCP and AdaptiveConformal) use the correct fixed-target update; the others do not implement ACI. The correct rule also misses 0.90 on these streams; the shortfall follows from finite-time behaviour and limited calibration support.
 
 
 
@@ -171,10 +173,9 @@ The table makes the trade-off explicit. The extra coverage in the incorrect row 
 
 ### 3.4 The cost rule
 
-The audit also yields the quantity a deployment needs: on digits the mean a_E is 0.99, so the cost threshold c_a / c_e is 0.01; on CIFAR-10 it lies between 0.96 and 0.99, giving a threshold of 0.01 to 0.04; on covertype it is 0.94, giving 0.06. Forcing is preferable to abstaining unless abstaining costs less than one to six percent of an error. The defaults are therefore rational for most deployments, although the decision is usually made silently, and the reported coverage no longer estimates the nominal level once the fallback is active.
+Table 4 reduces the cost calculation to a single ratio. The audit also yields the quantity a deployment needs: on digits the mean a_E is 0.99, so the cost threshold c_a / c_e is 0.01; on CIFAR-10 it lies between 0.96 and 0.99, giving a threshold of 0.01 to 0.04; on covertype it is 0.94, giving 0.06. Forcing is preferable to abstaining unless abstaining costs less than one to six percent of an error. The defaults are therefore rational for most deployments, although the decision is usually made silently, and the reported coverage no longer estimates the nominal level once the fallback is active.
 
-Table 4 reduces the cost calculation to a single ratio. The mean a_E is 0.99 on digits, 0.96 to 0.99 on CIFAR-10 and 0.94 on covertype, so the threshold c_a / c_e lies between 0.01 and 0.06.
-
+::: {.keep}
 ### Table 4. Cost rule
 
 | dataset | mean a_E | threshold c_a / c_e |
@@ -184,8 +185,9 @@ Table 4 reduces the cost calculation to a single ratio. The mean a_E is 0.99 on 
 | covertype | 0.94 | 0.06 |
 
 Forcing is better than abstaining when c_a / c_e exceeds 1 - a_E. The threshold is small in every dataset; the empty rate determines the exposure.
+:::
 
-The table condenses the decision into one ratio. The per-point proxy, which uses the maximum probability for a_E, coincides with uniform forcing at or above 0.05 on all three datasets, so it adds nothing to the population rule.
+The per-point proxy, which uses the maximum probability for a_E, coincides with uniform forcing at or above 0.05 on all three datasets, so it adds nothing to the population rule.
 
 Figure 4 returns to the update results and shows the trajectories behind Table 3. The correct rule recovers after each block; the incorrect rule drifts upward and never returns.
 
@@ -197,7 +199,7 @@ The divergence persists across blocks and reflects the fixed point of the varian
 
 ### 3.5 Simulation and the boundary
 
-The 1,260 image cells form the simulation component: the data are held fixed while score, target level, calibration size and model strength vary. The effect does not track model strength in a simple way, since a stronger model can have a higher empty rate when the score is more likely to cross the threshold on every label. Across the grid, the ranking of scores follows the ranking of empty rates, and the forced evaluation can reverse the ranking of two methods that differ only in their post-processing.
+The three probes draw on the same grid. Read as a whole, the 1,260 image cells form the simulation component: the data are held fixed while score, target level, calibration size and model strength vary. The effect does not track model strength in a simple way, since a stronger model can have a higher empty rate when the score is more likely to cross the threshold on every label. Across the grid, the ranking of scores follows the ranking of empty rates, and the forced evaluation can reverse the ranking of two methods that differ only in their post-processing.
 
 The covertype replication marks the boundary: at alpha = 0.10 the empty rate is 0.0 to 0.4 percent and the forcing gain is 0.0 to 0.4 points, so the identity still holds but has almost nothing to multiply. This is the behaviour the protocol predicts: a large gain on images and a near-zero gain on a well-calibrated tabular model are consistent with each other, and together they locate the exposure.
 
