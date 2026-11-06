@@ -48,8 +48,7 @@ refs/bib.json (69-entry pool, 26 cited in prose).
   (results/mapie_empty.json, Table 8).
 - ACI, digits linear: static 0.666; fixed 0.836 / size 3.44; buggy 0.869 / size
   4.58; near-trivial 10.8 to 24.4 percent (Table 4).
-- ACI, CIFAR: static 0.272; fixed 0.677 / size 5.13; buggy 0.801 / size 6.39;
-  near-trivial 4.6 to 12.9 percent (Table 7).
+- ACI, CIFAR-10-C style: static 0.451; fixed 0.828 / size 4.93; buggy 0.936 / size 6.97; near-trivial 14.5 to 38.0 percent (Table 7).
 - ACI divergence: two of five seeds above 0.69, one at 0.998; coverage 0.436 and
   0.162; seed SD 0.205 vs 0.046 (results/aci_digits.json).
 
@@ -105,3 +104,17 @@ Preprints are marked in the list. The remaining list-level issues are:
    submission build.
 4. The citation keys in the manuscript are still [@key] placeholders. They must be
    converted to the target journal's numeric or author-year style.
+
+
+## Update: CIFAR-10-C style drift (2026-11-06)
+
+The synthetic Gaussian ramp for CIFAR-10 was replaced by five corruption types
+(gaussian_noise, defocus_blur, contrast, brightness, jpeg_compression), three
+severities each, 1,000 images per block, 3,000 points per stream, three seeds.
+Generated with imagecorruptions 1.1.2 on the local CIFAR-10 images.
+
+Static calibration covers 0.451. The correct update covers 0.828 with a mean set
+size of 4.93. The incorrect update covers 0.936 with a mean set size of 6.97. The
+near-trivial share rises from 14.5 to 38.0 percent. The qualitative conclusion is
+unchanged, and the external validity is stronger because the drift is a standard
+corruption family rather than a one-dimensional Gaussian ramp.

@@ -70,8 +70,7 @@ after each observation. The published recursion uses a fixed target, and a commo
 implementation replaces it with the current level. The replacement removes the
 restoring force toward the nominal level, and the wrong rule can report a higher
 coverage by driving the level to the lower clip and inflating the sets. On
-CIFAR-10 the wrong rule reports 12.4 more points of coverage than the correct one,
-at a 25 percent larger mean set size. The correct rule is not a cure-all. On the
+CIFAR-10 the wrong rule reports 10.8 more points of coverage than the correct one, at a 41 percent larger mean set size. The correct rule is not a cure-all. On the
 streams we tested it also falls short of the target, for reasons that the current
 theory does not separate.
 
