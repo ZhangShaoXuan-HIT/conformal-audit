@@ -191,10 +191,13 @@ def fig_regime():
               if abs(r["alpha"] - 0.10) < 1e-9 and r["n_cal"] == 449]
     cifar = [r for r in load("postprocess_cifar.json")["rows"]
              if abs(r["alpha"] - 0.10) < 1e-9 and r["n_cal"] == 500]
+    covertype = [r for r in load("tabular.json")["rows"]
+                 if abs(r["alpha"] - 0.10) < 1e-9]
     scores = ["naive", "aps_rand"]
     fig, axes = plt.subplots(1, 2, figsize=(9.2, 3.7))
     datasets = [("digits", digits, "-", "o", "digits (n_cal = 449)"),
-                ("cifar10", cifar, "--", "^", "CIFAR-10 (n_cal = 500)")]
+                ("cifar10", cifar, "--", "^", "CIFAR-10 (n_cal = 500)"),
+                ("covertype", covertype, ":", "s", "covertype (n_cal = 20,000)")]
     for name, rows, ls, marker, label in datasets:
         summ = _regime_summary(rows)
         for score in scores:
@@ -218,8 +221,8 @@ def fig_regime():
                           label=SCORE_LABEL[s], markersize=5) for s in scores]
     handles += [plt.Line2D([], [], marker=mk, linestyle=ls, color="#666666",
                            label=label, markersize=5) for _, _, ls, mk, label in datasets]
-    fig.legend(handles=handles, fontsize=7, ncol=4, loc="lower center", bbox_to_anchor=(0.5, -0.02), frameon=False)
-    fig.tight_layout(rect=(0, 0.07, 1, 1))
+    fig.legend(handles=handles, fontsize=7, ncol=3, loc="lower center", bbox_to_anchor=(0.5, 0.01), frameon=False)
+    fig.tight_layout(rect=(0, 0.18, 1, 1))
     for ext in ("png", "pdf"):
         fig.savefig(os.path.join(OUT, "fig5_regime." + ext), bbox_inches="tight")
     plt.close(fig)

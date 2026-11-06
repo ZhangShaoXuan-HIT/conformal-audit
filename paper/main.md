@@ -9,7 +9,8 @@ Across two image datasets, a tabular benchmark, and a range of model strengths, 
 threshold is not a coverage method, a threshold calibrated on the true-class
 probability is exactly split conformal, and forcing the argmax into empty sets
 raises the reported coverage by up to 9.7 points at α = 0.10 on the image
-benchmarks. The common α_t update is not ACI and reports higher coverage by
+benchmarks. On a tabular benchmark the same mechanism is near zero, as the
+empty-rate diagnostic predicts. The common α_t update is not ACI and reports higher coverage by
 inflating sets. The audit of six libraries
 shows that the empty-set policy varies, that one widely used default over-covers
 by 4.6 points, and that three ACI implementations use the correct fixed-target
@@ -804,8 +805,9 @@ Table 11 repeats the audit on covertype. At alpha = 0.10 the empty rate is 0.0 t
 0.4 percent, and the forcing change is 0.0 to 0.4 points. The identity holds; the
 magnitude is governed by the empty rate. The trap is a regime effect, not a
 universal constant: on a well-calibrated tabular model with seven classes, the
-same post-processing is nearly invisible. This is the correct reading of the
-audit. The empty rate is the diagnostic, and it travels across datasets.
+same post-processing is nearly invisible. The near-zero change is what the identity predicts when the empty rate is near
+zero; it is a confirmation, not a null result. The empty rate is the diagnostic,
+and it travels across datasets.
 
 ### 5.4 Audit C: the update rule
 
@@ -830,11 +832,14 @@ looks at the coverage cannot answer either question.
 
 ### 5.5 The regime map
 
-The 1,260 cells of audit B are the raw material for a different view. Figure 5
+The 1,260 image cells of audit B, plus the covertype replication, are the raw material
+for a different view. Figure 5
 plots the raw empty rate and the coverage gain against the test accuracy, at
-α = 0.10 and a calibration size of 449 for digits and 500 for CIFAR-10. Each point
-is a model strength, averaged over seeds. The figure compares the naive score and
-the randomized APS.
+α = 0.10 and a calibration size of 449 for digits, 500 for CIFAR-10, and 20,000
+for covertype. Each point is a model strength, averaged over seeds. The figure
+compares the naive score and the randomized APS. Covertype sits near the origin:
+the empty rate is 0.0 to 0.4 percent, so the change is 0.0 to 0.4 points. The third
+dataset is the low end of the diagnostic, not a counterexample to it.
 
 The view is not a model-strength story. On digits the empty rate rises with
 accuracy, from 0 to 7.8 percent for the naive score and from 3.4 to 7.0 percent for
@@ -967,6 +972,32 @@ contribution is to make the decision measurable. The empty rate, the conditional
 accuracy, and the coverage and size costs are the quantities the decision needs.
 The checklist reports them. The rule uses them.
 
+### 6.2 A cost-sensitive reading
+
+Table 12 applies the rule to the cells of audit B. For each cell with a non-zero
+empty rate, a_E is estimated as the coverage gain divided by the empty rate, and
+the threshold is 1 - a_E. The estimate is high in every dataset, between 0.94 and
+0.99. The threshold is therefore small, between 0.01 and 0.06. Forcing is better
+than abstaining unless abstention costs less than one to six percent of an error.
+
+This explains why the non-empty defaults are popular. They are not a mistake in
+every deployment. When the inserted label is right on most empty sets, forcing is
+the better bet, and the default saves the deployment from an arbitrary abstention.
+The problem is not that the bet is always wrong. The problem is that the bet is
+made silently: the default changes the guarantee, and the reported coverage no
+longer estimates the nominal level.
+
+The empty rate determines the stakes. On digits, 6 to 9 percent of the points are
+affected, so the choice moves the reported coverage by several points. On
+covertype, 0.3 percent are affected, so the same choice moves it by less than half
+a point. The threshold is small in every dataset; the exposure is not.
+
+The practical recommendation is therefore narrower than "never force". It is:
+report the empty rate, report the conditional accuracy, and make the decision
+explicit. A deployment that prefers a non-empty output can force, and the cost
+analysis may justify it. A deployment that values abstention should not inherit
+that choice from a default.
+
 A paper that reports these six quantities can be checked. A paper that reports
 only coverage cannot. The checklist is not a substitute for the theory. It is a
 condition for the theory to be visible in the reported number.
@@ -1064,6 +1095,7 @@ supplementary material.
 | T9 | coverage against four surveys | paper/tables/table9_coverage.md |
 | T10 | experimental grid | paper/tables/table10_grid.md |
 | T11 | covertype audit B | paper/tables/table11_tabular.md |
+| T12 | cost-sensitive reading | paper/tables/table12_cost.md |
 | F1 | pipeline and the three trap locations | paper/figures/fig1_pipeline |
 | F2 | coverage and size versus threshold | paper/figures/fig2_equivalence |
 | F3 | delta coverage versus raw empty rate | paper/figures/fig3_forcing |

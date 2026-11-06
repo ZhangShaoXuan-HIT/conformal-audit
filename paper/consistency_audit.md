@@ -139,7 +139,7 @@ The paper is 11,300 words, 37 references, 11 tables and 5 figures.
 
 ## Re-audit after CIFAR-C and covertype (2026-11-06)
 
-Checks: 11,350 words; Tables 1-11 all referenced and present; Figures 1-5 all
+Checks: 11,683 words; Tables 1-11 all referenced and present; Figures 1-5 all
 referenced and present; 28 citation keys in prose, all in the bibliography; 37
 entries in the reference list (28 prose plus 3 map-only keys plus 6 software).
 Stale CIFAR numbers (0.272, 0.677, 0.801, 12.4, 25 percent, 12.9) are gone.
@@ -159,3 +159,22 @@ Fixes made in this pass:
 Remaining, not content errors: the Data and Code URL is a placeholder; the working
 notes after the final --- are not part of the paper; the [@key] citations still need
 conversion to the target journal's style.
+
+
+## Update: 6.2, Table 12, Figure 5 (2026-11-06)
+
+Added 6.2, a cost-sensitive reading of the fallback, and Table 12. At alpha =
+0.10, over cells with a non-zero empty rate, a_E is estimated as delta / empty
+rate. The estimate is 0.94 to 0.99 in every dataset, so the threshold c_a / c_e
+is 0.01 to 0.06. The empty rate is 0.003 on covertype and 0.060 to 0.093 on
+digits. The rule is the same; the exposure is not.
+
+This changes the paper's tone in a useful way: the non-empty defaults are not
+simply wrong, they are rational for most cost ratios. The problem is that the
+decision is made silently and changes the guarantee.
+
+Figure 5 now includes covertype as the near-origin points. The legend was fixed
+to avoid clipping. The abstract, 5.3 and 5.5 reframe the covertype result as a
+confirmation of the empty-rate diagnostic, not as a null result.
+
+The paper is 11,683 words, 12 tables and 5 figures.
