@@ -901,6 +901,54 @@ coverage is k/(n + 1) with continuous scores, and the calibration-conditional
 coverage is a random variable. A group-conditional claim is only as good as the
 group definition, and class-conditional coverage is not pointwise coverage.
 
+### 6.1 When to force the argmax
+
+The checklist says to report both numbers. It does not say which one to use. The
+choice is a decision under uncertainty, and it can be stated in one line.
+
+Let c_a be the loss of abstaining on an empty set, and c_e the loss of a wrong
+answer. A correct answer has loss zero. If the set is empty and the procedure
+abstains, the loss is c_a. If it forces the argmax, the answer is correct with
+probability a_E, where a_E is the conditional accuracy of the argmax on the empty
+sets, and wrong with probability 1 - a_E. The expected loss of forcing is
+c_e (1 - a_E). Forcing is better than abstaining exactly when
+
+c_e (1 - a_E) < c_a.
+
+The rule is a threshold on the ratio c_a/c_e. If abstaining costs as much as an
+error, any positive a_E makes forcing worthwhile. If abstaining is free, forcing
+is never worthwhile. If abstaining costs half an error, forcing is worthwhile
+when a_E > 0.5. The audit does not choose the ratio. The deployment does.
+
+The audit does supply a_E. The accounting identity of Section 4.2 gives
+Δ = empty rate × a_E, so a_E is the ratio of the coverage gain to the empty rate.
+A deployment that runs the audit on its own calibration and test data can estimate
+a_E, plug in its costs, and decide. The six numbers of the checklist are the
+inputs to the rule.
+
+The library defaults are uniform versions of the rule. MAPIE's
+include_last_label=True and puncc's rand=False always force. They are optimal for
+a deployment whose c_a is high relative to c_e (1 - a_E), and suboptimal for a
+deployment that values abstention. The library cannot know the ratio. This is why
+the default should be the exact rule, which carries the guarantee, and the
+non-empty rule should be an explicit option. coverforest exposes the option with
+allow_empty_sets. MAPIE and puncc expose it through include_last_label and rand,
+but their defaults choose the non-empty side. A default is a decision, and a
+statistical library is not the place to make a deployment's decision.
+
+The rule can also be applied per point, with the model's maximum probability as a
+proxy for a_E. That version is a heuristic, not a guarantee. The conformal
+construction does not give the conditional accuracy of the argmax on empty sets,
+and the model's probability is not that quantity. The average rule is the one the
+audit supports. The per-point rule is a reasonable engineering choice, and it
+should be labelled as one.
+
+The conclusion is not that the fallback is wrong. It is that the fallback is a
+decision, and the decision should be made with the costs in view. The audit's
+contribution is to make the decision measurable. The empty rate, the conditional
+accuracy, and the coverage and size costs are the quantities the decision needs.
+The checklist reports them. The rule uses them.
+
 A paper that reports these six quantities can be checked. A paper that reports
 only coverage cannot. The checklist is not a substitute for the theory. It is a
 condition for the theory to be visible in the reported number.
