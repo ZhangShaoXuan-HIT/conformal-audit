@@ -1,29 +1,142 @@
 # What Does Conformal Prediction Add?
 ## A Controlled Audit of Calibrated Set-Valued Classification
 
-**Status**: phase 0. Skeleton and first experiment only. No prose yet.
-**Core claim**: 共形预测增加的是有限样本覆盖保证，不是准确率，也不是集合构造本身。
+**Abstract.** A conformal predictor comes with a finite-sample coverage
+guarantee. The number a pipeline reports does not. We audit three choices that sit
+between the guarantee and the reported number: the calibration of the threshold,
+the treatment of empty sets, and the update rule of adaptive conformal inference.
+On two datasets and across a range of model strengths, a fixed probability
+threshold is not a coverage method, a threshold calibrated on the true-class
+probability is exactly split conformal, forcing the argmax into empty sets raises
+the reported coverage by up to 9.5 points, and the common α_t update is not
+ACI and reports higher coverage by inflating sets. The audit of six libraries
+shows that the empty-set policy varies, that one widely used default over-covers
+by 4.6 points, and that three ACI implementations use the correct fixed-target
+update. We organise the field by guarantee and assumption rather than by
+chronology, and we give a six-item checklist. The guarantee constrains the
+procedure, not the number that the pipeline prints.
+
+**Keywords.** conformal prediction; coverage; calibration; post-processing;
+adaptive conformal inference; implementation audit.
 
 ---
 
-## 1. Introduction (800 words)
+## 1. Introduction
 
-A practitioner sets a 0.90 coverage target, thresholds the softmax at 0.90, and
-reports the model's accuracy. The number looks like a coverage guarantee and is
-not one. Three different mistakes produce this outcome, and all three are common
-in released code.
+### 1.1 A number and a guarantee
 
-### Positioning against the closest work
+A practitioner sets a 0.90 coverage target. The simplest way to meet it is to
+threshold the softmax at 0.90, keep the labels above the threshold, and report the
+fraction of test points on which the true label is in the set. The reported number
+is usually close to the model's accuracy, and it is often presented as evidence
+that the model is calibrated. It is not. The threshold is a fixed probability, not
+a calibrated quantile, and the set it produces is a singleton or empty. The number
+is a property of the threshold rule, not of the guarantee.
 
-<!-- phase 3A. Do not claim the threshold geometry as new.
-- Aguru 2026 (Zenodo, binary): proves threshold >= 1/2 implies singleton or empty.
-  Cite it; start from the multi-class corollary and the empirical consequences.
-- Mehrtens et al. 2025 (arXiv 2506.18162): pitfalls in medical imaging, different set.
-- Gauthier, Bach & Jordan 2025 (arXiv 2510.04318): empty sets as a low-coverage outcome.
-- Al Bataineh 2026 (IEEE Sensors Letters): empty sets as a drift alarm.
-- Susmann, Chambaz & Josse 2023 (arXiv 2312.00448): AdaptiveConformal R package.
-- Avoid the word "pitfalls" in the title and abstract; use "audit" or "accounting".
--->
+The conformal alternative replaces the fixed threshold with a quantile of the
+calibration scores. The resulting set satisfies a finite-sample coverage guarantee
+under exchangeability [@Vovk2005; @Angelopoulos2021intro]. The guarantee is real,
+and it is the reason the method is worth using. The guarantee is also a statement
+about the procedure, not about the number a particular pipeline prints. Between
+the procedure and the number sit at least three choices: how the threshold is
+calibrated, what the implementation does with an empty set, and how an adaptive
+method updates its target. Each choice can move the reported coverage without
+changing the guarantee. This paper is about those three choices.
+
+### 1.2 Three places where the number moves
+
+The first is the threshold. A fixed probability threshold is not a coverage
+method. It returns a singleton for the labels above the threshold and an empty set
+for the rest, and its coverage is the model's accuracy on the points it does not
+abstain on. The correct calibration is a threshold on the true-class probability,
+and that threshold is exactly split conformal with the naive score. The identity
+is one line, and it is known [@Aguru2026]. We do not claim it. We measure what
+follows from using the wrong threshold. On CIFAR-10, a raw 0.90 threshold returns
+an empty set for 24.4 percent of the test points even when the model is 85.5
+percent accurate, and a threshold calibrated on the maximum probability still
+falls short of the target.
+
+The second is the empty set. A conformal set can be empty, and many
+implementations insert the argmax so that the output is never empty. The insertion
+is a post-processing rule, and it changes the reported coverage by the empty rate
+times the conditional accuracy of the argmax on the empty sets. On CIFAR-10 the
+change reaches 9.5 points. On digits it reaches 8.4. The effect is not a property
+of the score. It is a property of the interaction between the score and the
+post-processing, and it can turn a method that is on target into one that
+over-covers by several points.
+
+The third is the update rule. Adaptive conformal inference moves the target level
+after each observation. The published recursion uses a fixed target, and a common
+implementation replaces it with the current level. The replacement removes the
+restoring force toward the nominal level, and the wrong rule can report a higher
+coverage by driving the level to the lower clip and inflating the sets. On
+CIFAR-10 the wrong rule reports 12.4 more points of coverage than the correct one,
+at a 25 percent larger mean set size. The correct rule is not a cure-all. On the
+streams we tested it also falls short of the target, for reasons that the current
+theory does not separate.
+
+The three choices are not independent. The first decides whether a comparison is
+between two rules or between two calibrations. The second decides whether a
+comparison is between two scores or between two post-processing rules. The third
+decides whether an adaptive method is adapting or inflating. A paper that ignores
+all three can report a number that is internally consistent and externally
+meaningless.
+
+### 1.3 What this paper does
+
+We audit the three choices on two datasets. The digits benchmark is small enough
+to check by hand. CIFAR-10 is large enough that the coverage estimates are tight.
+We vary the score, the target level, the calibration size, and the model strength,
+and we evaluate every cell twice, once with the empty sets kept and once with the
+argmax forced. The grid has 1,260 cells. We also audit six libraries, all at the source level and one at runtime, and we compare their empty-set policies and their
+update rules.
+
+The audit is organised by a two-axis map. The rows are the guarantee a method
+pursues: marginal coverage, group-conditional coverage, pointwise conditional
+coverage, and risk control. The columns are the assumption it is willing to make:
+exchangeability, covariate shift, non-exchangeability, and known groups. The map
+replaces the chronology that a survey usually imposes, and its empty cells are the
+open problems of Section 7.
+
+### 1.4 Contributions and positioning
+
+The paper makes four contributions. First, the map, which makes the assumptions
+explicit and the costs comparable. Second, the audit, which measures the three
+choices on two datasets and separates the raw from the forced evaluation. Third,
+the library policy map, which shows that the empty-set policy varies, that one
+widely used default over-covers by 4.6 points, and that three ACI implementations
+use the correct fixed-target update. Fourth, a six-item checklist for
+practitioners.
+
+Four surveys are close enough to require positioning. Angelopoulos and Bates
+[@Angelopoulos2021intro] is a tutorial. It builds the reader's intuition for the
+split construction and covers the pre-2022 literature. Fontana et al.
+[@Fontana2023] is a unified review of the theory. Campos et al. [@Campos2024]
+organises the NLP literature by task, and Zhou et al. [@Zhou2025] organises the
+field by data modality. None of them audits the implementation choices that this
+paper measures. The closest 2025-2026 work is narrower. Aguru [@Aguru2026] proves
+the binary threshold geometry that our first audit uses. Mehrtens et al.
+[@Mehrtens2025] document a different set of pitfalls in medical imaging. Gauthier
+et al. [@Gauthier2025] treat empty sets as a low-coverage outcome. Al Bataineh
+[@Bataineh2026] uses empty sets as a drift alarm. Boman [@Boman2026] benchmarks
+score functions without measuring the post-processing. The audit complements these
+papers rather than repeating them.
+
+### 1.5 Scope
+
+The paper is an audit, not a benchmark. The datasets are two, the models are
+linear heads, and the drift is synthetic and one-dimensional. The claims are about
+mechanisms, not about the magnitudes that a deployment should expect. The
+bibliography is a curated set of 69 references, not a systematic census. The empty
+cells of the map mean "no method in the reviewed set," not "no method can exist."
+A reader who wants a positive result about adaptive inference will not find it
+here. A reader who wants to know how the reported number can move without the
+guarantee moving will.
+
+The rest of the paper is organised as follows. Section 2 states the guarantee and
+the finite-sample correction. Section 3 introduces the map. Section 4 audits the
+three choices and the libraries. Section 5 describes the experiments. Section 6
+gives the checklist. Section 7 states the open problems.
 
 ## 2. The guarantee in one page
 
