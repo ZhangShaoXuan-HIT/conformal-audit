@@ -1,0 +1,20 @@
+@page { size: A4; margin: 25mm; }
+a { color: inherit; text-decoration: none; }
+body { font-family: "Times New Roman", "Liberation Serif", serif; font-size: 12pt; line-height: 1.55; text-align: left; color: #111; }
+h1 { font-size: 18pt; text-align: center; margin: 0 0 4pt; line-height: 1.2; }
+h2 { font-size: 14pt; text-align: center; font-weight: normal; margin: 0 0 14pt; page-break-after: avoid; }
+h2:not(:first-of-type) { text-align: left; font-weight: bold; margin: 18pt 0 6pt; }
+h3 { font-size: 12pt; margin: 12pt 0 4pt; page-break-after: avoid; }
+h4 { font-size: 11pt; margin: 10pt 0 3pt; page-break-after: avoid; }
+p { margin: 0 0 8pt; }
+.author { text-align: center; font-size: 11pt; margin: 0 0 16pt; }
+.author p { margin: 0; }
+table { width: 100%; border-collapse: collapse; font-size: 8pt; line-height: 1.2; table-layout: fixed; margin: 6pt 0 12pt; }
+th, td { border: 0.4pt solid #777; padding: 2pt 2.5pt; vertical-align: top; overflow-wrap: anywhere; word-break: break-word; }
+th { background: #efefef; }
+thead { display: table-header-group; }
+tr { page-break-inside: avoid; }
+figure { margin: 10pt 0 14pt; page-break-inside: avoid; text-align: center; }
+figure img { width: 100% !important; max-width: 100% !important; height: auto; }
+figcaption { font-size: 10pt; text-align: left; margin-top: 3pt; }
+h2#tables, h2#figures, h2#references { page-break-before: always; }

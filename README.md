@@ -111,6 +111,19 @@ placeholders are inserted, and Tables 1-12 and Figures 1-5 are appended. It uses
 `pypandoc-binary` (Pandoc 3.9) and Microsoft Edge headless; the current script
 hard-codes the Windows Edge path, so another OS needs a different browser path.
 
+## Journal of Applied Statistics package
+
+```bash
+python code/build_jas.py
+```
+
+This builds `paper/jas/main_jas.pdf` (manuscript, author-date references,
+186-word abstract) and `paper/jas/supplement_jas.pdf` (Tables S1-S3), plus
+`paper/jas/cover_letter.md`. The package uses Harvard/APA author-date citations,
+12 pt Times at 1.55 spacing, and 8 pt tables. T&F's author-instructions page was
+not accessible at build time; verify the journal's exact reference style, page
+limit and spacing before submission.
+
 ## Design rules
 
 1. `build_sets` never forces non-empty sets; forcing is a separate

@@ -261,3 +261,16 @@ Author block added from ORCID 0009-0001-4103-6099: Shaoxuan Zhang, Faculty of
 Computing, Harbin Institute of Technology, Harbin, Heilongjiang, China. The
 ORCID is linked in the PDF; links are styled as plain text for print. The corresponding-author email is
 2023113033@stu.hit.edu.cn.
+
+
+## Update: Journal of Applied Statistics package (2026-11-06)
+
+code/build_jas.py builds paper/jas/main_jas.pdf (42 pages), supplement_jas.pdf
+(2 pages), and cover_letter.md. The package uses Harvard/APA author-date
+citations, a 186-word abstract, 12 pt Times at 1.55 spacing, Tables 2-8/11/12 in
+the main text, and Tables S1-S3 in the supplement.
+
+T&F's author instructions were not reachable (Cloudflare), so the exact JAS
+reference variant, spacing and page limit remain unverified. The manuscript is
+11,871 words; if JAS enforces a shorter limit, trim Sections 2.3-2.5, 3 and 7
+first.
