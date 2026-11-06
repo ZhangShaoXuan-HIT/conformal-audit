@@ -965,8 +965,8 @@ The rule can also be applied per point, with the model's maximum probability as 
 proxy for a_E. That version is a heuristic, not a guarantee. The conformal
 construction does not give the conditional accuracy of the argmax on empty sets,
 and the model's probability is not that quantity. The average rule is the one the
-audit supports. The per-point rule is a reasonable engineering choice, and it
-should be labelled as one.
+audit supports. The per-point rule is a heuristic, and on the three datasets we
+tested it did not improve on the average rule (Section 6.2).
 
 The conclusion is not that the fallback is wrong. It is that the fallback is a
 decision, and the decision should be made with the costs in view. The audit's
@@ -993,6 +993,13 @@ The empty rate determines the stakes. On digits, 6 to 9 percent of the points ar
 affected, so the choice moves the reported coverage by several points. On
 covertype, 0.3 percent are affected, so the same choice moves it by less than half
 a point. The threshold is small in every dataset; the exposure is not.
+
+We also tested the per-point version. On the same three datasets, at alpha = 0.10
+with deterministic APS, it coincides with uniform forcing above c_a/c_e = 0.05:
+the empty sets are high-confidence, so the proxy forces them all. The per-point
+rule does not improve on the population rule. The negative result is consistent
+with the high a_E. When the argmax is right on 94 to 99 percent of the empty sets,
+there is little for a per-point rule to select on.
 
 The practical recommendation is therefore narrower than "never force". It is:
 report the empty rate, report the conditional accuracy, and make the decision
