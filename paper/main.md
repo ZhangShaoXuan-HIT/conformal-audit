@@ -120,7 +120,8 @@ the binary threshold geometry that our first audit uses. Mehrtens et al.
 et al. [@Gauthier2025] treat empty sets as a low-coverage outcome. Al Bataineh
 [@Bataineh2026] uses empty sets as a drift alarm. Boman [@Boman2026] benchmarks
 score functions without measuring the post-processing. The audit complements these
-papers rather than repeating them.
+papers rather than repeating them. Preprints are marked in the reference list, and
+the software versions are listed there as well.
 
 ### 1.5 Scope
 
