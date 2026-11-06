@@ -139,7 +139,7 @@ The paper is 11,300 words, 37 references, 11 tables and 5 figures.
 
 ## Re-audit after CIFAR-C and covertype (2026-11-06)
 
-Checks: 11,683 words; Tables 1-11 all referenced and present; Figures 1-5 all
+Checks: 11,688 words; Tables 1-11 all referenced and present; Figures 1-5 all
 referenced and present; 28 citation keys in prose, all in the bibliography; 37
 entries in the reference list (28 prose plus 3 map-only keys plus 6 software).
 Stale CIFAR numbers (0.272, 0.677, 0.801, 12.4, 25 percent, 12.9) are gone.
@@ -177,4 +177,4 @@ Figure 5 now includes covertype as the near-origin points. The legend was fixed
 to avoid clipping. The abstract, 5.3 and 5.5 reframe the covertype result as a
 confirmation of the empty-rate diagnostic, not as a null result.
 
-The paper is 11,683 words, 12 tables and 5 figures.
+The paper is 11,688 words, 12 tables and 5 figures.
