@@ -126,5 +126,11 @@ python code/cifar_features.py
 
 ## Citation
 
-The paper is in preparation. The reference list is `paper/references.md`;
-author and venue information will be added at submission.
+The paper is in preparation. The code and results are at
+https://github.com/ZhangShaoXuan-HIT/conformal-audit. The reference list is
+`paper/references.md`; author and venue information will be added at submission.
+
+## License
+
+Code: MIT (see `LICENSE`). Manuscript text, tables and figures: CC BY 4.0
+(see `LICENSE-paper`).
