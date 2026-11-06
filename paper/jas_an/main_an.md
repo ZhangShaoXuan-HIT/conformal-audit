@@ -46,6 +46,10 @@ The update probe compares the published recursion alpha_{t+1} = alpha_t + gamma 
 
 Figure 1 shows the pipeline and the three probes, which work with existing scores and estimators; the protocol's contribution is to treat the implementation as the object of study and to decompose the reported number into the quantities that produce it.
 
+![Figure 1. The three stages (solid) and the reporting step (dashed), with the three places where the reported number can move.](../figures/fig1_pipeline.png)
+
+
+
 ### 2.2 Data and experimental grid
 
 Digits contains 1,797 images of 8 by 8 pixels in ten classes. A stratified split holds out 450 test points and 898 training points, with the calibration set drawn from the remaining 449; the model is a standardiser followed by multinomial logistic regression, and the training set is subsampled to 5, 25 and 100 percent (44, 224 and 898 points). CIFAR-10 contributes 50,000 training and 10,000 test images; a pretrained ResNet-18 supplies 512-dimensional features, a logistic-regression head is fitted on 100, 1,000, 5,000 or 30,000 images, and the calibration set is drawn from the remaining 20,000 at sizes 500, 2,000 and 10,000. Covertype is a 581,012-row, 54-feature, seven-class tabular dataset; we use a 120,000-row stratified subset, a logistic regression, training sizes of 6,000 and 60,000, a calibration set of 20,000 and a test set of 40,000.
@@ -72,6 +76,28 @@ On CIFAR-10 with 30,000 training images, the raw threshold returns an empty set 
 
 Table 1 collects the threshold results, and the pattern is consistent across datasets: a fixed probability threshold yields a set with no coverage guarantee, and the fraction it reports measures accuracy among the points on which the model does not abstain. A quantile of the maximum probability leaves the problem in place; only a quantile of the true-class probability reproduces the conformal set.
 
+### Table 1. Threshold calibration
+
+| dataset | training | rule | coverage | empty |
+|---|---|---|---|---|
+| digits | 44 | raw 0.90 | 0.294 | 0.701 |
+| digits | 44 | max-probability | 0.668 | 0.086 |
+| digits | 44 | true-class | 0.800 | 0.000 |
+| digits | 898 | raw 0.90 | 0.855 | 0.140 |
+| digits | 898 | max-probability | 0.771 | 0.008 |
+| digits | 898 | true-class | 0.901 | 0.000 |
+| CIFAR-10 | 30,000 | raw 0.90 | 0.716 | 0.244 |
+| CIFAR-10 | 30,000 | max-probability | 0.810 | 0.000 |
+| CIFAR-10 | 30,000 | true-class | 0.899 | 0.000 |
+
+The true-class rule and split conformal are identical pointwise. The raw threshold is a singleton or empty; its coverage is accuracy on non-abstentions.
+
+![Figure 2. Coverage and set size versus the threshold on digits.](../figures/fig2_equivalence.png)
+
+
+
+
+
 ### 3.2 Empty-set post-processing
 
 Across the 540 digits cells, forcing raises coverage by 0.077 on average and by as much as 0.318. The mean gain is 0.041 for the naive score, 0.080 for randomized APS, 0.108 for deterministic APS and 0.078 for RAPS, a ranking that follows the empty rates: the naive score rarely leaves a set empty, while deterministic APS does so often. On CIFAR-10 the naive score produces no empty sets at any strength; randomized APS produces 1.0 to 3.7 percent empty sets and shifts coverage by 0.9 to 3.6 points, and deterministic APS produces 6.9 to 9.5 percent empty sets and shifts coverage by 6.8 to 9.5 points. The 5,000-image APS cell is the exception, since it is already conservative at 0.994 coverage and a mean size of 6.08, leaving the fallback with nothing to do.
@@ -82,6 +108,26 @@ The library audit reproduces the mechanism in released code. MAPIE's APS default
 
 Table 2 summarises the library results: the empty-set policy changes reported coverage by several points when the empty rate is high and by almost nothing when it is low, so the empty rate itself is the quantity a deployment should report alongside coverage.
 
+### Table 2. Library behaviour
+
+| implementation | setting | coverage | empty | size |
+|---|---|---|---|---|
+| MAPIE | APS default | 0.9457 | 0.0000 | 3.68 |
+| MAPIE | APS randomized | 0.8998 | 0.0004 | 3.23 |
+| puncc | APS randomization off | 0.977 | 0.000 | 4.06 |
+| puncc | APS randomization on | 0.889 | 0.002 | 2.98 |
+| crepes | LAC | 0.895 | 0.000 | 2.87 |
+| nonconformist | ICP margin | 0.890 | 0.000 | 3.50 |
+| conformal | per-label thresholds | 0.890 | 0.000 | 3.02 |
+
+MAPIE rows are five seeds; the other rows are one seed on the common synthetic task. The LAC implementations of MAPIE, puncc and crepes agree at 0.895 and a size of 2.87.
+
+![Figure 3. Change in coverage versus the raw empty rate across the image cells.](../figures/fig3_forcing.png)
+
+
+
+
+
 ### 3.3 Adaptive conformal inference
 
 On digits, the static procedure covers 0.666 of the stream. The correct update at gamma = 0.02 covers 0.836 with a mean size of 3.44, while the incorrect update covers 0.869 with a mean size of 4.58. The extra 3.3 points of coverage come with a 33 percent increase in size and a rise in the near-trivial share from 10.8 to 24.4 percent. The final level is 0.0074 for the correct rule and 0.0011 for the incorrect one, at the lower clip. At gamma = 0.1, two of the five digits seeds drive the level above 0.69, one of them to 0.998, and coverage falls to 0.436 and 0.162.
@@ -90,11 +136,42 @@ On CIFAR-10 with five corruption types and three severities, the static procedur
 
 Table 3 collects the update results: the variant's higher coverage is bought with larger sets, and at the lower clip it reflects a level that has lost the fixed target. Three of the eight implementations (MAPIE, TorchCP and AdaptiveConformal) use the correct fixed-target update; the others do not implement ACI. The correct rule also misses 0.90 on these streams; the shortfall follows from finite-time behaviour and limited calibration support. The result is negative for ACI on these streams, and it identifies the mechanism behind the shortfall.
 
+### Table 3. ACI update
+
+| dataset | update | coverage | size | near-trivial | alpha final |
+|---|---|---|---|---|---|
+| digits | static | 0.666 | — | — | — |
+| digits | correct | 0.836 | 3.44 | 0.108 | 0.0074 |
+| digits | incorrect | 0.869 | 4.58 | 0.244 | 0.0011 |
+| CIFAR-10 | static | 0.451 | 1.30 | 0.000 | — |
+| CIFAR-10 | correct | 0.828 | 4.93 | 0.145 | 0.0106 |
+| CIFAR-10 | incorrect | 0.936 | 6.97 | 0.380 | 0.0019 |
+
+The incorrect update reports more coverage at a larger size and a larger near-trivial share. The correct update also falls short of 0.90.
+
+
+
+
+
 ### 3.4 The cost rule
 
 The audit also yields the quantity a deployment needs: on digits the mean a_E is 0.99, so the cost threshold c_a / c_e is 0.01; on CIFAR-10 it lies between 0.96 and 0.99, giving a threshold of 0.01 to 0.04; on covertype it is 0.94, giving 0.06. Forcing is preferable to abstaining unless abstaining costs less than one to six percent of an error. The defaults are therefore rational for most deployments, although the decision is usually made silently, and the reported coverage no longer estimates the nominal level once the fallback is active.
 
 Table 4 gives the threshold; a per-point version that uses the model's maximum probability as a proxy for a_E coincides with uniform forcing at or above c_a / c_e = 0.05 on all three datasets, so the proxy adds nothing to the population rule.
+
+### Table 4. Cost rule
+
+| dataset | mean a_E | threshold c_a / c_e |
+|---|---|---|
+| digits | 0.99 | 0.01 |
+| CIFAR-10 | 0.96 to 0.99 | 0.01 to 0.04 |
+| covertype | 0.94 | 0.06 |
+
+Forcing is better than abstaining when c_a / c_e exceeds 1 - a_E. The threshold is small in every dataset; the empty rate determines the exposure.
+
+![Figure 4. Coverage and level trajectories under drift on digits.](../figures/fig4_aci.png)
+
+
 
 ### 3.5 Simulation and the boundary
 
@@ -143,72 +220,3 @@ The supplementary file contains the full tables, the two-axis map, the complete 
 ## References
 
 <!-- REFERENCES -->
-
-## Tables
-
-### Table 1. Threshold calibration
-
-| dataset | training | rule | coverage | empty |
-|---|---|---|---|---|
-| digits | 44 | raw 0.90 | 0.294 | 0.701 |
-| digits | 44 | max-probability | 0.668 | 0.086 |
-| digits | 44 | true-class | 0.800 | 0.000 |
-| digits | 898 | raw 0.90 | 0.855 | 0.140 |
-| digits | 898 | max-probability | 0.771 | 0.008 |
-| digits | 898 | true-class | 0.901 | 0.000 |
-| CIFAR-10 | 30,000 | raw 0.90 | 0.716 | 0.244 |
-| CIFAR-10 | 30,000 | max-probability | 0.810 | 0.000 |
-| CIFAR-10 | 30,000 | true-class | 0.899 | 0.000 |
-
-The true-class rule and split conformal are identical pointwise. The raw threshold is a singleton or empty; its coverage is accuracy on non-abstentions.
-
-### Table 2. Library behaviour
-
-| implementation | setting | coverage | empty | size |
-|---|---|---|---|---|
-| MAPIE | APS default | 0.9457 | 0.0000 | 3.68 |
-| MAPIE | APS randomized | 0.8998 | 0.0004 | 3.23 |
-| puncc | APS randomization off | 0.977 | 0.000 | 4.06 |
-| puncc | APS randomization on | 0.889 | 0.002 | 2.98 |
-| crepes | LAC | 0.895 | 0.000 | 2.87 |
-| nonconformist | ICP margin | 0.890 | 0.000 | 3.50 |
-| conformal | per-label thresholds | 0.890 | 0.000 | 3.02 |
-
-MAPIE rows are five seeds; the other rows are one seed on the common synthetic task. The LAC implementations of MAPIE, puncc and crepes agree at 0.895 and a size of 2.87.
-
-### Table 3. ACI update
-
-| dataset | update | coverage | size | near-trivial | alpha final |
-|---|---|---|---|---|---|
-| digits | static | 0.666 | — | — | — |
-| digits | correct | 0.836 | 3.44 | 0.108 | 0.0074 |
-| digits | incorrect | 0.869 | 4.58 | 0.244 | 0.0011 |
-| CIFAR-10 | static | 0.451 | 1.30 | 0.000 | — |
-| CIFAR-10 | correct | 0.828 | 4.93 | 0.145 | 0.0106 |
-| CIFAR-10 | incorrect | 0.936 | 6.97 | 0.380 | 0.0019 |
-
-The incorrect update reports more coverage at a larger size and a larger near-trivial share. The correct update also falls short of 0.90.
-
-### Table 4. Cost rule
-
-| dataset | mean a_E | threshold c_a / c_e |
-|---|---|---|
-| digits | 0.99 | 0.01 |
-| CIFAR-10 | 0.96 to 0.99 | 0.01 to 0.04 |
-| covertype | 0.94 | 0.06 |
-
-Forcing is better than abstaining when c_a / c_e exceeds 1 - a_E. The threshold is small in every dataset; the empty rate determines the exposure.
-
-## Figures
-
-<!-- FIGURES -->
-
-## Figure captions
-
-**Figure 1.** The three stages (solid) and the reporting step (dashed), with the three places where the reported number can move.
-
-**Figure 2.** Coverage and set size versus the threshold on digits.
-
-**Figure 3.** Change in coverage versus the raw empty rate across the image cells.
-
-**Figure 4.** Coverage and level trajectories under drift on digits.
