@@ -89,7 +89,7 @@ python code/cifar_features.py
 | Tables 2-4, digits audits A/B/C | `code/make_tables.py` from `results/*.json` |
 | Tables 5-6, CIFAR audits A/B | `code/make_cifar_tables.py` |
 | Table 7, CIFAR-10-C style drift | `code/make_cifar_tables.py` from `results/aci_cifar_c.json` |
-| Table 8, library audit | source-policy columns curated from `_libs/src`; runtime rows from `results/library_runtime.json` |
+| Table 8, library audit | source-policy columns curated from the package versions listed; runtime rows from `results/library_runtime.json` |
 | Table 9, coverage matrix | conceptual; `paper/tables/table9_coverage.md` |
 | Table 10, experimental grid | design table; `paper/tables/table10_grid.md` |
 | Table 11, covertype audit | `code/make_tabular_table.py` from `results/tabular.json` |
@@ -118,9 +118,9 @@ python code/cifar_features.py
   official archive.
 - Seeds: five for audits A/B, three for the CIFAR-10-C stream, one for the
   library runtime. The paper states this in Section 5.
-- `data/` and `_libs/` are gitignored. The source snapshots in `_libs/src` were
-  downloaded for the Table 8 audit; the table records the versions and line
-  numbers.
+- `data/` and `_libs/` are not included. The source snapshots in `_libs/src` were
+  downloaded locally for the Table 8 audit; the table records the package
+  versions and line numbers, and the packages are public on PyPI/GitHub.
 - `legacy/` is the frozen earlier manuscript, kept for comparison and not part
   of the paper.
 

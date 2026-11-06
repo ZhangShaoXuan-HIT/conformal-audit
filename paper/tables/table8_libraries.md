@@ -1,6 +1,7 @@
 # Table 8. Library behavior audit
 
-Versions checked on 2026-11-06. Line numbers refer to the sources in _libs/src.
+Versions checked on 2026-11-06. Line numbers refer to the named files in the
+package versions listed; the source snapshots were downloaded locally for the audit.
 Runtime: MAPIE, puncc, crepes, nonconformist, and conformal. Source inspection:
 TorchCP, coverforest, and AdaptiveConformal.
 
