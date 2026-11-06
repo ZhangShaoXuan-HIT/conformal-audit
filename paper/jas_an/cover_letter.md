@@ -8,7 +8,7 @@ The data challenge is practical. A practitioner sets a 0.90 coverage target, thr
 
 The Approach is an audit protocol that uses existing conformal constructions as probes. It composes a threshold probe, an empty-set probe and an update probe with a coverage accounting identity and a cost rule. The protocol is not a new estimator; it is an innovative use of existing methods to answer a question that a standard application does not answer: whether the reported number estimates the nominal level.
 
-I apply the protocol to digits, CIFAR-10 and covertype, and to eight public implementations. The main text is 15 pages. The supplementary file contains the full tables, the two-axis map, the complete grid, the per-corruption results and a reporting checklist.
+I apply the protocol to digits, CIFAR-10 and covertype, and to eight public implementations. The main text is 15 pages. The supplementary file contains the full tables, the complete grid, the per-corruption results and a reporting checklist.
 
 The code and results are available at https://github.com/ZhangShaoXuan-HIT/conformal-audit and archived at https://doi.org/10.5281/zenodo.24001054. The manuscript is not under consideration elsewhere, and I am the sole author. The required declaration of generative AI use is included in the manuscript.
 

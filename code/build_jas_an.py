@@ -50,7 +50,7 @@ def ref(key):
     names = parse_names(v["authors"])
     parts = []
     for surname, initials in names:
-        parts.append(surname + (", " + " ".join(i + "." for i in initials) if initials else ""))
+        parts.append(surname + (", " + " ".join(i + "." for i in initials) if initials else "."))
     if len(parts) == 1:
         authors = parts[0]
     elif len(parts) == 2:
@@ -88,8 +88,16 @@ def repl(m):
     return "(" + "; ".join(intext(k) for k in keys) + ")"
 
 
+text_keys = []
+for m in re.finditer(r"\[@([^\]]+)\]", md):
+    for k in m.group(1).split(";"):
+        k = k.strip().lstrip("@")
+        if k in bib:
+            text_keys.append(k)
+text_keys = sorted(set(text_keys))
 md = re.sub(r"\[@([^\]]+)\]", repl, md)
-refs = sorted([ref(k) for k in cited if k in bib], key=lambda s: s.lower())
+refs = sorted([ref(k) for k in text_keys], key=lambda s: s.lower())
+print("references", len(refs))
 md = md.replace("<!-- REFERENCES -->", "\n\n".join(refs))
 
 figs = [

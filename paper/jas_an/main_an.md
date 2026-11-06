@@ -38,7 +38,7 @@ The paper contributes the protocol itself, an empirical audit on three datasets 
 
 A conformal pipeline fits a model f, calibrates a quantile q on held-out data, and forms C(x) = {y : s(x,y) <= q}. Each stage admits a plausible shortcut, and the protocol turns each shortcut into a probe.
 
-The threshold probe compares four rules: a raw 0.90 threshold, a quantile of the maximum probability, a quantile of the true-class probability, and split conformal with the naive score. The raw rule returns a singleton or an empty set; the maximum-probability rule takes a quantile of a quantity unrelated to the calibration score. For the naive score s(x,y) = 1 - p_y, the true-class threshold t satisfies p_y >= 1 - q, which is exactly the conformal set. We check the identity pointwise as well as in aggregate coverage, since a coverage match can hide set-level disagreement.
+The threshold probe compares four rules: a raw 0.90 threshold, a quantile of the maximum probability, a quantile of the true-class probability, and split conformal with the naive score [@Shafer2008; @Lei2018]. The raw rule returns a singleton or an empty set; the maximum-probability rule takes a quantile of a quantity unrelated to the calibration score. For the naive score s(x,y) = 1 - p_y, the true-class threshold t satisfies p_y >= 1 - q, which is exactly the conformal set. We check the identity pointwise as well as in aggregate coverage, since a coverage match can hide set-level disagreement.
 
 The empty-set probe keeps the raw set and a forced set in which the argmax is inserted only when the raw set is empty. If e is the empty rate and a_E is the fraction of empty-set points on which the argmax is correct, forcing adds one covered point for each such point, so the coverage gain is exactly delta = e a_E. The identity is exact and yields a cost rule: with c_a the loss of abstaining and c_e the loss of a wrong answer, forcing is preferable when c_e (1 - a_E) < c_a, or c_a / c_e > 1 - a_E. The audit estimates a_E as delta / e.
 
@@ -54,15 +54,15 @@ The dashed reporting step is where the three probes act; each probe holds the ot
 
 ### 2.2 Data and experimental grid
 
-Digits contains 1,797 images of 8 by 8 pixels in ten classes. A stratified split holds out 450 test points and 898 training points, with the calibration set drawn from the remaining 449; the model is a standardiser followed by multinomial logistic regression, and the training set is subsampled to 5, 25 and 100 percent (44, 224 and 898 points). CIFAR-10 contributes 50,000 training and 10,000 test images; a pretrained ResNet-18 supplies 512-dimensional features, a logistic-regression head is fitted on 100, 1,000, 5,000 or 30,000 images, and the calibration set is drawn from the remaining 20,000 at sizes 500, 2,000 and 10,000. Covertype is a 581,012-row, 54-feature, seven-class tabular dataset; we use a 120,000-row stratified subset, a logistic regression, training sizes of 6,000 and 60,000, a calibration set of 20,000 and a test set of 40,000.
+Digits contains 1,797 images of 8 by 8 pixels in ten classes. A stratified split holds out 450 test points and 898 training points, with the calibration set drawn from the remaining 449; the model is a standardiser followed by multinomial logistic regression, and the training set is subsampled to 5, 25 and 100 percent (44, 224 and 898 points). CIFAR-10 contributes 50,000 training and 10,000 test images; a pretrained ResNet-18 supplies 512-dimensional features, a logistic-regression head is fitted on 100, 1,000, 5,000 or 30,000 images, and the calibration set is drawn from the remaining 20,000 at sizes 500, 2,000 and 10,000. Covertype is a 581,012-row, 54-feature, seven-class tabular dataset [@Blackard1998]; we use a 120,000-row stratified subset, a logistic regression, training sizes of 6,000 and 60,000, a calibration set of 20,000 and a test set of 40,000.
 
-Four scores enter the grid: the naive score 1 - p_y, randomized APS, deterministic APS and RAPS. The grid crosses score, target level (0.05, 0.10, 0.20), calibration size and model strength. Audit A fixes alpha = 0.10 and compares the four threshold rules; Audit B runs the full score-by-level-by-calibration-by-strength grid, 540 digits cells and 720 CIFAR-10 cells, each evaluated raw and forced; Audit C uses controlled drift streams, with 450 digits points in nine blocks and Gaussian noise rising from 0 to 0.60, and 3,000 CIFAR-10 images in three severity blocks across five corruption types. Five seeds are used for Audits A and B, and three for the CIFAR-10 drift stream.
+Four scores enter the grid: the naive score 1 - p_y [@Sadinle2019], randomized APS [@Romano2020], deterministic APS and RAPS [@RAPS]. The grid crosses score, target level (0.05, 0.10, 0.20), calibration size and model strength. Audit A fixes alpha = 0.10 and compares the four threshold rules; Audit B runs the full score-by-level-by-calibration-by-strength grid, 540 digits cells and 720 CIFAR-10 cells, each evaluated raw and forced; Audit C uses controlled drift streams, with 450 digits points in nine blocks and Gaussian noise rising from 0 to 0.60, and 3,000 CIFAR-10 images in three severity blocks across five corruption types. Five seeds are used for Audits A and B, and three for the CIFAR-10 drift stream.
 
 The grid also serves as the simulation study, varying the factors a deployment can control and includes regimes where the effect should be large and regimes where it should vanish. The tabular replication acts as a stress test, since it changes modality, model and empty rate at once.
 
 ### 2.3 Implementations
 
-We inspect eight implementations: MAPIE 1.6.0, TorchCP 1.2.1, puncc 0.9.3, crepes 0.9.1, coverforest 0.0.3, nonconformist 2.1.0, conformal 0.1 and the AdaptiveConformal R package. All eight were read at source level. Five were run on a common synthetic five-class task, with five seeds for MAPIE and one for the others; TorchCP, coverforest and AdaptiveConformal were read only. The sample deliberately includes two older, smaller packages and covers eight public implementations; a complete census remains future work.
+We inspect eight implementations: MAPIE 1.6.0, TorchCP 1.2.1, puncc 0.9.3, crepes 0.9.1, coverforest 0.0.3, nonconformist 2.1.0, conformal 0.1 and the AdaptiveConformal R package [@mapie2026; @torchcp2026; @puncc2026; @crepes2026; @coverforest2026; @nonconformist2017; @conformal2017; @adaptiveconformal2023]. All eight were read at source level. Five were run on a common synthetic five-class task, with five seeds for MAPIE and one for the others; TorchCP, coverforest and AdaptiveConformal were read only. The sample deliberately includes two older, smaller packages and covers eight public implementations; a complete census remains future work.
 
 ### 2.4 Metrics and the cost rule
 
@@ -78,6 +78,7 @@ On CIFAR-10 with 30,000 training images, the raw threshold returns an empty set 
 
 Table 1 sets the four rules side by side at two training sizes. The gap between the raw and true-class columns is widest when the model is weak and narrows as training grows, while the maximum-probability column never closes it.
 
+::: {.keep}
 ### Table 1. Threshold calibration
 
 | dataset | training | rule | coverage | empty |
@@ -93,6 +94,7 @@ Table 1 sets the four rules side by side at two training sizes. The gap between 
 | CIFAR-10 | 30,000 | true-class | 0.899 | 0.000 |
 
 The true-class rule and split conformal are identical pointwise. The raw threshold is a singleton or empty; its coverage is accuracy on non-abstentions.
+:::
 
 The table isolates the source of the gap: the raw column falls furthest below the target when the model is weak, and the maximum-probability column closes only part of the distance.
 
@@ -235,7 +237,7 @@ The code, results and tables are available at https://github.com/ZhangShaoXuan-H
 
 ## Supplementary material
 
-The supplementary file contains the full tables, the two-axis map, the complete experimental grid, the per-corruption results and the checklist. The main text reports the cells needed for the argument.
+The supplementary file contains the full tables, the complete experimental grid, the per-corruption results and the reporting checklist. The main text reports the cells needed for the argument.
 
 ## References
 

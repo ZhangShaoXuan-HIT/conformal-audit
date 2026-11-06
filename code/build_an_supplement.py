@@ -9,17 +9,15 @@ PAPER = ROOT / "paper"
 AN = PAPER / "jas_an"
 AN.mkdir(exist_ok=True)
 
-jas_supp = (PAPER / "jas" / "supplement_jas.md").read_text(encoding="utf-8")
-s1 = jas_supp.split("## Table S2")[0].rstrip()
-parts = [s1]
+parts = ["# Supplementary material"]
 
 table_map = [
-    ("S2", "table2_equivalence.md"), ("S3", "table3_postprocess.md"),
-    ("S4", "table4_aci.md"), ("S5", "table5_cifar_equivalence.md"),
-    ("S6", "table6_cifar_postprocess.md"), ("S7", "table7_cifar_aci.md"),
-    ("S8", "table8_libraries.md"), ("S9", "table9_coverage.md"),
-    ("S10", "table10_grid.md"), ("S11", "table11_tabular.md"),
-    ("S12", "table12_cost.md"),
+    ("S1", "table2_equivalence.md"), ("S2", "table3_postprocess.md"),
+    ("S3", "table4_aci.md"), ("S4", "table5_cifar_equivalence.md"),
+    ("S5", "table6_cifar_postprocess.md"), ("S6", "table7_cifar_aci.md"),
+    ("S7", "table8_libraries.md"), ("S8", "table9_coverage.md"),
+    ("S9", "table10_grid.md"), ("S10", "table11_tabular.md"),
+    ("S11", "table12_cost.md"),
 ]
 for new, name in table_map:
     txt = (PAPER / "tables" / name).read_text(encoding="utf-8").replace("\r\n", "\n")

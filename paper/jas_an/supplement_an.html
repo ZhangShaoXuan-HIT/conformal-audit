@@ -3,64 +3,7 @@
 material</title>
 <link rel="stylesheet" href="style.css"></head><body><h1
 id="supplementary-material">Supplementary material</h1>
-<h2 id="table-s1.-guarantee-by-data-assumption">Table S1. Guarantee by
-data assumption</h2>
-<p>Each cell gives a representative method, the assumption it needs, and
-the price it pays. “Open” means no method in the reviewed set covers
-that cell.</p>
-<table>
-<colgroup>
-<col style="width: 20%" />
-<col style="width: 20%" />
-<col style="width: 20%" />
-<col style="width: 20%" />
-<col style="width: 20%" />
-</colgroup>
-<thead>
-<tr>
-<th>guarantee</th>
-<th>exchangeable</th>
-<th>covariate shift</th>
-<th>non-exchangeable / temporal</th>
-<th>known groups</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>marginal coverage</td>
-<td>Vovk et al. (2005), Lei et al. (2018), Angelopoulos &amp; Bates
-(2023). One calibration pass.</td>
-<td>Tibshirani et al. (2019). Likelihood ratio known or estimable.</td>
-<td>Barber et al. (2023), Oliveira et al. (2022). Gap bounded by the
-violation.</td>
-<td>Vovk (2012). Per-group quantiles; small n per group.</td>
-</tr>
-<tr>
-<td>group-conditional coverage</td>
-<td>Vovk (2012), Gibbs et al. (2025). Group-wise quantiles; smaller
-effective n.</td>
-<td>open</td>
-<td>open</td>
-<td>Vovk (2012), Gibbs et al. (2025). Group labels known at test.</td>
-</tr>
-<tr>
-<td>pointwise conditional coverage</td>
-<td>Barber et al. (2021), Hore &amp; Barber (2025). Larger sets.</td>
-<td>open</td>
-<td>open</td>
-<td>open</td>
-</tr>
-<tr>
-<td>risk control</td>
-<td>Bates et al. (2021), Angelopoulos et al. (2022), Angelopoulos et
-al. (2025). Monotone loss; grid and multiplicity.</td>
-<td>open in the reviewed set</td>
-<td>Farinhas et al. (2023). Bounded non-exchangeability.</td>
-<td>Combes et al. (2026).</td>
-</tr>
-</tbody>
-</table>
-<h3 id="table-s2.-a-calibrated-threshold-is-split-conformal">Table S2. A
+<h3 id="table-s1.-a-calibrated-threshold-is-split-conformal">Table S1. A
 calibrated threshold is split conformal</h3>
 <p>digits, alpha = 0.10, n_cal = 449, 5 seeds. Coverage is the mean over
 seeds. Raw keeps empty sets; forced fills them with the argmax. Size is
@@ -279,7 +222,7 @@ and split conformal: mismatches = 0.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="table-s3.-non-empty-post-processing-inflates-coverage">Table S3.
+<h3 id="table-s2.-non-empty-post-processing-inflates-coverage">Table S2.
 Non-empty post-processing inflates coverage</h3>
 <p>digits, alpha = 0.10, 5 seeds. Delta = forced coverage - raw
 coverage. Raw empty is the share of sets that were empty before the
@@ -727,7 +670,7 @@ argmax was forced in.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="table-s4.-the-alpha_t-update-is-not-aci">Table S4. The alpha_t
+<h3 id="table-s3.-the-alpha_t-update-is-not-aci">Table S3. The alpha_t
 update is not ACI</h3>
 <p>digits, alpha = 0.10, 5 seeds. Coverage and size are means over
 seeds. Min/max block are computed on the seed-averaged block curve. Clip
@@ -1737,7 +1680,7 @@ sets.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="table-s7.-cifar-10-c-style-drift">Table S7. CIFAR-10-C style
+<h3 id="table-s6.-cifar-10-c-style-drift">Table S6. CIFAR-10-C style
 drift</h3>
 <p>Five corruption types (gaussian_noise, defocus_blur, contrast,
 brightness, jpeg_compression), three severities (1, 3, 5), 1,000 images
@@ -1852,7 +1795,7 @@ Calibration is clean.</p>
 correct one, at a 41 percent larger mean set size, and raises the share
 of near-trivial sets from 14.5 to 38.0 percent. The correct update also
 falls short of 0.90, at 0.828.</p>
-<h3 id="table-s8.-library-behavior-audit">Table S8. Library behavior
+<h3 id="table-s7.-library-behavior-audit">Table S7. Library behavior
 audit</h3>
 <p>Versions checked on 2026-11-06. Line numbers refer to the named files
 in the package versions listed; the source snapshots were downloaded
@@ -2117,7 +2060,7 @@ code calls _get_n_samples_bootstrap without the sample_weight argument
 that the installed scikit-learn requires. TorchCP 1.2.1 was not run: its
 optional graph dependencies (torch_geometric) are not installed. Both
 were read at the source level.</p>
-<h3 id="table-s9.-coverage-against-four-surveys">Table S9. Coverage
+<h3 id="table-s8.-coverage-against-four-surveys">Table S8. Coverage
 against four surveys</h3>
 <p>Authors’ assessment of topical coverage, not of quality. A circle
 means the topic is not a focus of that survey, not that the survey is
@@ -2211,7 +2154,7 @@ open circle = not a focus.</p>
 </table>
 <p>The last two rows are the reason this paper exists. The first six
 rows are the reason it has to cite the other four.</p>
-<h3 id="table-s10.-experimental-grid">Table S10. Experimental grid</h3>
+<h3 id="table-s9.-experimental-grid">Table S9. Experimental grid</h3>
 <table style="width:100%;">
 <colgroup>
 <col style="width: 11%" />
@@ -2276,7 +2219,7 @@ rows are the reason it has to cite the other four.</p>
 <p>The calibration column gives the sizes used in each audit. The
 strength column gives the number of training points used to fit the
 model; the calibration and test sets are disjoint from it.</p>
-<h3 id="table-s11.-covertype-audit-b">Table S11. Covertype audit B</h3>
+<h3 id="table-s10.-covertype-audit-b">Table S10. Covertype audit B</h3>
 <p>120,000-row stratified subset, 54 features, 7 classes, logistic
 regression, 20,000 calibration points, 40,000 test points, alpha = 0.10,
 5 seeds.</p>
@@ -2371,7 +2314,7 @@ regression, 20,000 calibration points, 40,000 test points, alpha = 0.10,
 empty rate x conditional accuracy holds. The empty rate is 0.0 to 0.4
 percent, so the change is 0.0 to 0.4 points. The trap is a regime
 effect, not a universal constant.</p>
-<h3 id="table-s12.-cost-sensitive-reading-of-the-fallback">Table S12.
+<h3 id="table-s11.-cost-sensitive-reading-of-the-fallback">Table S11.
 Cost-sensitive reading of the fallback</h3>
 <p>At alpha = 0.10, over cells with a non-zero raw empty rate. a_E is
 the conditional accuracy of the inserted label on empty sets, estimated

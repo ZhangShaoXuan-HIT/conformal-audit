@@ -98,13 +98,14 @@ a plausible shortcut, and the protocol turns each shortcut into a
 probe.</p>
 <p>The threshold probe compares four rules: a raw 0.90 threshold, a
 quantile of the maximum probability, a quantile of the true-class
-probability, and split conformal with the naive score. The raw rule
-returns a singleton or an empty set; the maximum-probability rule takes
-a quantile of a quantity unrelated to the calibration score. For the
-naive score s(x,y) = 1 - p_y, the true-class threshold t satisfies p_y
-&gt;= 1 - q, which is exactly the conformal set. We check the identity
-pointwise as well as in aggregate coverage, since a coverage match can
-hide set-level disagreement.</p>
+probability, and split conformal with the naive score (Shafer &amp;
+Vovk, 2008; Lei et al., 2018). The raw rule returns a singleton or an
+empty set; the maximum-probability rule takes a quantile of a quantity
+unrelated to the calibration score. For the naive score s(x,y) = 1 -
+p_y, the true-class threshold t satisfies p_y &gt;= 1 - q, which is
+exactly the conformal set. We check the identity pointwise as well as in
+aggregate coverage, since a coverage match can hide set-level
+disagreement.</p>
 <p>The empty-set probe keeps the raw set and a forced set in which the
 argmax is inserted only when the raw set is empty. If e is the empty
 rate and a_E is the fraction of empty-set points on which the argmax is
@@ -147,11 +148,12 @@ pretrained ResNet-18 supplies 512-dimensional features, a
 logistic-regression head is fitted on 100, 1,000, 5,000 or 30,000
 images, and the calibration set is drawn from the remaining 20,000 at
 sizes 500, 2,000 and 10,000. Covertype is a 581,012-row, 54-feature,
-seven-class tabular dataset; we use a 120,000-row stratified subset, a
-logistic regression, training sizes of 6,000 and 60,000, a calibration
-set of 20,000 and a test set of 40,000.</p>
-<p>Four scores enter the grid: the naive score 1 - p_y, randomized APS,
-deterministic APS and RAPS. The grid crosses score, target level (0.05,
+seven-class tabular dataset (Blackard, 1998); we use a 120,000-row
+stratified subset, a logistic regression, training sizes of 6,000 and
+60,000, a calibration set of 20,000 and a test set of 40,000.</p>
+<p>Four scores enter the grid: the naive score 1 - p_y (Sadinle et al.,
+2019), randomized APS (Romano et al., 2020), deterministic APS and RAPS
+(Angelopoulos et al., 2021). The grid crosses score, target level (0.05,
 0.10, 0.20), calibration size and model strength. Audit A fixes alpha =
 0.10 and compares the four threshold rules; Audit B runs the full
 score-by-level-by-calibration-by-strength grid, 540 digits cells and 720
@@ -168,12 +170,15 @@ once.</p>
 <h3 id="implementations">2.3 Implementations</h3>
 <p>We inspect eight implementations: MAPIE 1.6.0, TorchCP 1.2.1, puncc
 0.9.3, crepes 0.9.1, coverforest 0.0.3, nonconformist 2.1.0, conformal
-0.1 and the AdaptiveConformal R package. All eight were read at source
-level. Five were run on a common synthetic five-class task, with five
-seeds for MAPIE and one for the others; TorchCP, coverforest and
-AdaptiveConformal were read only. The sample deliberately includes two
-older, smaller packages and covers eight public implementations; a
-complete census remains future work.</p>
+0.1 and the AdaptiveConformal R package (MAPIE contributors, 2026;
+TorchCP contributors, 2026; puncc contributors, 2026; crepes
+contributors, 2026; coverforest contributors, 2026; Linusson, 2017;
+Koul, 2017; Susmann et al., 2023). All eight were read at source level.
+Five were run on a common synthetic five-class task, with five seeds for
+MAPIE and one for the others; TorchCP, coverforest and AdaptiveConformal
+were read only. The sample deliberately includes two older, smaller
+packages and covers eight public implementations; a complete census
+remains future work.</p>
 <h3 id="metrics-and-the-cost-rule">2.4 Metrics and the cost rule</h3>
 <p>For each cell we record coverage, mean set size, the raw empty rate,
 the share of near-trivial sets, class coverage, expected calibration
@@ -205,8 +210,8 @@ across the CIFAR grid.</p>
 gap between the raw and true-class columns is widest when the model is
 weak and narrows as training grows, while the maximum-probability column
 never closes it.</p>
-<h3 id="table-1.-threshold-calibration">Table 1. Threshold
-calibration</h3>
+<section id="table-1.-threshold-calibration" class="keep">
+<h3>Table 1. Threshold calibration</h3>
 <table>
 <thead>
 <tr>
@@ -286,6 +291,7 @@ calibration</h3>
 <p>The true-class rule and split conformal are identical pointwise. The
 raw threshold is a singleton or empty; its coverage is accuracy on
 non-abstentions.</p>
+</section>
 <p>The table isolates the source of the gap: the raw column falls
 furthest below the target when the model is weak, and the
 maximum-probability column closes only part of the distance.</p>
@@ -647,8 +653,8 @@ Writing - review &amp; editing, Visualization.</p>
 https://github.com/ZhangShaoXuan-HIT/conformal-audit and archived at
 https://doi.org/10.5281/zenodo.24001054.</p>
 <h2 id="supplementary-material">Supplementary material</h2>
-<p>The supplementary file contains the full tables, the two-axis map,
-the complete experimental grid, the per-corruption results and the
+<p>The supplementary file contains the full tables, the complete
+experimental grid, the per-corruption results and the reporting
 checklist. The main text reports the cells needed for the argument.</p>
 <h2 id="references">References</h2>
 <p>Aguru, M. K. (2026). What Split Conformal Prediction Guarantees, and
@@ -663,26 +669,10 @@ Sensors Letters. https://doi.org/10.1109/lsens.2026.3748815</p>
 <p>Angelopoulos, A. N., &amp; Bates, S. (2023). Conformal Prediction: A
 Gentle Introduction. Foundations and Trends in Machine Learning 16(4),
 494-591. https://doi.org/10.1561/2200000101</p>
-<p>Angelopoulos, A. N., Bates, S., Candès, E. J., Jordan, M. I., &amp;
-Lei, L. (2025). Learn then Test: Calibrating Predictive Algorithms to
-Achieve Risk Control. Annals of Applied Statistics 19(2), 1641–1662.
-https://doi.org/10.1214/24-AOAS1998</p>
-<p>Angelopoulos, A. N., Bates, S., Fisch, A., Lei, L., &amp; Schuster,
-T. (2022). Conformal Risk Control. arXiv:2208.02814. Preprint.</p>
 <p>Angelopoulos, A. N., Bates, S., Malik, J., &amp; Jordan, M. I.
 (2021). Uncertainty Sets for Image Classifiers using Conformal
 Prediction. International Conference on Learning Representations (ICLR
 2021). arXiv:2009.14193.</p>
-<p>Barber, R. F., Candès, E. J., Ramdas, A., &amp; Tibshirani, R. J.
-(2021). The Limits of Distribution-Free Conditional Predictive
-Inference. Information and Inference 10(2), 455–482.
-https://doi.org/10.1093/imaiai/iaaa017</p>
-<p>Barber, R. F., Candès, E. J., Ramdas, A., &amp; Tibshirani, R. J.
-(2023). Conformal Prediction Beyond Exchangeability. Annals of
-Statistics 51(2), 816–845. https://doi.org/10.1214/23-AOS2276</p>
-<p>Bates, S., Angelopoulos, A. N., Lei, L., Malik, J., &amp; Jordan, M.
-I. (2021). Distribution-Free, Risk-Controlling Prediction Sets. Journal
-of the ACM 68(6), 1–34. https://doi.org/10.1145/3478535</p>
 <p>Blackard, J. A. (1998). Covertype. UCI Machine Learning Repository.
 https://doi.org/10.24432/C50K5N</p>
 <p>Boman, S. E. (2026). Benchmarking non-conformity score functions in
@@ -691,37 +681,17 @@ conformal prediction. arXiv:2605.24983. Preprint.</p>
 Martins, A. F. T. (2024). Conformal Prediction for Natural Language
 Processing: A Survey. Transactions of the Association for Computational
 Linguistics 12, 1497-1516. https://doi.org/10.1162/tacl_a_00715</p>
-<p>Cohen, K. M., Park, S., Simeone, O., &amp; Shamai, S. S. (2024).
-Cross-Validation Conformal Risk Control. IEEE International Symposium on
-Information Theory (ISIT 2024), 250–255.
-https://doi.org/10.1109/isit57864.2024.10619172</p>
-<p>Combes, J., Coeurjolly, J., &amp; Derville, A. (2026). Macro Mondrian
-Conformal Risk Control. https://doi.org/10.48550/arxiv.2610.35035
-Preprint.</p>
-<p>coverforest contributors (2026). coverforest: conformal prediction
+<p>coverforest contributors. (2026). coverforest: conformal prediction
 with random forests. version 0.0.3.
 https://pypi.org/project/coverforest/</p>
-<p>crepes contributors (2026). crepes: conformal regressors and
+<p>crepes contributors. (2026). crepes: conformal regressors and
 predictive systems. version 0.9.1. https://pypi.org/project/crepes/</p>
-<p>Farinhas, A., Zerva, C., Ulmer, D., &amp; Martins, A. F. T. (2023).
-Non-Exchangeable Conformal Risk Control. arXiv:2310.01262. Preprint.</p>
 <p>Fontana, M., Zeni, G., &amp; Vantini, S. (2023). Conformal
 prediction: A unified review of theory and new challenges. Bernoulli
 29(1), 1-23. https://doi.org/10.3150/21-BEJ1447</p>
 <p>Gauthier, E., Bach, F., &amp; Jordan, M. I. (2025). Adaptive Coverage
 Policies in Conformal Prediction.
 https://doi.org/10.48550/arxiv.2510.04318 Preprint.</p>
-<p>Gibbs, I., &amp; Candès, E. J. (2021). Adaptive Conformal Inference
-Under Distribution Shift. Advances in Neural Information Processing
-Systems 34 (NeurIPS 2021). arXiv:2106.00170.</p>
-<p>Gibbs, I., Cherian, J. J., &amp; Candès, E. J. (2025). Conformal
-Prediction with Conditional Guarantees. Journal of the Royal Statistical
-Society: Series B 87(4), 1100–1126.
-https://doi.org/10.1093/jrsssb/qkaf008</p>
-<p>Hore, R., &amp; Barber, R. F. (2025). Conformal Prediction with Local
-Weights: Randomization Enables Robust Guarantees. Journal of the Royal
-Statistical Society: Series B 87(2), 549–578.
-https://doi.org/10.1093/jrsssb/qkae103</p>
 <p>Koul, A. (2017). conformal: a minimal conformal prediction
 implementation for classification. version 0.1.
 https://pypi.org/project/conformal/</p>
@@ -732,20 +702,14 @@ https://doi.org/10.1080/01621459.2017.1307116</p>
 <p>Linusson, H. (2017). nonconformist: Python implementation of the
 conformal prediction framework. version 2.1.0.
 https://github.com/donlnz/nonconformist</p>
-<p>MAPIE contributors (2026). MAPIE: a scikit-learn-contrib package for
+<p>MAPIE contributors. (2026). MAPIE: a scikit-learn-contrib package for
 conformal prediction. version 1.6.0. https://pypi.org/project/mapie/</p>
 <p>Mehrtens, H., Bucher, T., &amp; Brinker, T. J. (2025). Pitfalls of
 Conformal Predictions for Medical Image Classification.
 arXiv:2506.18162. Preprint.</p>
-<p>Oliveira, R. I., Orenstein, P., Ramos, T. R., &amp; Romano, J. V.
-(2022). Split Conformal Prediction and Non-Exchangeable Data.
-https://doi.org/10.48550/arxiv.2203.15885 Preprint.</p>
-<p>puncc contributors (2026). puncc: predictive uncertainty calibration
+<p>puncc contributors. (2026). puncc: predictive uncertainty calibration
 and conformal prediction. version 0.9.3.
 https://pypi.org/project/puncc/</p>
-<p>Romano, Y., Patterson, E., &amp; Candes, E. J. (2019). Conformalized
-Quantile Regression. Advances in Neural Information Processing Systems
-32 (NeurIPS 2019). arXiv:1905.03222.</p>
 <p>Romano, Y., Sesia, M., &amp; Candès, E. J. (2020). Classification
 with Valid and Adaptive Coverage. Advances in Neural Information
 Processing Systems 33 (NeurIPS 2020). arXiv:2006.02544.</p>
@@ -759,14 +723,8 @@ https://doi.org/10.5555/1390681.1390693</p>
 <p>Susmann, H., Chambaz, A., &amp; Josse, J. (2023). AdaptiveConformal:
 an R package for adaptive conformal inference. arXiv:2312.00448.
 Preprint.</p>
-<p>Tibshirani, R. J., Barber, R. F., Candès, E. J., &amp; Ramdas, A.
-(2019). Conformal Prediction Under Covariate Shift. Advances in Neural
-Information Processing Systems 32 (NeurIPS 2019). arXiv:1904.06019.</p>
-<p>TorchCP contributors (2026). TorchCP: a Python library for conformal
+<p>TorchCP contributors. (2026). TorchCP: a Python library for conformal
 prediction. version 1.2.1. https://pypi.org/project/torchcp/</p>
-<p>Vovk, V. (2012). Conditional validity of inductive conformal
-predictors. ACML 2012, PMLR 25, 475-490.
-https://proceedings.mlr.press/v25/vovk12.html</p>
 <p>Vovk, V., Gammerman, A., &amp; Shafer, G. (2005). Algorithmic
 Learning in a Random World. Springer, New York.
 https://doi.org/10.1007/b106715</p>

@@ -1,18 +1,6 @@
 # Supplementary material
 
-## Table S1. Guarantee by data assumption
-
-Each cell gives a representative method, the assumption it needs, and the price it pays.
-"Open" means no method in the reviewed set covers that cell.
-
-| guarantee | exchangeable | covariate shift | non-exchangeable / temporal | known groups |
-|---|---|---|---|---|
-| marginal coverage | Vovk et al. (2005), Lei et al. (2018), Angelopoulos & Bates (2023). One calibration pass. | Tibshirani et al. (2019). Likelihood ratio known or estimable. | Barber et al. (2023), Oliveira et al. (2022). Gap bounded by the violation. | Vovk (2012). Per-group quantiles; small n per group. |
-| group-conditional coverage | Vovk (2012), Gibbs et al. (2025). Group-wise quantiles; smaller effective n. | open | open | Vovk (2012), Gibbs et al. (2025). Group labels known at test. |
-| pointwise conditional coverage | Barber et al. (2021), Hore & Barber (2025). Larger sets. | open | open | open |
-| risk control | Bates et al. (2021), Angelopoulos et al. (2022), Angelopoulos et al. (2025). Monotone loss; grid and multiplicity. | open in the reviewed set | Farinhas et al. (2023). Bounded non-exchangeability. | Combes et al. (2026). |
-
-### Table S2. A calibrated threshold is split conformal
+### Table S1. A calibrated threshold is split conformal
 
 digits, alpha = 0.10, n_cal = 449, 5 seeds. Coverage is the mean over seeds.
 Raw keeps empty sets; forced fills them with the argmax. Size is mean cardinality.
@@ -53,7 +41,7 @@ Pointwise set equality between the conformal threshold and split conformal: mism
 
 
 
-### Table S3. Non-empty post-processing inflates coverage
+### Table S2. Non-empty post-processing inflates coverage
 
 digits, alpha = 0.10, 5 seeds. Delta = forced coverage - raw coverage.
 Raw empty is the share of sets that were empty before the argmax was forced in.
@@ -111,7 +99,7 @@ Raw empty is the share of sets that were empty before the argmax was forced in.
 
 
 
-### Table S4. The alpha_t update is not ACI
+### Table S3. The alpha_t update is not ACI
 
 digits, alpha = 0.10, 5 seeds. Coverage and size are means over seeds.
 Min/max block are computed on the seed-averaged block curve. Clip is the share of steps at a clip bound.
@@ -234,7 +222,7 @@ Delta = forced coverage - raw coverage. Raw empty is the share of empty sets.
 | 30000 | RAPS | 0.894 | 0.929 | +0.035 | 0.036 | 1.261 | 1.297 |
 
 
-### Table S7. CIFAR-10-C style drift
+### Table S6. CIFAR-10-C style drift
 
 Five corruption types (gaussian_noise, defocus_blur, contrast, brightness,
 jpeg_compression), three severities (1, 3, 5), 1,000 images per block, 3,000
@@ -263,7 +251,7 @@ The incorrect update reports 10.8 points more coverage than the correct one, at 
 14.5 to 38.0 percent. The correct update also falls short of 0.90, at 0.828.
 
 
-### Table S8. Library behavior audit
+### Table S7. Library behavior audit
 
 Versions checked on 2026-11-06. Line numbers refer to the named files in the
 package versions listed; the source snapshots were downloaded locally for the audit.
@@ -324,7 +312,7 @@ scikit-learn requires. TorchCP 1.2.1 was not run: its optional graph dependencie
 (torch_geometric) are not installed. Both were read at the source level.
 
 
-### Table S9. Coverage against four surveys
+### Table S8. Coverage against four surveys
 
 Authors' assessment of topical coverage, not of quality. A circle means the topic is not
 a focus of that survey, not that the survey is deficient. Symbols: full circle =
@@ -345,7 +333,7 @@ The last two rows are the reason this paper exists. The first six rows are the r
 has to cite the other four.
 
 
-### Table S10. Experimental grid
+### Table S9. Experimental grid
 
 | dataset | train pool | strengths | calibration | test | model | scores | alpha | seeds |
 |---|---|---|---|---|---|---|---|---|
@@ -358,7 +346,7 @@ the number of training points used to fit the model; the calibration and test se
 disjoint from it.
 
 
-### Table S11. Covertype audit B
+### Table S10. Covertype audit B
 
 120,000-row stratified subset, 54 features, 7 classes, logistic regression,
 20,000 calibration points, 40,000 test points, alpha = 0.10, 5 seeds.
@@ -379,7 +367,7 @@ conditional accuracy holds. The empty rate is 0.0 to 0.4 percent, so the change 
 0.0 to 0.4 points. The trap is a regime effect, not a universal constant.
 
 
-### Table S12. Cost-sensitive reading of the fallback
+### Table S11. Cost-sensitive reading of the fallback
 
 At alpha = 0.10, over cells with a non-zero raw empty rate. a_E is the
 conditional accuracy of the inserted label on empty sets, estimated as
