@@ -1095,6 +1095,14 @@ The author reports no conflict of interest.
 
 This research received no specific grant from any funding agency.
 
+## Declaration of generative AI use
+
+The author used a generative AI assistant (DeepSeek) for code development, data analysis, and drafting/editing of the manuscript. The author verified all results, analyses, and references and takes full responsibility for the content.
+
+## CRediT authorship contribution statement
+
+Shaoxuan Zhang: Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Data curation, Writing - original draft, Writing - review & editing, Visualization.
+
 ## Data availability statement
 
 The experiments are implemented in a single Python repository with fixed seeds.

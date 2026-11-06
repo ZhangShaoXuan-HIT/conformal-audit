@@ -118,8 +118,10 @@ python code/build_jas.py
 ```
 
 This builds `paper/jas/main_jas.pdf` (manuscript, author-date references,
-186-word abstract) and `paper/jas/supplement_jas.pdf` (Tables S1-S3), plus
-`paper/jas/cover_letter.md`. The package uses Harvard/APA author-date citations,
+186-word abstract), `paper/jas/main_jas.docx` (editable Word manuscript with
+embedded figures), and `paper/jas/supplement_jas.pdf` (Tables S1-S3), plus
+`paper/jas/cover_letter.md`. The DOCX includes the required declaration of
+generative AI use. The package uses Harvard/APA author-date citations,
 12 pt Times at 1.55 spacing, and 8 pt tables. T&F's author-instructions page was
 not accessible at build time; verify the journal's exact reference style, page
 limit and spacing before submission.

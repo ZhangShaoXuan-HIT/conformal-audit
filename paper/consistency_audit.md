@@ -274,3 +274,12 @@ T&F's author instructions were not reachable (Cloudflare), so the exact JAS
 reference variant, spacing and page limit remain unverified. The manuscript is
 11,871 words; if JAS enforces a shorter limit, trim Sections 2.3-2.5, 3 and 7
 first.
+
+
+## Update: JAS DOCX and AI declaration (2026-11-06)
+
+A .docx manuscript was generated (504 KB, 5 embedded figures, 18 tables) with
+the declaration of generative AI use and CRediT statement. It is editable and
+satisfies the journal's format-free Word submission and editable-revision
+requirements. The manuscript is still 42 pages; JAS limits Research/Review
+articles to 20 pages and Application Notes to 15, so it is not yet compliant.

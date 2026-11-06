@@ -126,6 +126,14 @@ body = body.replace(
     "## Data availability statement",
     "## Disclosure statement\n\nThe author reports no conflict of interest.\n\n"
     "## Funding\n\nThis research received no specific grant from any funding agency.\n\n"
+    "## Declaration of generative AI use\n\n"
+    "The author used a generative AI assistant (DeepSeek) for code development, data analysis, "
+    "and drafting/editing of the manuscript. The author verified all results, analyses, and "
+    "references and takes full responsibility for the content.\n\n"
+    "## CRediT authorship contribution statement\n\n"
+    "Shaoxuan Zhang: Conceptualization, Methodology, Software, Validation, Formal analysis, "
+    "Investigation, Data curation, Writing - original draft, Writing - review & editing, "
+    "Visualization.\n\n"
     "## Data availability statement"
 )
 body = body.replace(
@@ -257,4 +265,10 @@ def build(md_name, html_name, pdf_name, title):
 
 build("main_jas.md", "main_jas.html", "main_jas.pdf", "What Does Conformal Prediction Add?")
 build("supplement_jas.md", "supplement_jas.html", "supplement_jas.pdf", "Supplementary material")
+img_dir = str(PAPER / "figures").replace("\\", "/")
+docx_md = re.sub(r"!\[([^\]]*)\]\(\.\./figures/([^)]+)\)",
+                 r"![\1](" + img_dir + r"/\2){width=6.5in}", main_jas)
+(JAS / "main_jas_docx.md").write_text(docx_md, encoding="utf-8")
+pypandoc.convert_file(str(JAS / "main_jas_docx.md"), "docx", outputfile=str(JAS / "main_jas.docx"),
+                      extra_args=["--resource-path=" + str(JAS)])
 print("main words", len(re.sub(r"[#*|]", " ", main_jas).split()))
